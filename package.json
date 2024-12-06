@@ -1,0 +1,30 @@
+{
+  "name": "mobify",
+  "version": "1.0.0",
+  "description": "This is an e-commerce Platform. This is my first project. it is a website that can be used for buying new and refurbished phones. I will complete within 2 months. I am super exited to do that. Thank you all.",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Aljo00/Mobify.git"
+  },
+  "author": "Aljo Joju",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Aljo00/Mobify/issues"
+  },
+  "homepage": "https://github.com/Aljo00/Mobify#readme",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "mongodb": "^6.11.0",
+    "mongoose": "^8.8.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}

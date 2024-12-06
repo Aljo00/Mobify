@@ -1,0 +1,357 @@
+/* Custom styles on top of Bootstrap */
+
+/* Banner styles */
+.hero-section {
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Samsung banner */
+.samsung-banner {
+    background: linear-gradient(45deg, #1a237e, #0d47a1, #1565c0);
+    color: white;
+}
+
+.samsung-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 70% center, rgba(255,255,255,0.1) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+/* iPhone banner */
+.iphone-banner {
+    background: linear-gradient(45deg, #1a1a1a, #2c2c2c, #404040);
+    color: white;
+}
+
+.iphone-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%),
+        radial-gradient(circle at 30% 50%, rgba(255,255,255,0.08) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+/* OnePlus banner */
+.oneplus-banner {
+    background: linear-gradient(45deg, #8b0000, #cc0000, #ff1a1a);
+    color: white;
+}
+
+.oneplus-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 30% center, rgba(0,0,0,0.3) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+/* Common banner styles */
+.hero-section .display-4 {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.hero-section .lead {
+    font-size: 1.4rem;
+    margin-bottom: 2rem;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+.hero-section .btn-light {
+    padding: 0.8rem 2rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    background: rgba(255,255,255,0.9);
+}
+
+.hero-section .btn-light:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    background: #ffffff;
+}
+
+.hero-section img {
+    max-height: 500px;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
+    transition: transform 0.3s ease;
+}
+
+.hero-section:hover img {
+    transform: translateY(-5px);
+}
+
+/* Product card styles */
+.product-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Card image sizing */
+.card-img-top {
+    height: 200px;
+    object-fit: contain;
+    padding: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+/* Social icons */
+.social-icons i {
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.social-icons i:hover {
+    color: #007bff;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .hero-section {
+        text-align: center;
+    }
+    
+    .hero-section img {
+        margin-top: 2rem;
+    }
+}
+
+/* Custom animations */
+.btn {
+    transition: transform 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Navbar link hover animation */
+.navbar-nav .nav-link {
+    position: relative;
+    padding: 0.5rem 1rem;
+    transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 50%;
+    background-color: #007bff;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.navbar-nav .nav-link:hover {
+    color: #007bff;
+}
+
+.navbar-nav .nav-link:hover::after {
+    width: 70%;
+}
+
+/* Newsletter input styling */
+.footer input[type="email"] {
+    background-color: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+}
+
+.footer input[type="email"]::placeholder {
+    color: rgba(255,255,255,0.5);
+}
+
+/* Icons group styling */
+.icons-group {
+    display: flex;
+    align-items: center;
+}
+
+/* Icon hover animations */
+.icons-group a {
+    position: relative;
+    transition: transform 0.3s ease;
+}
+
+.icons-group a:hover {
+    transform: translateY(-3px);
+    color: #007bff !important;
+}
+
+/* Responsive adjustments for icons */
+@media (max-width: 768px) {
+    .icons-group {
+        margin-top: 1rem;
+    }
+}
+
+/* Product card enhancements */
+.badge {
+    font-size: 0.8rem;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+}
+
+.price-info {
+    font-size: 1.1rem;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-warning:hover {
+    background-color: #ffb300;
+    transform: translateY(-2px);
+}
+
+/* Rating stars */
+.rating {
+    font-size: 0.9rem;
+}
+
+/* Wishlist button */
+.btn-wishlist {
+    background: white;
+    border: none;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    color: #dc3545;
+}
+
+.btn-wishlist:hover {
+    transform: scale(1.1);
+    color: #c82333;
+}
+
+/* Search input styling */
+.input-group .form-control {
+    border-right: none;
+}
+
+.input-group .search-icon {
+    background-color: white;
+    border-left: none;
+    cursor: pointer;
+}
+
+.input-group .search-icon:hover {
+    color: #007bff;
+}
+
+.input-group .form-control:focus {
+    border-color: #dee2e6;
+    box-shadow: none;
+}
+
+.input-group .form-control:focus + .search-icon {
+    border-color: #dee2e6;
+}
+
+/* Carousel styling */
+.carousel {
+    position: relative;
+    overflow: hidden;
+}
+
+.carousel-item {
+    transition: transform 0.6s ease-in-out;
+}
+
+.carousel-item img {
+    max-height: 500px;
+    object-fit: contain;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+    width: 5%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.carousel:hover .carousel-control-prev,
+.carousel:hover .carousel-control-next {
+    opacity: 0.8;
+}
+
+.carousel-indicators {
+    bottom: 20px;
+}
+
+.carousel-indicators button {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin: 0 5px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.carousel-indicators button.active {
+    background-color: #fff;
+    transform: scale(1.2);
+}

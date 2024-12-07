@@ -1,0 +1,130 @@
+<%- include('../../views/layout/header.ejs')%>
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<!-- Custom CSS -->
+<link rel="stylesheet" href="/styles/user/signup.css">
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-primary" href="#">Mobify</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</nav>
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-lg">
+                <div class="row g-0">
+                    <!-- Welcome Image -->
+                    <div class="col-md-6 d-none d-md-block welcome-side">
+                        <div class="welcome-image h-100 d-flex flex-column justify-content-center align-items-center text-white p-4 text-center">
+                            <img src="https://img.freepik.com/free-vector/sign-up-concept-illustration_114360-7965.jpg" alt="Welcome" class="img-fluid mb-4">
+                            <h3>Welcome to Mobify</h3>
+                            <p>Your one-stop destination for mobile phones and accessories.</p>
+                        </div>
+                    </div>
+                    <!-- Sign Up Form -->
+                    <div class="col-md-6">
+                        <div class="card-body p-4">
+                            <h2 class="text-center mb-3 text-primary fw-bold">Create Account</h2>
+                            <p class="text-center text-muted mb-4">Join us and explore the world of smartphones</p>
+                            <form novalidate method="post" action="/signup">
+                                <div class="mb-3">
+                                    <label for="fullName" class="form-label">Full Name</label>
+                                    <input type="text" class="form-control form-control-sm" id="fullName" name="name" required minlength="3" maxlength="30">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email address</label>
+                                    <input type="email" class="form-control form-control-sm" id="email" name="email" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control form-control-sm" id="phone" name="phone" required pattern="[0-9]{10}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Password</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="password" class="form-control" id="password" name="password" required minlength="8">
+                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                            <i class="far fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div id="passwordRequirements" class="mt-2 small">
+                                        <p class="mb-1">Password must contain:</p>
+                                        <div class="requirement" id="lengthReq">
+                                            <i class="fas fa-times text-danger"></i> At least 8 characters
+                                        </div>
+                                        <div class="requirement" id="upperReq">
+                                            <i class="fas fa-times text-danger"></i> One uppercase letter
+                                        </div>
+                                        <div class="requirement" id="lowerReq">
+                                            <i class="fas fa-times text-danger"></i> One lowercase letter
+                                        </div>
+                                        <div class="requirement" id="numberReq">
+                                            <i class="fas fa-times text-danger"></i> One number
+                                        </div>
+                                        <div class="requirement" id="specialReq">
+                                            <i class="fas fa-times text-danger"></i> One special character
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                                        <button class="btn btn-outline-secondary" type="button" id="toggleConfirmPassword">
+                                            <i class="far fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-sm w-100 mb-3">Sign Up</button>
+                                <button type="button" class="btn btn-outline-dark btn-sm w-100 mb-3 d-flex align-items-center justify-content-center">
+                                    <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png" alt="Google" class="google-icon me-2">
+                                    Sign up with Google
+                                </button>
+                                <p class="text-center mb-0 small">Already have an account? <a href="/login" class="text-primary text-decoration-none">Login here</a></p>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-dark py-2 mt-4">
+    <div class="container">
+        <div class="row align-items-center g-3">
+            <div class="col-md-4 text-center text-md-start">
+                <a class="navbar-brand fw-bold text-primary mb-0" href="#">Mobify</a>
+                <p class="text-muted small mb-0">Your trusted mobile store</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="social-links">
+                    <a href="#" class="text-muted mx-2"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-muted mx-2"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-muted mx-2"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="col-md-4 text-center text-md-end">
+                <p class="mb-0 text-muted small">&copy; 2023 Mobify. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Custom JS -->
+<script src="/scripts/user/signup.js"> </script>
+
+<%- include('../../views/layout/footer.ejs')%>

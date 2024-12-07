@@ -42,19 +42,9 @@
     text-shadow: 2px 2px 10px rgba(0, 123, 255, 0.2);
 }
 
-/* Home Cover Full-Screen */
-main.container {
-    min-height: 100vh; /* Full-screen height */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
 /* Footer styles */
 footer {
     background: linear-gradient(to right, #1a1a1a, #2d2d2d) !important;
-    color: #ffffff !important; /* White text */
 }
 
 footer h5 {
@@ -67,7 +57,7 @@ footer h5 {
 footer p, 
 footer a,
 footer li {
-    color: rgba(255, 255, 255, 0.9) !important;
+    color: rgba(255, 255, 255, 0.8) !important;
     text-decoration: none;
     transition: color 0.3s ease;
     line-height: 1.8;

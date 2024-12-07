@@ -1,0 +1,167 @@
+/* Base styles */
+body {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Card styles */
+.card {
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+/* Form styles */
+.form-control {
+    border-radius: 6px;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid #dee2e6;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Button styles */
+.btn {
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+    transform: translateY(-1px);
+}
+
+.btn-outline-dark {
+    transition: all 0.3s ease;
+}
+
+.btn-outline-dark:hover {
+    transform: translateY(-1px);
+}
+
+/* Google icon */
+.google-icon {
+    height: 18px;
+    width: auto;
+    object-fit: contain;
+}
+
+/* Welcome side styles */
+.welcome-side {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+}
+
+.welcome-image img {
+    max-width: 80%;
+    height: auto;
+}
+
+.welcome-image h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.welcome-image p {
+    opacity: 0.9;
+    font-size: 0.9rem;
+}
+
+/* Password requirements styles */
+#passwordRequirements {
+    font-size: 0.85rem;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+#passwordRequirements.show {
+    display: block;
+    opacity: 1;
+}
+
+.requirement {
+    margin-bottom: 0.25rem;
+    transition: all 0.3s ease;
+}
+
+.requirement i {
+    width: 16px;
+    margin-right: 4px;
+}
+
+.text-success {
+    color: #198754 !important;
+}
+
+.text-danger {
+    color: #dc3545 !important;
+}
+
+/* Footer styles */
+footer {
+    background: linear-gradient(to right, #1a1a1a, #2d2d2d) !important;
+    margin-top: auto;
+}
+
+footer .navbar-brand {
+    color: #fff !important;
+    font-size: 1.2rem;
+}
+
+footer .social-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+footer .social-links a {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7) !important;
+    transition: all 0.3s ease;
+}
+
+footer .social-links a:hover {
+    color: #fff !important;
+    transform: translateY(-2px);
+}
+
+footer .text-muted {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .welcome-side {
+        display: none;
+    }
+
+    footer .row > div {
+        text-align: center !important;
+        margin-bottom: 0.5rem;
+    }
+
+    footer .social-links {
+        margin: 0.5rem 0;
+    }
+}

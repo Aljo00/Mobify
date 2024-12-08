@@ -21,6 +21,18 @@ const load_page404 = async (req,res) => {
 
 }
 
+const load_page404 = async (req,res) => {
+
+    try {
+
+        res.status(404).render("user/page404")
+        
+    } catch (error) {
+        res.redirect('/page404')
+    }
+
+}
+
 const load_landing = async (req,res) => {
     
     try {
@@ -61,6 +73,7 @@ const load_signuppage = async (req,res) => {
 
 }
 
+<<<<<<< HEAD
 function generateOtp(){
     return Math.floor(100000 + Math.random() * 900000).toString();
 }
@@ -203,6 +216,21 @@ const resendOtp = async (req,res) => {
     } catch (error) {
         console.log("error in resending otp:-- ",error.message)
         res.status(500).json({success:false, message:"An error occured"})
+=======
+const addUser = async (req,res) => {
+    
+    const {name,email,phone,password} = req.body
+    try {
+
+        const newUser = new User({name,email,phone,password})
+        console.log(newUser)
+        await newUser.save();
+        res.render("user/login")
+        
+    } catch (error) {
+        console.log(error.message)
+        res.status(500).send("Server error")
+>>>>>>> 2995d72858372e5c4d1a9e4014a1d58a7e94bcdc
     }
 
 }
@@ -212,7 +240,11 @@ module.exports = {
     load_page404,
     load_loginpage,
     load_signuppage,
+<<<<<<< HEAD
     addUser,
     verifyOtp,
     resendOtp
+=======
+    addUser
+>>>>>>> 2995d72858372e5c4d1a9e4014a1d58a7e94bcdc
 }

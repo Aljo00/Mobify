@@ -25,9 +25,12 @@
     "express-session": "^1.18.1",
     "mongodb": "^6.11.0",
     "mongoose": "^8.8.4",
+<<<<<<< HEAD
     "nodemailer": "^6.9.16",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
+=======
+>>>>>>> 2995d72858372e5c4d1a9e4014a1d58a7e94bcdc
     "uuid": "^11.0.3"
   },
   "devDependencies": {

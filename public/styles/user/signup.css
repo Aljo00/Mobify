@@ -164,7 +164,6 @@ footer .text-muted {
     footer .social-links {
         margin: 0.5rem 0;
     }
-<<<<<<< HEAD
 }
 
 /* EJS Alert Styles */
@@ -189,6 +188,4 @@ footer .text-muted {
         opacity: 1;
         transform: translateY(0);
     }
-=======
->>>>>>> 2995d72858372e5c4d1a9e4014a1d58a7e94bcdc
 }

@@ -198,11 +198,4 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!isConfirmPasswordValid) validateInput(confirmPassword);
         }
     });
-<<<<<<< HEAD
 });
-
-
-
-=======
-});
->>>>>>> 2995d72858372e5c4d1a9e4014a1d58a7e94bcdc

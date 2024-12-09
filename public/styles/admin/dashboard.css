@@ -1,0 +1,36 @@
+body {
+    background-color: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+.sidebar {
+    height: 100vh;
+    background-color: #343a40;
+    padding: 20px;
+    z-index: 10;
+}
+.sidebar a {
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+    display: block;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+.sidebar a:hover {
+    background-color: #495057;
+}
+.main-content {
+    padding: 20px;
+    flex-grow: 1;
+}
+.card {
+    margin-bottom: 20px;
+}
+footer {
+    background-color: #000000;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+}

@@ -22,10 +22,6 @@
                 <li class="nav-item"><a class="nav-link" href="#">Deals</a></li>
                 <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
             </ul>
-            <div class="d-flex align-items-center">
-                <a href="/login" class="btn btn-outline-primary me-2">Login</a>
-                <a href="/signup" class="btn btn-primary">Sign Up</a>
-            </div>
             <form class="d-flex me-3">
                 <div class="input-group">
                     <input class="form-control" type="search" placeholder="Search products...">
@@ -36,9 +32,23 @@
             </form>
             <div class="icons-group me-2">
                 <a href="#" class="text-dark me-3"><i class="far fa-heart fs-5"></i></a>
-                <a href="#" class="text-dark me-3"><i class="far fa-user fs-5"></i></a>
                 <a href="#" class="text-dark"><i class="fas fa-shopping-cart fs-5"></i></a>
             </div>
+            <% if (locals.user) {%>
+                <div class="dropdown">
+                    <a href="#" class="sign-in-link"><%=locals.user.name%></a>
+                    <div class="dropdown-content">
+                        <a href="#">Profile</a>
+                        <a href="/logout">logout</a>
+                    </div>
+                </div>
+            <%} else {%>
+            <div class="d-flex align-items-center">
+                <a href="/login" class="btn btn-outline-primary me-2">Login</a>
+                <a href="/signup" class="btn btn-primary">Sign Up</a>
+            </div>
+            <%}%>
+            
         </div>
     </div>
 </nav>
@@ -51,48 +61,22 @@
 </main>
 
 <!-- Footer -->
-<footer class="bg-dark text-light py-3 mt-4">
+<footer class="bg-dark py-2 mt-4">
     <div class="container">
-        <div class="row">
-            <div class="col-md-3 mb-3">
-                <h5 class="mb-2">About Mobify</h5>
-                <p class="text-muted small">Your trusted destination for mobile phones. We offer the best deals on the latest smartphones.</p>
+        <div class="row align-items-center g-3">
+            <div class="col-md-4 text-center text-md-start">
+                <a class="navbar-brand fw-bold text-primary mb-0" href="#">Mobify</a>
+                <p class="text-muted small mb-0">Your trusted mobile store</p>
             </div>
-            <div class="col-md-3 mb-3">
-                <h5 class="mb-2">Quick Links</h5>
-                <ul class="list-unstyled small">
-                    <li><a href="#" class="text-muted">About Us</a></li>
-                    <li><a href="#" class="text-muted">Contact Us</a></li>
-                    <li><a href="#" class="text-muted">Privacy Policy</a></li>
-                    <li><a href="#" class="text-muted">Terms & Conditions</a></li>
-                </ul>
-            </div>
-            <div class="col-md-3 mb-3">
-                <h5 class="mb-2">Customer Service</h5>
-                <ul class="list-unstyled small">
-                    <li><a href="#" class="text-muted">FAQ</a></li>
-                    <li><a href="#" class="text-muted">Shipping Info</a></li>
-                    <li><a href="#" class="text-muted">Returns</a></li>
-                    <li><a href="#" class="text-muted">Order Status</a></li>
-                </ul>
-            </div>
-            <div class="col-md-3 mb-3">
-                <h5 class="mb-2">Connect With Us</h5>
+            <div class="col-md-4 text-center">
                 <div class="social-links">
-                    <a href="#" class="text-muted me-3"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="text-muted me-3"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="text-muted me-3"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="text-muted"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="text-muted mx-2"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-muted mx-2"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-muted mx-2"><i class="fab fa-instagram"></i></a>
                 </div>
             </div>
-        </div>
-        <hr class="my-2 bg-secondary">
-        <div class="row align-items-center">
-            <div class="col-md-6 text-center text-md-start">
+            <div class="col-md-4 text-center text-md-end">
                 <p class="mb-0 text-muted small">&copy; 2023 Mobify. All rights reserved.</p>
-            </div>
-            <div class="col-md-6 text-center text-md-end">
-                <img src="https://i.ibb.co/Qfvn4z6/payment.png" alt="Payment Methods" class="img-fluid" style="max-width: 200px;">
             </div>
         </div>
     </div>

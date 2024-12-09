@@ -10,7 +10,11 @@ const session = require('express-session')
 //requiring the user_routes file
 const user_route = require("./routes/user_routes");
 
+const admin_route = require("./routes/admin_routes")
+
 const passport = require("./config/passport");
+
+const nocache = require("nocache")
 
 //midlleware uses for parsing json data and encoding the url datas
 app.use(express.json());
@@ -32,6 +36,8 @@ app.use(session({
     }
 }));
 
+app.use(nocache())
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -48,6 +54,7 @@ app.set("views", './views');
 app.use(express.static('public'));
 
 app.use('/',user_route);
+app.use('/admin',admin_route);
 
 //Starting the server
 const PORT = process.env.PORT || 3005

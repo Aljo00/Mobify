@@ -12,10 +12,14 @@ const load_page404 = async (req, res) => {
     }
 };
 
-const load_landing = async (req, res) => {
+const load_homePage = async (req, res) => {
     try {
-        console.log("User in landing page");
-        return res.render("user/home");
+
+        const user = req.session.user
+        console.log(user)
+        const userData = user ? await User.findById(user) : null;
+        return res.render("user/home", {user: userData});
+
     } catch (error) {
         console.log("Error found: ", error.message);
         res.status(500).send("Server error");
@@ -65,7 +69,7 @@ async function emailVerification(email, otp) {
                 <h1>Welcome to Mobify!</h1>
                 <p>To complete your sign-up process, please use the OTP below:</p>
                 <h2>${otp}</h2>
-                <p>This OTP is valid for the next <strong>10 minutes</strong>. Do not share it with anyone.</p>
+                <p>This OTP is valid for the next <strong>2 minutes</strong>. Do not share it with anyone.</p>
                 <br>
                 <p>If you did not request this, please contact our support at <a href="mailto:support@mobify.com">support@mobify.com</a>.</p>
                 <p>Thank you, <br> Mobify Team</p>
@@ -165,12 +169,73 @@ const resendOtp = async (req, res) => {
     }
 };
 
+const verifyLogin = async (req,res) => {
+
+    try {
+
+        const {email,password} = req.body;
+
+        const findUser = await User.findOne({isAdmin: 0, email: email});
+
+        if(!findUser){
+            return res.render("user/login",{message: "No user found"})
+        }
+
+        if(findUser.isBlocked){
+            return res.render("user/login",{message: "User is blocked by the admin"})
+        }
+
+        if(findUser.googleId){
+            return res.render("user/login",{message: "You used the google sign"})
+        }
+
+        const passwordMatch = await bcrypt.compare(password, findUser.password)
+
+        if(!passwordMatch){
+            return res.render("user/login",{message: "Incorrect Password"})
+        }
+
+        req.session.user = findUser._id;
+        console.log(req.session.user)
+        res.redirect("/");
+        
+    } catch (error) {
+
+        console.log("An error occured in the login page :-- ",error.message);
+        res.render("user/login",{message:"Login Failed! Please try again"})
+        
+    }
+    
+}
+
+const logout = async (req,res) => {
+
+    try {
+
+        req.session.destroy((err)=>{
+            if(err){
+                console.log("Session destroy error:- ", err.message)
+                return res.redirect('/page404')
+            }
+
+            return res.redirect("/login");
+        })
+        
+    } catch (error) {
+        console.log("Session destroy error:- ", error.message)
+        return res.redirect('/page404')
+    }
+    
+}
+
 module.exports = {
-    load_landing,
+    load_homePage,
     load_page404,
     load_loginpage,
     load_signuppage,
     addUser,
     verifyOtp,
-    resendOtp
+    resendOtp,
+    verifyLogin,
+    logout
 };

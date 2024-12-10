@@ -7,7 +7,7 @@ const brandSchema = new Schema({
         required: true
     },
     brandImage: {
-        type: [String],
+        type: String,
         required: true
     },
     isBlocked: {

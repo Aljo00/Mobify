@@ -65,9 +65,30 @@ const loadDashboard = async (req,res) => {
     
 }
 
+const logout = async (req,res) => {
+
+    try {
+
+        req.session.destroy(err =>{
+            if(err){
+                console.log("error in distroying the session :-- ",err.message);
+                return res.redirect('/admin/error')
+            }
+
+            res.redirect("/admin/login")
+        })
+        
+    } catch (error) {
+        console.log("Error found: ", error.message);
+        res.redirect("/admin/error")
+    }
+    
+}
+
 module.exports = {
     loadLogin,
     verifyAdminLogin,
     loadDashboard,
-    show_error
+    show_error,
+    logout
 }

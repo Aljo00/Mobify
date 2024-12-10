@@ -3,10 +3,10 @@
 // if not it will redirect to the login page.
 const is_AdminLogin = async (req, res, next) => {
     try {
-        if (req.session.user) {
+        if (req.session.admin) {
             next();
         } else {
-            res.redirect('/login');
+            res.redirect('/admin/login');
         }
     } catch (error) {
         console.log(error.message);
@@ -16,8 +16,8 @@ const is_AdminLogin = async (req, res, next) => {
 //if exists it will redirect to the home page.
 const is_AdminLogout = async (req, res, next) => {
     try {
-        if (req.session.user) {
-            res.redirect('/');
+        if (req.session.admin) {
+            res.redirect('/admin/dashboard');
         } else {
             next();
         }

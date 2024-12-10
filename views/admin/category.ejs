@@ -1,0 +1,105 @@
+<%- include('../../views/layout/header.ejs')%>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<link rel="stylesheet" href="/styles/admin/category.css">
+
+<div class="d-flex">
+    <div class="sidebar">
+        <h2 class="text-white">Admin Dashboard</h2>
+        <a href="/admin/dashboard">Dashboard</a>
+        <a href="/admin/users">Users</a>
+        <a id="live-dashboard-button" href="#" style="background-color: #007bff; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none;">Categories</a>
+        <a href="/admin/brands">Brands</a>
+        <a href="#">Orders</a>
+        <a href="#">Reports</a>
+        <a href="#">Settings</a>
+        <a href="#">Logout</a>
+    </div>
+    <div class="main-content flex-grow-1">
+        <div class="container">
+            <div class="category-management">
+                <div class="text-center">
+                    <h1 class="my-4">Category Management</h1>
+                </div>
+                <div class="breadcrumb-container">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Category Management</li>
+                        </ol>
+                    </nav>
+                </div>                
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Actions</th>
+                                <th>List</th>
+                                <th>Unlist</th>
+                                <th>Add Offer</th>
+                                <th>Remove Offer</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% cat.reverse().forEach((category,index)=> { %>
+                                <tr>
+                                    <td><%= category.name %></td>
+                                    <td><%= category.description %></td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="/admin/editCategory?id=<%= category._id %>" class="btn btn-warning btn-sm">Edit</a>
+                                            <button class="btn btn-danger btn-sm" onclick="softDeleteCategory('<%= category._id %>')">Delete</button>
+                                        </div>
+                                    </td>
+                                    <td><button class="btn btn-success btn-sm">List</button></td>
+                                    <td><button class="btn btn-secondary btn-sm">Unlist</button></td>
+                                    <td><button class="btn btn-info btn-sm">Add Offer</button></td>
+                                    <td><button class="btn btn-danger btn-sm">Remove Offer</button></td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2 class="my-4 text-center">Add New Category</h2>
+                <div class="d-flex justify-content-center">
+                    <form class="w-50" method="post" onsubmit="return handleFormSumbit(event)">
+                        <div class="mb-3">
+                            <label for="categoryName" class="form-label">Name:</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                            <div id="name-error" class="error-message text-danger"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="categoryDescription" class="form-label">Description:</label>
+                            <input type="text" class="form-control" id="description" name="description" required>
+                            <div id="description-error" class="error-message text-danger"></div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer>
+    <div class="container text-center">
+        <p class="mb-0">&copy; 2023 Mobify. All rights reserved.</p>
+    </div>
+</footer>
+
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Include jQuery before your script -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="/scripts/admin/addCategory.js"></script>
+
+
+<%- include('../../views/layout/footer.ejs')%>

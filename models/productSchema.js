@@ -23,7 +23,7 @@ const productSchema = new Schema({
         required: true
     },
     salePrice: {
-        typr: Number,
+        type: Number,
         required: true
     },
     offer: {
@@ -32,7 +32,7 @@ const productSchema = new Schema({
     },
     quantity: {
         type: Number,
-        default: true
+        default: 0
     },
     colors: {
         type: [String],
@@ -53,7 +53,7 @@ const productSchema = new Schema({
         default:"Available"
     }
 
-}, {Timestamp: true})
+}, {timestamps: true})
 
 const Product = mongoose.model("Product", productSchema);
 

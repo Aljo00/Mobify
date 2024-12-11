@@ -11,6 +11,8 @@ const categoryController = require("../controllers/admin/categoryController");
 
 const brandController = require("../controllers/admin/brandController");
 
+const productController = require("../controllers/admin/productController");
+
 const multer = require("multer");
 
 const storage = require("../helpers/multer");
@@ -50,6 +52,13 @@ admin_route.post('/deleteCategory/:id', categoryController.softDeleteCategory);
 admin_route.get("/brands",adminAuth.is_AdminLogin,brandController.loadBrandPage)
 
 admin_route.post("/addBrands",uploads.single("image"),brandController.addBrands)
+
+//Admin Prduct Management Routes
+admin_route.get('/addProducts',adminAuth.is_AdminLogin,productController.loadProductAddPage)
+
+admin_route.post('/addProducts',uploads.array("images",4),productController.addProducts)
+
+admin_route.get('/products',adminAuth.is_AdminLogin,productController.getAllProducts);
 
 
 

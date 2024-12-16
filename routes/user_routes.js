@@ -4,6 +4,8 @@ const user_router = express.Router();
 const user_controller = require('../controllers/user/user_controller');
 const passport = require("passport");
 
+const User = require("../models/userSchema")
+
 const userAuth = require("../middleware/userAuth")
 
 user_router.get('/',user_controller.load_homePage);
@@ -23,22 +25,44 @@ user_router.get('/auth/google', passport.authenticate('google', { scope: ['profi
 user_router.get(
     "/auth/google/callback",
     passport.authenticate("google", { failureRedirect: "/login" }),
-    (req, res) => {
-        // Regenerate session for Google user
-        req.session.regenerate((err) => {
-            if (err) {
-                console.error("Error regenerating session:", err);
-                return res.redirect("/login");
+    async (req, res) => {
+        try {
+            // Check if the user is blocked
+            const user = await User.findById(req.user._id); // Fetch the user from the database
+
+            if (user.isBlocked) {
+                // If the user is blocked, destroy the session and redirect to login
+                req.session.destroy((err) => {
+                    if (err) {
+                        console.error("Error destroying session:", err);
+                    }
+                    return res.render("user/login",{message: "User is blocked by the admin"})
+                });
+
+                // console.log(`the user is blocked ${User.name}`)
+
+
+
+            } else {
+                // Regenerate session for the valid Google user
+                req.session.regenerate((err) => {
+                    if (err) {
+                        console.error("Error regenerating session:", err);
+                        return res.redirect("/login");
+                    }
+
+                    req.session.user = req.user._id;
+
+                    res.redirect("/");
+                });
             }
-
-            // Save the Google user's ID in the session
-            req.session.user = req.user._id; // Use Google ID for session management
-            req.session.isGoogleUser = true; // Optional: Mark the session as Google-authenticated
-
-            res.redirect("/"); // Redirect to homepage or desired location
-        });
+        } catch (error) {
+            console.error("Error checking user block status:", error);
+            res.redirect("/login?message=An error occurred. Please try again.");
+        }
     }
 );
+
 
 
 user_router.get('/login',userAuth.is_UserLogout,user_controller.load_loginpage)

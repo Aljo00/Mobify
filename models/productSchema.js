@@ -14,18 +14,32 @@ const productSchema = new Schema({
         type: String,
         required: true
     },
-    category:{
-        type: String,
-        required: true
-    },
-    regularPrice: {
-        type: Number,
-        required: true
-    },
-    salePrice: {
-        type: Number,
-        required: true
-    },
+    combos: [{
+        ram: {
+            type: String,
+            required: true
+        },
+        storage: {
+            type: String,
+            required: true
+        },
+        regularPrice: {
+            type: Number,
+            required: true
+        },
+        salePrice: {
+            type: Number,
+            required: true
+        },
+        quantity: {
+            type: Number,
+            required: true
+        },
+        color: {
+            type: String,
+            required: true
+        }
+    }],
     offer: {
         type: Number,
         default: 0
@@ -33,10 +47,6 @@ const productSchema = new Schema({
     quantity: {
         type: Number,
         default: 0
-    },
-    colors: {
-        type: [String],
-        required: true
     },
     productImage: {
         type:[String],

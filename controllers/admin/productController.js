@@ -26,62 +26,54 @@ const loadProductAddPage = async (req,res) => {
     
 }
 
-const addProducts = async (req,res) => {
-
+const addProducts = async (req, res) => {
+    console.log(req.body);
     try {
+        
+        const {  productName, brand, description, category, combos } = req.body;
 
-        console.log(req.body)
-        const products = req.body;
-        const productExists = await Product.findOne({
-            productName:products.productName
+        // Handle image upload and resizing
+        const imagePaths = [];
+        if (req.files && req.files.length > 0) {
+            for (let i = 0; i < req.files.length; i++) {
+                const imagePath = req.files[i].filename;
+                imagePaths.push(imagePath);
+            }
+        }
+
+        if (combos) {
+            console.log("Combos Data:", combos);  // Log the combos data
+            const parsedCombos = JSON.parse(combos);  // Parse combos if it's a stringified JSON
+            console.log("Parsed Combos:", parsedCombos);  // Log parsed combos
+        }
+
+        // Check if the product already exists
+        const existingProduct = await Product.findOne({ productName });
+        if (existingProduct) {
+            return res.status(400).json({ error: "Product already exists" });
+        }
+
+        const combosArray = JSON.parse(combos);
+
+        // Save the new product
+        const newProduct = new Product({
+            productName,
+            description,
+            brand,
+            category,
+            combos: combosArray, // Combos array that includes RAM, Storage, Prices, etc.
+            productImage: imagePaths,
+            status: "Available"
         });
 
-        console.log(productExists)
+        await newProduct.save();
+        res.redirect("/admin/addProducts");
 
-        if(!productExists){
-            const images = [];
-            if(req.files && req.files.length > 0){
-                for (let i = 0; i < req.files.length; i++) {
-                    const orginalImagePath = req.files[i].path;
-
-                    const reSizedImagesPath = path.join('public','uploads','product-images',req.files[i].filename);
-                    await sharp(orginalImagePath).resize({width:440,height:440}).toFile(reSizedImagesPath);
-                    images.push(req.files[i].filename);
-                }
-            }
-
-            const categoryId = await Category.findOne({name:products.category});
-
-            const newProduct = new Product({
-                productName: products.productName,
-                description: products.description,
-                brand: products.brand,
-                category: categoryId._id,
-                regularPrice: products.regularPrice,
-                salePrice: products.salePrice,
-                createdAt: new Date(),
-                quantity:products.quantity,
-                size: products.size,
-                color: products.color,
-                productImage: images,
-                status:"Available"
-            });
-
-            await newProduct.save()
-            console.log("Product Added successfully")
-
-            return res.redirect("/admin/addProducts")
-
-        }else{
-            res.status(400).json("Product is already Exists, Please try with another name")
-        }
-        
     } catch (error) {
-        console.log("Error found in Product Management side: ", error.message);
-        res.redirect("/admin/error");
+        console.error("Error adding product:", error);
+        res.status(500).send("Internal server error");
     }
-    
-}
+};
 
 const getAllProducts = async (req,res) => {
 
@@ -90,8 +82,25 @@ const getAllProducts = async (req,res) => {
         const search = req.query.search || "";
         const page = req.query.page || 1;
         const limit = 4;
+        const skip = (page-1)*limit;
 
-        
+        const productData = await Product.find({
+            $or:[
+                {productName:{$regex: new RegExp(".*"+search+".*","i")}},
+                {brand:{$regex: new RegExp(".*"+search+".*","i")}}
+            ]
+        })
+        .limit(limit)
+        .skip(skip)
+        .populate('category')
+        .exec()
+
+        const count = await Product.find({
+            $or:[
+                {productName:{$regex: new RegExp(".*"+search+".*","i")}},
+                {brand:{$regex: new RegExp(".*"+search+".*","i")}}
+            ]
+        }).countDocuments()
         
     } catch (error) {
         console.log("Error found in Product Management side: ", error.message);

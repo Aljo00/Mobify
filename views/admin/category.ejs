@@ -12,7 +12,7 @@
         <a id="live-dashboard-button" href="#" style="background-color: #007bff; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none;">Categories</a>
         <a href="/admin/brands">Brands</a>
         <a href="/admin/addProducts">Add Products</a>
-        <a href="#">Reports</a>
+        <a href="/admin/products">Products</a>
         <a href="#">Settings</a>
         <a href="#">Logout</a>
     </div>
@@ -37,8 +37,6 @@
                                 <th>Name</th>
                                 <th>Description</th>
                                 <th>Actions</th>
-                                <th>List</th>
-                                <th>Unlist</th>
                                 <th>Add Offer</th>
                                 <th>Remove Offer</th>
                             </tr>
@@ -54,8 +52,6 @@
                                             <button class="btn btn-danger btn-sm" onclick="softDeleteCategory('<%= category._id %>')">Delete</button>
                                         </div>
                                     </td>
-                                    <td><button class="btn btn-success btn-sm">List</button></td>
-                                    <td><button class="btn btn-secondary btn-sm">Unlist</button></td>
                                     <td><button class="btn btn-info btn-sm">Add Offer</button></td>
                                     <td><button class="btn btn-danger btn-sm">Remove Offer</button></td>
                                 </tr>

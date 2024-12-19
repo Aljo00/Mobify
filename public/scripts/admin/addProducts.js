@@ -59,6 +59,13 @@ function viewImage(event, index) {
             background: false,
             autoCropArea: 1,
             zoomable: true,
+            ready() {
+                // Set the crop box dimensions here
+                this.cropper.setCropBoxData({
+                    width: 283.15, 
+                    height: 220 
+                });
+            }
         });
 
         const cropperContainer = document.querySelector("#croppedImg" + index).parentNode;
@@ -66,7 +73,10 @@ function viewImage(event, index) {
 
         const saveButton = document.querySelector("#saveButton" + index);
         saveButton.addEventListener("click", async () => {
-            const croppedCanvas = cropper.getCroppedCanvas();
+            const croppedCanvas = cropper.getCroppedCanvas({
+                width:283.15,
+                height:220
+            });
             const croppedImage = document.getElementById("croppedImg" + index);
             croppedImage.src = croppedCanvas.toDataURL("image/jpeg", 1.0);
 
@@ -190,10 +200,6 @@ addComboBtn.addEventListener("click", () => {
             <input name="ram" type="text" class="form-control border" required>
         </div>
         <div class="col-lg-3">
-            <label class="form-label">Color</label>
-            <input name="color" type="text" class="form-control border" required>
-        </div>
-        <div class="col-lg-3">
             <label class="form-label">Storage</label>
             <input name="storage" type="text" class="form-control border" required>
         </div>
@@ -208,6 +214,10 @@ addComboBtn.addEventListener("click", () => {
         <div class="col-lg-3">
             <label class="form-label">Sale Price</label>
             <input name="salePrice" type="number" class="form-control border" required>
+        </div>
+        <div class="col-lg-3">
+            <label class="form-label">Color</label>
+            <input name="color" type="text" class="form-control border" placeholder="e.g., Red, Blue, Green" required>
         </div>
         <div class="col-lg-3 d-flex align-items-center">
             <button type="button" class="btn btn-danger delete-combo-btn">Delete</button>
@@ -260,4 +270,17 @@ function clearErrorMessages() {
         element.innerText = "";
         element.style.display = "none";
     });
+}
+
+function deleteSingleImage(imageId, productId) {
+    $.ajax({
+        url:"/admin/deleteimage",
+        method:"POST",
+        data:{imageNameToServer: imageId, productIdToServer: productId},
+        success:((response)=>{
+            if(response.status === true){
+                window.location.reload()
+            }
+        })
+    })
 }

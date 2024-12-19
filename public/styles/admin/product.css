@@ -41,48 +41,6 @@
     background-color: #495057;
 }
 
-/* Main Content */
-.content-main {
-    margin-left: 270px; /* Offset for the fixed sidebar */
-    padding: 20px;
-    background-color: #f8f9fa;
-    min-height: 100vh;
-}
-
-.content-header {
-    background-color: #e9ecef;
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-}
-
-.content-title {
-    font-size: 24px;
-    color: #333;
-    font-weight: bold;
-}
-
-.card {
-    background-color: white;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    padding: 20px;
-}
-
-.card h4 {
-    font-size: 18px;
-    margin-bottom: 15px;
-    color: #007bff;
-}
-
-.breadcrumb-container {
-    margin-bottom: 20px;
-    padding: 10px 15px;
-    background: linear-gradient(90deg, #f8f9fa, #e9ecef);
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
 .breadcrumb {
     display: flex;
     align-items: center;
@@ -119,49 +77,182 @@
     font-weight: 600;
 }
 
-.error-message {
-    color: red;
-    font-size: 12px;
-    margin-top: 5px;
+/* Content Header */
+.content-header {
+    margin-left: 270px; /* Adjust for the sidebar width */
+    padding: 20px 0;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
 }
 
-/* Input & Select Fields */
-input.form-control,
-select.form-select,
-textarea.form-control {
-    border-radius: 5px;
-    border: 1px solid #ced4da;
-    padding: 10px;
+/* Breadcrumb container */
+.breadcrumb-container {
+    margin-left: 270px; /* Align with the content area */
+    padding: 15px;
+    background: #e9ecef;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Right Table */
+.right {
+    margin-left: 270px; /* Adjust for the sidebar */
+    margin-right: 20px;
+}
+
+table.table {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+table.table th,
+table.table td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 15px;
+}
+
+table.table tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
 }
 
 /* Buttons */
-button {
+.btn-info a,
+.btn-danger a,
+.btn-success a {
+    color: white;
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-info:hover {
+    background-color: #138496;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+/* Sidebar - Highlight Active Link */
+.sidebar a.active,
+#live-dashboard-button {
     background-color: #007bff;
     color: white;
-    padding: 10px 20px;
+    font-weight: bold;
+}
+
+/* Updated Search Bar */
+.input-group {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* Slightly stronger shadow for depth */
+    background-color: #f8f9fa; /* Light gray background for contrast */
+    border-radius: 10px; /* Decreased radius */
+    overflow: hidden;
+    position: relative; /* Ensures proper placement */
+    margin-top: 15px; /* Add spacing to avoid overlapping the navbar */
+    width: 80%; /* Center it with a nice width */
+    max-width: 600px; /* Prevent it from being too large */
+    margin-left: auto; /* Center align horizontally */
+    margin-right: auto; /* Center align horizontally */
+}
+
+.input-group input {
+    padding: 12px 15px;
+    font-size: 16px; /* Increase font size for readability */
     border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+    border-radius: 10px 0 0 10px; /* Adjust border radius */
+    outline: none;
+    background-color: #ffffff; /* Bright input box */
+    color: #495057; /* Neutral text color */
+    width: 85%; /* Adjust width for alignment */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle inner shadow */
 }
 
-button:hover {
-    background-color: #0056b3;
+.input-group input::placeholder {
+    color: #adb5bd; /* Light gray placeholder text */
 }
 
-/* File Upload Section */
-#addedImagesContainer img {
-    max-width: 100px;
-    margin: 10px;
-    border: 1px solid #ced4da;
-    border-radius: 5px;
-    padding: 5px;
-}
-
-
-footer {
-    background-color: #000000;
+.input-group button {
     color: white;
-    text-align: center;
-    padding: 10px 0;
+    background-color: #007bff;
+    border: none;
+    border-radius: 0 10px 10px 0; /* Adjust border radius */
+    padding: 12px 20px; /* Even spacing */
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 15%; /* Button aligns with the input */
+}
+
+.input-group button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+    transform: scale(1.05); /* Add slight zoom effect */
+}
+
+/* Table Headers */
+table.table thead th {
+    background-color: #007bff;
+    color: white;
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif; /* Change font to a modern one */
+    letter-spacing: 0.5px; /* Add spacing between letters */
+}
+
+/* Table Content */
+table.table tbody td {
+    font-size: 14px;
+    font-family: 'Roboto', sans-serif; /* Set a clean font for table rows */
+    color: #495057;
+    padding: 15px;
+}
+
+/* Adjustments for Responsive Design */
+@media (max-width: 768px) {
+    .sidebar {
+        position: relative;
+        width: 100%;
+        min-height: auto;
+    }
+
+    .content-header,
+    .breadcrumb-container,
+    .right {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .input-group {
+        width: 100%;
+    }
+
+    table.table thead th,
+    table.table tbody td {
+        font-size: 12px;
+    }
 }

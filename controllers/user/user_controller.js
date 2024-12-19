@@ -1,4 +1,7 @@
 const User = require('../../models/userSchema');
+const Brand = require('../../models/brandSchema');
+const Category = require('../../models/categorySchema');
+const Product = require('../../models/productSchema');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const { response } = require('../../app');
@@ -14,12 +17,63 @@ const load_page404 = async (req, res) => {
 
 const load_homePage = async (req, res) => {
     try {
+        const categories = await Category.find({ isListed: true });
 
-        const user = req.session.user
-        console.log(user)
+        // Pagination parameters
+        const page = parseInt(req.query.page) || 1; // Current page
+        const limit = 6; // Items per page
+        const skip = (page - 1) * limit; // Items to skip
+
+        // Fetch Refurbished Phones
+        const refurbishedCount = await Product.countDocuments({
+            isBlocked: false,
+            combos: { $elemMatch: { quantity: { $gt: 0 } } },
+            category: "Refurbished Phones", // Replace with the actual category identifier for refurbished phones
+        });
+
+        const refurbishedPhones = await Product.find({
+            isBlocked: false,
+            combos: { $elemMatch: { quantity: { $gt: 0 } } },
+            category: "Refurbished Phones",
+        })
+            .sort({ createdOn: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        // Fetch New Phones
+        const newCount = await Product.countDocuments({
+            isBlocked: false,
+            combos: { $elemMatch: { quantity: { $gt: 0 } } },
+            category: "New Phone", // Replace with the actual category identifier for new phones
+        });
+
+        const newPhones = await Product.find({
+            isBlocked: false,
+            combos: { $elemMatch: { quantity: { $gt: 0 } } },
+            category: "New Phone",
+        })
+            .sort({ createdOn: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        // Calculate total pages for pagination
+        const totalPagesRefurbished = Math.ceil(refurbishedCount / limit);
+        const totalPagesNew = Math.ceil(newCount / limit);
+
+        const user = req.session.user;
+        const brand = await Brand.find({}).limit(7);
+
         const userData = user ? await User.findById(user) : null;
-        return res.render("user/home", {user: userData});
 
+        return res.render("user/home", {
+            user: userData,
+            brand: brand,
+            refurbishedPhones,
+            newPhones,
+            currentPage: page,
+            totalPagesRefurbished,
+            totalPagesNew,
+        });
     } catch (error) {
         console.log("Error found: ", error.message);
         res.status(500).send("Server error");

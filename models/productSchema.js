@@ -14,6 +14,10 @@ const productSchema = new Schema({
         type: String,
         required: true
     },
+    category:{
+        type: String,
+        required: true
+    },
     combos: [{
         ram: {
             type: String,
@@ -36,15 +40,17 @@ const productSchema = new Schema({
             required: true
         },
         color: {
-            type: String,
+            type: [String],
             required: true
+        },   
+        status: {
+            type: String,
+            enum: ["Available", "Out of Stock", "Discontinued"],
+            required: true,
+            default:"Available"
         }
     }],
     offer: {
-        type: Number,
-        default: 0
-    },
-    quantity: {
         type: Number,
         default: 0
     },
@@ -55,12 +61,6 @@ const productSchema = new Schema({
     isBlocked: {
         type: Boolean,
         default: false
-    },
-    status: {
-        type: String,
-        enum: ["Available", "Out of Stock", "Discontinued"],
-        required: true,
-        default:"Available"
     }
 
 }, {timestamps: true})

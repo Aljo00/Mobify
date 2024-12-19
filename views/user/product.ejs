@@ -1,0 +1,176 @@
+<%- include('../../views/layout/header.ejs') %>
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<!-- Custom CSS -->
+<link rel="stylesheet" href="/styles/user/home.css">
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-primary" href="/">Mobify</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link active" href="/">Home</a></li>
+                <%for(let i = 0; i < brand.length; i++) {%>
+                <li class="nav-item"><a class="nav-link" href="#"><%= brand[i].brandName%></a></li>
+                <%}%>
+            </ul>
+            <form class="d-flex me-3" method="get">
+                <div class="input-group">
+                    <input class="form-control" type="search" name="search" placeholder="Search products...">
+                    <button class="input-group-text search-icon" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>            
+            <div class="icons-group me-2">
+                <a href="#" class="text-dark me-3"><i class="far fa-heart fs-5"></i></a>
+                <a href="#" class="text-dark"><i class="fas fa-shopping-cart fs-5"></i></a>
+            </div>
+            <% if (locals.user) {%>
+                <div class="dropdown">
+                    <a href="#" class="sign-in-link"><%=locals.user.name%></a>
+                    <div class="dropdown-content">
+                        <a href="#">Profile</a>
+                        <a href="/logout">logout</a>
+                    </div>
+                </div>
+            <%} else {%>
+            <div class="d-flex align-items-center">
+                <a href="/login" class="btn btn-outline-primary me-2">Login</a>
+                <a href="/signup" class="btn btn-primary">Sign Up</a>
+            </div>
+            <%}%>
+            
+        </div>
+    </div>
+</nav>
+
+
+
+
+<div class="container">
+    <!-- Product Section -->
+    <div class="product-details">
+        <div class="row">
+            <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <% product.productImage.forEach((image, index) => { %>
+                        <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                            <img src="/uploads/re-image/<%= image %>" class="d-block w-100" alt="Product Image">
+                        </div>
+                    <% }) %>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>            
+
+            <!-- Product Info -->
+            <div class="col-lg-6">
+                <h1 class="product-title"><%= product.productName %></h1>
+                <p class="brand">Brand: <%= product.brand %></p>
+                              
+                <p class="description">
+                    <%= product.description || "No description available" %>
+                </p>
+                <div class="product-combos">
+                    <div class="ram-options">
+                        <h5>RAM:</h5>
+                        <% product.combos.map(combo => combo.ram).forEach((ramOption, index) => { %>
+                            <a href="/product/<%= product._id %>?ram=<%= ramOption %>&storage=<%= storage || product.combos[0].storage %>&color=<%= color || product.combos[0].color %>"
+                               class="btn <%= ram === ramOption ? 'btn-primary' : 'btn-outline-primary' %>">
+                                <%= ramOption %> GB
+                            </a>
+                        <% }); %>
+                    </div>
+                
+                    <div class="storage-options">
+                        <h5>Storage:</h5>
+                        <% product.combos.map(combo => combo.storage).forEach((storageOption, index) => { %>
+                            <a href="/product/<%= product._id %>?ram=<%= ram || product.combos[0].ram %>&storage=<%= storageOption %>&color=<%= color || product.combos[0].color %>"
+                               class="btn <%= storage === storageOption ? 'btn-primary' : 'btn-outline-primary' %>">
+                                <%= storageOption %> GB
+                            </a>
+                        <% }); %>
+                    </div>
+                
+                    <div class="color-options">
+                        <h5>Color:</h5>
+                        <% product.combos.map(combo => combo.color).forEach((colorOption, index) => { %>
+                            <a href="/product/<%= product._id %>?ram=<%= ram || product.combos[0].ram %>&storage=<%= storage || product.combos[0].storage %>&color=<%= colorOption %>"
+                               class="btn <%= color === colorOption ? 'btn-primary' : 'btn-outline-primary' %>">
+                                <%= colorOption %>
+                            </a>
+                        <% }); %>
+                    </div>
+                </div>
+                
+                <div class="product-price-section">
+                    <% if (selectedCombo && selectedCombo.quantity > 0) { %>
+                        <h3 class="product-price">
+                            ₹<%= selectedCombo.salePrice.toLocaleString() %>
+                            <span class="text-muted">
+                                <del>₹<%= selectedCombo.regularPrice.toLocaleString() %></del>
+                            </span>
+                        </h3>
+                        <a href="/addToCart?id=<%= product._id %>&comboId=<%= selectedCombo._id %>" class="btn btn-success">
+                            Add to Cart
+                        </a>
+                    <% } else { %>
+                        <button class="btn btn-warning" disabled>Notify Me</button>
+                    <% } %>
+                </div>  
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    <div class="related-products">
+        <h3>Related Products</h3>
+        <div class="row">
+            <% relatedProducts.forEach(related => { %>
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <a href="/product/<%= related._id %>" class="related-product">
+                        <div class="product__item">
+                            <div class="product__item__pic" 
+                                 style="background-image: url('/uploads/re-image/<%= related.productImage[0] %>');">
+                                <div class="product-discount">-<%= related.discount || 50 %>%</div>
+                            </div>
+                            <div class="product__item__text">
+                                <h6><%= related.productName %></h6>
+                                <h5>₹<%= related.combos[0].salePrice.toLocaleString() %></h5>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Footer -->
+<footer>
+    <div class="container text-center">
+        <p class="mb-0">&copy; 2023 Mobify. All rights reserved.</p>
+    </div>
+</footer>
+
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<%- include('../../views/layout/footer.ejs') %>

@@ -10,26 +10,25 @@
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
     <div class="container">
-        <a class="navbar-brand fw-bold text-primary" href="#">Mobify</a>
+        <a class="navbar-brand fw-bold text-primary" href="/">Mobify</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item"><a class="nav-link active" href="/">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Shop</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Categories</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Deals</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+                <%for(let i = 0; i < brand.length; i++) {%>
+                <li class="nav-item"><a class="nav-link" href="#"><%= brand[i].brandName%></a></li>
+                <%}%>
             </ul>
-            <form class="d-flex me-3">
+            <form class="d-flex me-3" method="get">
                 <div class="input-group">
-                    <input class="form-control" type="search" placeholder="Search products...">
-                    <span class="input-group-text search-icon">
+                    <input class="form-control" type="search" name="search" placeholder="Search products...">
+                    <button class="input-group-text search-icon" type="submit">
                         <i class="fas fa-search"></i>
-                    </span>
+                    </button>
                 </div>
-            </form>
+            </form>            
             <div class="icons-group me-2">
                 <a href="#" class="text-dark me-3"><i class="far fa-heart fs-5"></i></a>
                 <a href="#" class="text-dark"><i class="fas fa-shopping-cart fs-5"></i></a>
@@ -55,30 +54,113 @@
 
 <!-- Main Content -->
 <main class="container py-5 text-center">
-    <h1 class="display-4 fw-bold">Welcome to Mobify</h1>
-    <p class="lead text-muted mb-4">Your trusted destination for the latest smartphones and unbeatable deals.</p>
-    <a href="/shop" class="btn btn-primary btn-lg">Start Shopping</a>
+    <section class="product spad">
+        <div class="container">
+            <!-- Refurbished Phones Section -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3 class="section-title">Refurbished Phones</h3>
+                </div>
+            </div>
+            <div class="row product__filter">
+                <% for (let i = 0; i < refurbishedPhones.length; i++) { %>
+                    <div class="col-lg-2 col-md-3 col-sm-4 col-6 mix new-arrivals">
+                        <div class="product__item compact">
+                            <a href="/products/<%= refurbishedPhones[i]._id %>">
+                                <div class="product__item__pic" 
+                                     style="background-image: url('/uploads/re-image/<%= refurbishedPhones[i].productImage[0] %>');">
+                                    <div class="product-discount">-<%= refurbishedPhones[i].discount || 50 %>%</div>
+                                    <i class="fa fa-heart"></i>
+                                </div>
+                            </a>                                                       
+                            <div class="product__item__text">
+                                <h6 class="product-name"><%= refurbishedPhones[i].productName %></h6>
+                                <h5 class="product-price">
+                                    ₹<%= refurbishedPhones[i].combos[0].salePrice.toLocaleString() %>
+                                    <span class="text-muted">
+                                        <del>₹<%= refurbishedPhones[i].combos[0].regularPrice.toLocaleString() %></del>
+                                    </span>
+                                </h5>
+                                <a href="/addToCart?id=<%= refurbishedPhones[i]._id %>" class="add-cart">Add To Cart</a>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+    
+            <!-- Pagination for Refurbished Phones -->
+            <div class="pagination">
+                <% if (currentPage > 1) { %>
+                    <a href="?page=<%= currentPage - 1 %>" class="prev-page">&laquo; Previous</a>
+                <% } %>
+            
+                <% for (let page = 1; page <= totalPagesRefurbished; page++) { %>
+                    <a href="?page=<%= page %>" class="page-number <%= page === currentPage ? 'active' : '' %>">
+                        <%= page %>
+                    </a>
+                <% } %>
+            
+                <% if (currentPage < totalPagesRefurbished) { %>
+                    <a href="?page=<%= currentPage + 1 %>" class="next-page">Next &raquo;</a>
+                <% } %>
+            </div>
+    
+            <!-- New Phones Section -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3 class="section-title">New Phones</h3>
+                </div>
+            </div>
+            <div class="row product__filter">
+                <% for (let i = 0; i < newPhones.length; i++) { %>
+                    <div class="col-lg-2 col-md-3 col-sm-4 col-6 mix new-arrivals">
+                        <div class="product__item compact">
+                            <div class="product__item__pic" 
+                                 style="background-image: url('/uploads/re-image/<%= newPhones[i].productImage[0] %>');">
+                                <div class="product-discount">-<%= newPhones[i].discount || 50 %>%</div>
+                                <a href="/addToWishlist?id=<%= newPhones[i]._id %>" class="wishlist-btn">
+                                    <i class="fa fa-heart"></i>
+                                </a>
+                            </div>
+                            <div class="product__item__text">
+                                <h6 class="product-name"><%= newPhones[i].productName %></h6>
+                                <h5 class="product-price">
+                                    ₹<%= newPhones[i].combos[0].salePrice.toLocaleString() %>
+                                    <span class="text-muted">
+                                        <del>₹<%= newPhones[i].combos[0].regularPrice.toLocaleString() %></del>
+                                    </span>
+                                </h5>
+                                <a href="/addToCart?id=<%= newPhones[i]._id %>" class="add-cart">Add To Cart</a>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+    
+            <!-- Pagination for New Phones -->
+            <div class="pagination">
+                <% if (currentPage > 1) { %>
+                    <a href="?page=<%= currentPage - 1 %>" class="prev-page">&laquo; Previous</a>
+                <% } %>
+            
+                <% for (let page = 1; page <= totalPagesNew; page++) { %>
+                    <a href="?page=<%= page %>" class="page-number <%= page === currentPage ? 'active' : '' %>">
+                        <%= page %>
+                    </a>
+                <% } %>
+            
+                <% if (currentPage < totalPagesNew) { %>
+                    <a href="?page=<%= currentPage + 1 %>" class="next-page">Next &raquo;</a>
+                <% } %>
+            </div>
+        </div>
+    </section>      
 </main>
 
 <!-- Footer -->
-<footer class="bg-dark py-2 mt-4">
-    <div class="container">
-        <div class="row align-items-center g-3">
-            <div class="col-md-4 text-center text-md-start">
-                <a class="navbar-brand fw-bold text-primary mb-0" href="#">Mobify</a>
-                <p class="text-muted small mb-0">Your trusted mobile store</p>
-            </div>
-            <div class="col-md-4 text-center">
-                <div class="social-links">
-                    <a href="#" class="text-muted mx-2"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="text-muted mx-2"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="text-muted mx-2"><i class="fab fa-instagram"></i></a>
-                </div>
-            </div>
-            <div class="col-md-4 text-center text-md-end">
-                <p class="mb-0 text-muted small">&copy; 2023 Mobify. All rights reserved.</p>
-            </div>
-        </div>
+<footer>
+    <div class="container text-center">
+        <p class="mb-0">&copy; 2023 Mobify. All rights reserved.</p>
     </div>
 </footer>
 

@@ -60,6 +60,15 @@ admin_route.post('/addProducts',uploads.array("images",4),productController.addP
 
 admin_route.get('/products',adminAuth.is_AdminLogin,productController.getAllProducts);
 
+admin_route.post('/deleteProduct/:id', productController.softDeleteProduct);
+
+admin_route.get('/editProduct',adminAuth.is_AdminLogin,productController.getEditProduct);
+
+admin_route.post('/editProduct/:id',uploads.array("images",4),productController.editProduct);
+
+admin_route.post('/deleteimage',productController.deleteSingleImage);
+
+
 
 
 

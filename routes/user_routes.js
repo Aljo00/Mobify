@@ -2,6 +2,7 @@ const express = require("express");
 const user_router = express.Router();
 
 const user_controller = require('../controllers/user/user_controller');
+const productController = require('../controllers/user/product_controller')
 const passport = require("passport");
 
 const User = require("../models/userSchema")
@@ -68,6 +69,8 @@ user_router.get(
 user_router.get('/login',userAuth.is_UserLogout,user_controller.load_loginpage)
 
 user_router.post('/login',user_controller.verifyLogin)
+
+user_router.get('/product/:id', productController.loadProductDetails);
 
 user_router.get('/logout',user_controller.logout)
 

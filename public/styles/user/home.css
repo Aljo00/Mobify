@@ -224,6 +224,48 @@
     color: white;
 }
 
+.product-carousel-image {
+    max-height: 400px; /* Adjust the height as needed */
+    object-fit: contain; /* Ensures the image doesn't stretch */
+    border: 1px solid #ddd; /* Optional: Add a border around the image */
+    border-radius: 8px; /* Optional: Rounded corners */
+    margin-bottom: 20px;
+}
+
+.related-products .product__item__pic {
+    height: 200px; /* Adjust for related products */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    border: 1px solid #ddd; /* Optional: Add a border around the images */
+    border-radius: 8px;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+    border-radius: 50%; /* Make the button round */
+    width: 30px;
+    height: 30px;
+    background-size: 70%; /* Shrink the arrow icon for a cleaner look */
+}
+
+.carousel-control-prev-icon:hover,
+.carousel-control-next-icon:hover {
+    background-color: rgba(0, 0, 0, 0.8); /* Darker on hover */
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+    top: 50%; /* Center vertically */
+    transform: translateY(-50%);
+}
+
+.carousel-control-prev-icon:after,
+.carousel-control-next-icon:after {
+    content: ''; /* Clear content if needed */
+}
+
 footer {
     background-color: #000000;
     color: white;

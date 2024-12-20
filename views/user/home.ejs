@@ -66,7 +66,7 @@
                 <% for (let i = 0; i < refurbishedPhones.length; i++) { %>
                     <div class="col-lg-2 col-md-3 col-sm-4 col-6 mix new-arrivals">
                         <div class="product__item compact">
-                            <a href="/products/<%= refurbishedPhones[i]._id %>">
+                            <a href="/product/<%= refurbishedPhones[i]._id %>">
                                 <div class="product__item__pic" 
                                      style="background-image: url('/uploads/re-image/<%= refurbishedPhones[i].productImage[0] %>');">
                                     <div class="product-discount">-<%= refurbishedPhones[i].discount || 50 %>%</div>
@@ -115,13 +115,15 @@
                 <% for (let i = 0; i < newPhones.length; i++) { %>
                     <div class="col-lg-2 col-md-3 col-sm-4 col-6 mix new-arrivals">
                         <div class="product__item compact">
+                            <a href="/product/<%= newPhones[i]._id %>">
                             <div class="product__item__pic" 
                                  style="background-image: url('/uploads/re-image/<%= newPhones[i].productImage[0] %>');">
                                 <div class="product-discount">-<%= newPhones[i].discount || 50 %>%</div>
-                                <a href="/addToWishlist?id=<%= newPhones[i]._id %>" class="wishlist-btn">
+                                <!-- <a href="/addToWishlist?id=" class="wishlist-btn"> -->
                                     <i class="fa fa-heart"></i>
-                                </a>
+                                <!-- </a> -->
                             </div>
+                        </a>
                             <div class="product__item__text">
                                 <h6 class="product-name"><%= newPhones[i].productName %></h6>
                                 <h5 class="product-price">

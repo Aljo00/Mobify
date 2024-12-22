@@ -39,6 +39,8 @@ function handleFormSumbit(event) {
                     title: "Oops",
                     text: "Category already exists..",
                 });
+                document.getElementById("name").value = "";
+                document.getElementById("description").value = "";
             } else {
                 Swal.fire({
                     icon: 'error',

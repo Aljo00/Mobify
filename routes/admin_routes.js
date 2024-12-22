@@ -1,8 +1,10 @@
 const express = require("express");
 const admin_route = express.Router();
 
+//This middleware is used for checking the session of the admin.
 const adminAuth = require("../middleware/adminAuth");
 
+//This is controller for the admin login and verify and also logout controlling.
 const adminController = require("../controllers/admin/adminController");
 
 const customerController = require("../controllers/admin/customerController")

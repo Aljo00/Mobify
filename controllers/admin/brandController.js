@@ -1,5 +1,6 @@
 const Brand = require("../../models/brandSchema");
 
+//This controller is used for rendering Brand page in the admin side.
 const loadBrandPage = async (req,res) => {
 
     try {
@@ -10,6 +11,9 @@ const loadBrandPage = async (req,res) => {
 
         const brandData = await Brand.find({}).sort({createdAt:-1}).skip(skip).limit(limit);
         const totalBrands = await Brand.countDocuments();
+        console.log(`Admin Side :-- Brand Management page rendered succesfully.`)
+        console.log(`Total Brands count is ${totalBrands}`)
+        console.log("==========");
         const totalPages = Math.ceil(totalBrands/limit);
 
         res.render("admin/brands",{
@@ -20,17 +24,17 @@ const loadBrandPage = async (req,res) => {
         })
         
     } catch (error) {
-        console.log("Error found in loading brand page side: ", error.message);
+        console.log(`Admin Side :-- Brand Management page rendering Failed. Because `, error.message)
+        console.log("==========");
         res.redirect("/admin/error");
     }
     
 }
 
+//This controller add new brands to the database.
 const addBrands = async (req,res) => {
 
     try {
-
-        console.log(req.body.brand)
         const brandName = req.body.brand;
         const findBrand = await Brand.findOne({brandName});
         if(!findBrand){
@@ -41,11 +45,15 @@ const addBrands = async (req,res) => {
             });
 
             await newBrand.save();
+            console.log(`Admin Side :-- Adding New brand is successfully completed.`)
+            console.log(`This is the New brand the admin added  ${brandName}`)
+            console.log("==========");
             res.redirect("/admin/brands")
         }
         
     } catch (error) {
-        console.log("Error found in Adding new brand side: ", error.message);
+        console.log(`Admin Side :-- Adding New brand is Failed. Because ${error.message}`)
+        console.log("==========");
         res.redirect("/admin/error");
     }
     

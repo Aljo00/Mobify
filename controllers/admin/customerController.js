@@ -22,9 +22,9 @@ const customerInfo = async (req, res) => {
                 { email: { $regex: ".*" + search + ".*", $options: "i" } }
             ]
         })
-            .limit(limit)
-            .skip((page - 1) * limit)
-            .exec();
+        .limit(limit)
+        .skip((page - 1) * limit)
+        .exec();
 
         const count = await User.find({
             isAdmin: false,
@@ -36,11 +36,10 @@ const customerInfo = async (req, res) => {
 
         const totalPages = Math.ceil(count / limit);
 
-        // Pass data to the view
         res.render("admin/users", {
-            data: userData, // The user data for the table
-            totalPages, // Total number of pages for pagination
-            currentPage: page // Current page number
+            data: userData,
+            totalPages,
+            currentPage: page
         });
     } catch (error) {
         console.log("Error found in customerManagement side: ", error.message);

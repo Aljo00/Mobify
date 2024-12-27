@@ -36,9 +36,9 @@ const addCategory = async (req, res) => {
 
     try {
         // Check if the category already exists
-        const existingCategory = await Category.findOne({ name }); // Use findOne for a single document
+        const existingCategory = await Category.findOne({ name });
         if (existingCategory) {
-            return res.status(400).json({ error: "Category already exists.." }); // Add `return` to prevent further execution
+            return res.status(400).json({ error: "Category already exists.." });
         }
 
         // Create a new category
@@ -48,12 +48,9 @@ const addCategory = async (req, res) => {
         });
         await newCategory.save();
 
-        // Send success response
         return res.status(200).json({ message: "Category added successfully" });
     } catch (error) {
         console.log("Error found in Adding category side: ", error.message);
-
-        // Handle unexpected errors
         return res.status(500).json({ error: "Internal server error" });
     }
 }

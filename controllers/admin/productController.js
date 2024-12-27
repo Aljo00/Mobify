@@ -31,7 +31,6 @@ const addProducts = async (req, res) => {
     try {
         const { productName, brand, description, category, combos } = req.body;
 
-        // Handle image upload and resizing
         const imagePaths = [];
         if (req.files && req.files.length > 0) {
             for (let i = 0; i < req.files.length; i++) {
@@ -41,12 +40,10 @@ const addProducts = async (req, res) => {
         }
 
         if (combos) {
-            console.log("Combos Data:", combos); // Log the original combos
             
             // Parse combos first
-            const combosArray = JSON.parse(combos); // Parse combos safely
+            const combosArray = JSON.parse(combos);
 
-            // Iterate over the parsed combos
             combosArray.forEach((combo) => {
                 if (combo.color && typeof combo.color === "string") {
                     combo.color = combo.color.split(",").map((color) => color.trim());
@@ -112,7 +109,7 @@ const getAllProducts = async (req,res) => {
 
         // Add comboCount for each product document
         productData.forEach(product => {
-            product.comboCount = product.combos ? product.combos.length : 0; // Add combo count
+            product.comboCount = product.combos ? product.combos.length : 0;
         });       
 
         const category = await Category.find({isListed: true});
@@ -141,7 +138,6 @@ const softDeleteProduct = async (req, res) => {
     try {
         const id = req.params.id;
 
-        // Update the category's `isListed` status to false
         const updateProduct = await Product.findByIdAndUpdate(id, { isBlocked: true }, { new: true });
 
         if (updateProduct) {
@@ -176,31 +172,38 @@ const getEditProduct = async (req,res) => {
 
 }
 
-const editProduct = async (req,res) => {
-
+const editProduct = async (req, res) => {
     try {
-
         const id = req.params.id;
-        const product = await Product.findOne({_id:id});
+        const product = await Product.findOne({ _id: id });
         const data = req.body;
+
         const existingProduct = await Product.findOne({
             productName: data.productName,
-            _id:{$ne:id}
+            _id: { $ne: id }
         });
 
-        if(existingProduct){
-            return res.status(400).json({error:"Product with this name is already exists!. Please try again with another name"})
+        if (existingProduct) {
+            return res.status(400).json({
+                error: "Product with this name already exists! Please try again with another name"
+            });
         }
 
         const images = [];
 
-        if(req.files && req.files.length > 0){
-            for(let i = 0; i < req.files.length; i++){
+        if (req.files && req.files.length > 0) {
+            for (let i = 0; i < req.files.length; i++) {
                 images.push(req.files[i].filename);
             }
         }
 
-        const combosArray = req.body.combos;
+        // Ensure combos are parsed as an array of objects
+        let combosArray = [];
+        if (typeof data.combos === "string") {
+            combosArray = JSON.parse(data.combos);  // Convert the string to an array of objects
+        } else if (Array.isArray(data.combos)) {
+            combosArray = data.combos;  // If it's already an array, no need to parse
+        }
 
         const updateFields = {
             productName: data.productName,
@@ -208,22 +211,21 @@ const editProduct = async (req,res) => {
             brand: data.brand,
             category: data.category,
             combos: combosArray
+        };
+
+        if (req.files.length > 0) {
+            updateFields.$push = { productImage: { $each: images } };
         }
 
-        if(req.files.length > 0){
-            updateFields.$push = {productImage: {$each:images}};
-        }
-
-        await Product.findByIdAndUpdate(id,updateFields,{new: true});
-        console.log("Products editted successfully completed")
+        await Product.findByIdAndUpdate(id, updateFields, { new: true });
+        console.log("Product edited successfully!");
         res.redirect("/admin/products");
-        
+
     } catch (error) {
         console.log("Error found in Edit Product side: ", error.message);
         res.redirect("/admin/error");
     }
-    
-}
+};
 
 const deleteSingleImage = async (req,res) => {
 

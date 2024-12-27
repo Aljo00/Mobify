@@ -266,6 +266,34 @@
     content: ''; /* Clear content if needed */
 }
 
+/* Thumbnail Styles */
+.thumbnail-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    margin: 0 5px;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.thumbnail-image:hover {
+    opacity: 0.8;
+}
+
+/* Zoom Effect Styles */
+.zoom-container {
+    position: relative;
+    overflow: hidden;
+}
+.product-carousel-image {
+    transition: transform 0.3s ease-in-out;
+    cursor: zoom-in;
+}
+.zoom-container:hover .product-carousel-image {
+    transform: scale(1.5); /* Adjust the zoom level */
+    cursor: zoom-out;
+}
+
 footer {
     background-color: #000000;
     color: white;

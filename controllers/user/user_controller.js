@@ -272,7 +272,7 @@ const logout = async (req,res) => {
                 return res.redirect('/page404')
             }
 
-            return res.redirect("/login");
+            return res.redirect("/");
         })
         
     } catch (error) {

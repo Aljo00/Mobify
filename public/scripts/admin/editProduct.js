@@ -1,10 +1,10 @@
 // Attach event listener to publish button
-const publishButton = document.getElementById("publishBtn");
+const publishButton = document.getElementById("updatebtnBtn");
 publishButton.addEventListener("click", validateAndSubmit);
 
-
+// Validation and Submission
 function validateAndSubmit(event) {
-    event.preventDefault();
+    // event.preventDefault();  // Prevent default form submission to allow for validation
 
     if (validateForm()) {
         // Collect combo data from the form
@@ -19,6 +19,7 @@ function validateAndSubmit(event) {
             const salePrice = row.querySelector('input[name="salePrice"]').value;
             const color = row.querySelector('input[name="color"]').value;
 
+            // Push the data for each combo
             combos.push({
                 ram: ram,
                 storage: storage,
@@ -102,7 +103,7 @@ function validateForm() {
     clearErrorMessages();
     let isValid = true;
 
-    const comboSet = new Set();
+    const comboSet = new Set(); // Declare comboSet to track duplicates
 
     // Validate Product Name
     const name = document.getElementsByName("productName")[0].value.trim();
@@ -197,32 +198,26 @@ addComboBtn.addEventListener("click", () => {
         <div class="col-lg-3">
             <label class="form-label">RAM</label>
             <input name="ram" type="text" class="form-control border" required>
-            <div id="comboRAM-error" class="error-message"></div>
         </div>
         <div class="col-lg-3">
             <label class="form-label">Storage</label>
             <input name="storage" type="text" class="form-control border" required>
-            <div id="comboStorage-error" class="error-message"></div>
         </div>
         <div class="col-lg-3">
             <label class="form-label">Quantity</label>
             <input name="quantity" type="number" class="form-control border" required>
-            <div id="comboQuantity-error" class="error-message"></div>
         </div>
         <div class="col-lg-3">
             <label class="form-label">Regular Price</label>
             <input name="regularPrice" type="number" class="form-control border" required>
-            <div id="comboReg-error" class="error-message"></div>
         </div>
         <div class="col-lg-3">
             <label class="form-label">Sale Price</label>
             <input name="salePrice" type="number" class="form-control border" required>
-            <div id="comboSale-error" class="error-message"></div>
         </div>
         <div class="col-lg-3">
             <label class="form-label">Color</label>
             <input name="color" type="text" class="form-control border" placeholder="e.g., Red, Blue, Green" required>
-            <div id="comboColor-error" class="error-message"></div>+
         </div>
         <div class="col-lg-3 d-flex align-items-center">
             <button type="button" class="btn btn-danger delete-combo-btn">Delete</button>

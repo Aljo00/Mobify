@@ -29,10 +29,9 @@ user_router.get(
     async (req, res) => {
         try {
             // Check if the user is blocked
-            const user = await User.findById(req.user._id); // Fetch the user from the database
+            const user = await User.findById(req.user._id);
 
             if (user.isBlocked) {
-                // If the user is blocked, destroy the session and redirect to login
                 req.session.destroy((err) => {
                     if (err) {
                         console.error("Error destroying session:", err);
@@ -40,12 +39,10 @@ user_router.get(
                     return res.render("user/login",{message: "User is blocked by the admin"})
                 });
 
-                // console.log(`the user is blocked ${User.name}`)
-
 
 
             } else {
-                // Regenerate session for the valid Google user
+                
                 req.session.regenerate((err) => {
                     if (err) {
                         console.error("Error regenerating session:", err);
@@ -71,6 +68,8 @@ user_router.get('/login',userAuth.is_UserLogout,user_controller.load_loginpage)
 user_router.post('/login',user_controller.verifyLogin)
 
 user_router.get('/product/:id', productController.loadProductDetails);
+
+user_router.get("/product/combo/:id",productController.loadComboDetails)
 
 user_router.get('/logout',user_controller.logout)
 

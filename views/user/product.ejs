@@ -60,13 +60,17 @@
         <!-- Product Image Carousel -->
         <div class="col-lg-6 col-md-12">
             <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+                <!-- Main Carousel -->
                 <div class="carousel-inner">
                     <% product.productImage.forEach((image, index) => { %>
                         <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
-                            <img src="/uploads/re-image/<%= image %>" class="d-block w-100 product-carousel-image" alt="Product Image">
+                            <div class="zoom-container">
+                                <img src="/uploads/re-image/<%= image %>" class="d-block w-100 product-carousel-image" alt="Product Image">
+                            </div>
                         </div>
                     <% }) %>
                 </div>
+                <!-- Carousel Controls -->
                 <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                     <span class="visually-hidden">Previous</span>
@@ -76,78 +80,80 @@
                     <span class="visually-hidden">Next</span>
                 </button>
             </div>
+
+            <!-- Thumbnails Section -->
+            <div class="product-thumbnails mt-3 d-flex justify-content-center">
+                <% product.productImage.forEach((image, index) => { %>
+                    <img 
+                        src="/uploads/re-image/<%= image %>" 
+                        class="thumbnail-image <%= index === 0 ? 'selected' : '' %>" 
+                        data-bs-target="#productCarousel" 
+                        data-bs-slide-to="<%= index %>" 
+                        alt="Thumbnail Image">
+                <% }) %>
+            </div>
         </div>
+
     
         <!-- Product Details -->
         <div class="col-lg-6">
             <h1 class="product-title"><%= product.productName %></h1>
             <p class="brand">Brand: <%= product.brand %></p>
-    
+
             <p class="description">
                 <%= product.description || "No description available" %>
             </p>
-            
+
             <div class="product-combos">
-                <form id="comboForm" action="/product/<%= product._id %>" method="GET">
-                    <!-- RAM Options -->
-                    <div class="ram-options">
-                        <h5>RAM:</h5>
-                        <% product.combos.map(combo => combo.ram).forEach((ramOption, index) => { %>
-                            <button type="button" 
-                                    class="btn <%= ram === ramOption ? 'btn-primary' : 'btn-outline-primary' %> ram-option"
-                                    data-ram="<%= ramOption %>">
-                                <%= ramOption %> GB
-                            </button>
-                        <% }); %>
-                    </div>
-            
-                    <!-- Storage Options -->
-                    <div class="storage-options">
-                        <h5>Storage:</h5>
-                        <% product.combos.map(combo => combo.storage).forEach((storageOption, index) => { %>
-                            <button type="button" 
-                                    class="btn <%= storage === storageOption ? 'btn-primary' : 'btn-outline-primary' %> storage-option"
-                                    data-storage="<%= storageOption %>">
-                                <%= storageOption %> GB
-                            </button>
-                        <% }); %>
-                    </div>
-            
-                    <!-- Color Options -->
-                    <div class="color-options">
-                        <h5>Color:</h5>
-                        <% product.combos.map(combo => combo.color).forEach((colorOption, index) => { %>
-                            <button type="button" 
-                                    class="btn <%= color === colorOption ? 'btn-primary' : 'btn-outline-primary' %> color-option"
-                                    data-color="<%= colorOption %>">
-                                <%= colorOption %>
-                            </button>
-                        <% }); %>
-                    </div>
-            
-                    <!-- Hidden Inputs -->
-                    <input type="hidden" name="ram" id="selectedRam" value="<%= ram || product.combos[0].ram %>">
-                    <input type="hidden" name="storage" id="selectedStorage" value="<%= storage || product.combos[0].storage %>">
-                    <input type="hidden" name="color" id="selectedColor" value="<%= color || product.combos[0].color %>">
-                    <button type="submit" class="btn btn-success mt-3">Apply</button>
-                </form>
+                <h5>Available Combos:</h5>
+                <div class="combo-buttons">
+                    <% product.combos.forEach((combo, index) => { %>
+                        <button 
+                            type="button" 
+                            class="btn <%= index === 0 ? 'btn-primary' : 'btn-outline-primary' %> combo-option" 
+                            data-ram="<%= combo.ram %>" 
+                            data-storage="<%= combo.storage %>" 
+                            data-color="<%= combo.color %>"
+                            onclick="selectCombo('<%= combo.ram %>', '<%= combo.storage %>', '<%= combo.color %>')"
+                        >
+                            <%= combo.ram %>GB / <%= combo.storage %>GB / <%= combo.color %>
+                        </button>
+                    <% }); %>
+                </div>
             </div>
-            
+
             <!-- Product Price Section -->
             <div id="priceSection" class="product-price-section mt-4">
-                <% if (selectedCombo && selectedCombo.quantity > 0) { %>
-                    <h3 class="product-price">
-                        ₹<span id="currentPrice"><%= selectedCombo.salePrice.toLocaleString() %></span>
-                        <span class="text-muted">
-                            <del>₹<span id="regularPrice"><%= selectedCombo.regularPrice.toLocaleString() %></span></del>
-                        </span>
-                    </h3>
+                <h3 class="product-price">
+                    ₹<span id="currentPrice"><%= product.combos[0].salePrice.toLocaleString() %></span>
+                    <span id="regularPrice" class="text-muted">
+                        <del>₹<%= product.combos[0].regularPrice.toLocaleString() %></del>
+                    </span>
+                </h3>
+                <p id="quantityStatus" class="text-danger">
+                    <% if (product.combos[0].quantity === 0) { %>
+                        Out of Stock
+                    <% } else { %>
+                        <span>Available Quantity: <%= product.combos[0].quantity %></span>
+                    <% } %>
+                </p>
+            </div>
+
+            <!-- Add to Cart and Buy Now Buttons -->
+            <div id="actionButtons" class="action-buttons mt-3">
+                <% if (product.combos[0].quantity > 0) { %>
+                    <a id="addToCartBtn" href="/add-to-cart/<%= product._id %>?ram=<%= product.combos[0].ram %>&storage=<%= product.combos[0].storage %>&color=<%= product.combos[0].color %>">
+                        <button class="btn btn-success">Add to Cart</button>
+                    </a>
+                    <a id="buyNowBtn" href="/buy-now/<%= product._id %>?ram=<%= product.combos[0].ram %>&storage=<%= product.combos[0].storage %>&color=<%= product.combos[0].color %>">
+                        <button class="btn btn-primary">Buy Now</button>
+                    </a>
                 <% } else { %>
-                    <h3 class="text-danger">Out of Stock</h3>
+                    <button class="btn btn-danger" disabled>Out of Stock</button>
                 <% } %>
-            </div>            
-        
-    </div>      
+            </div>
+        </div>
+  
     </div>
 
     <!-- Related Products -->
@@ -183,30 +189,80 @@
     </div>
 </footer>
 
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
 <script>
-    document.querySelectorAll('.ram-option').forEach(button => {
-        button.addEventListener('click', () => {
-            document.querySelectorAll('.ram-option').forEach(btn => btn.classList.remove('btn-primary'));
-            button.classList.add('btn-primary');
-            document.getElementById('selectedRam').value = button.dataset.ram;
+    function selectCombo(ram, storage, color) {
+        // Send an AJAX request to the backend
+        fetch(`/product/combo/<%= product._id %>?ram=${ram}&storage=${storage}&color=${color}`)
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+
+                    document.getElementById('currentPrice').innerText = data.combo.salePrice.toLocaleString();
+                    document.getElementById('regularPrice').innerHTML = `<del>₹${data.combo.regularPrice.toLocaleString()}</del>`;
+                    
+
+                    const quantityStatus = document.getElementById('quantityStatus');
+                    const actionButtons = document.getElementById('actionButtons');
+                    
+                    if (data.combo.quantity > 0) {
+                        quantityStatus.innerHTML = `Available Quantity: ${data.combo.quantity}`;
+                        
+                        // Update action buttons
+                        actionButtons.innerHTML = `
+                            <a id="addToCartBtn" href="/add-to-cart/<%= product._id %>?ram=${ram}&storage=${storage}&color=${color}">
+                                <button class="btn btn-success">Add to Cart</button>
+                            </a>
+                            <a id="buyNowBtn" href="/buy-now/<%= product._id %>?ram=${ram}&storage=${storage}&color=${color}">
+                                <button class="btn btn-primary">Buy Now</button>
+                            </a>
+                        `;
+                    } else {
+                        quantityStatus.innerHTML = `<span class="text-danger">Out of Stock</span>`;
+                        
+                        actionButtons.innerHTML = `
+                            <button class="btn btn-danger" disabled>Out of Stock</button>
+                        `;
+                    }
+
+                    document.querySelectorAll('.combo-option').forEach((button) => {
+                        const isSelected = 
+                            button.dataset.ram === ram &&
+                            button.dataset.storage === storage &&
+                            button.dataset.color === color;
+
+                        button.classList.toggle('btn-primary', isSelected); 
+                        button.classList.toggle('btn-outline-primary', !isSelected); 
+                    });
+                } else {
+                    alert("Combo not available.");
+                }
+            })
+            .catch((error) => {
+                console.error("Error fetching combo data:", error);
+            });
+        }
+
+
+        document.querySelectorAll('.zoom-container').forEach(container => {
+        const img = container.querySelector('.product-carousel-image');
+        container.addEventListener('mousemove', (e) => {
+            const rect = container.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            img.style.transformOrigin = `${x}px ${y}px`; 
+            img.style.transform = 'scale(1.5)';
         });
+
+        container.addEventListener('mouseleave', () => {
+            img.style.transformOrigin = 'center center'; 
+            img.style.transform = 'scale(1)';
+        });
+        
     });
 
-    document.querySelectorAll('.storage-option').forEach(button => {
-        button.addEventListener('click', () => {
-            document.querySelectorAll('.storage-option').forEach(btn => btn.classList.remove('btn-primary'));
-            button.classList.add('btn-primary');
-            document.getElementById('selectedStorage').value = button.dataset.storage;
-        });
-    });
-
-    document.querySelectorAll('.color-option').forEach(button => {
-        button.addEventListener('click', () => {
-            document.querySelectorAll('.color-option').forEach(btn => btn.classList.remove('btn-primary'));
-            button.classList.add('btn-primary');
-            document.getElementById('selectedColor').value = button.dataset.color;
-        });
-    });
 </script>
 
 <!-- Bootstrap JS -->

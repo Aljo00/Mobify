@@ -2,104 +2,98 @@ const User = require('../../models/userSchema');
 const Brand = require('../../models/brandSchema');
 const Category = require('../../models/categorySchema');
 const Product = require('../../models/productSchema');
-const nodemailer = require('nodemailer');
-const bcrypt = require('bcrypt');
 const { response } = require('../../app');
 const env = require("dotenv").config();
 
-
-const getProductDetails = async (req, res) => {
-    try {
-        const productId = req.query.id;
-
-        if (!productId) {
-            return res.redirect('/error'); // Handle invalid product ID
-        }
-
-        // Fetch the main product
-        const product = await Product.findById(productId)
-            .populate('category')
-            .populate('combos')
-            .exec();
-
-        if (!product) {
-            return res.redirect('/error'); // Handle product not found
-        }
-
-        // Fetch related products based on the category (excluding the current product)
-        const relatedProducts = await Product.find({
-            category: product.category,
-            _id: { $ne: product._id },
-            isBlocked: false,
-            combos: { $elemMatch: { quantity: { $gt: 0 } } }
-        })
-            .limit(4)
-            .exec();
-
-        const brand = await Brand.find({}).limit(7);
-
-        return res.render('user/product', {
-            product: product,
-            relatedProducts: relatedProducts,
-            brand:brand
-        });
-    } catch (error) {
-        console.error('Error fetching product details:', error.message);
-        res.redirect('/error');
-    }
-};
-
 const loadProductDetails = async (req, res) => {
     try {
-        const productId = req.params.id; // Extract product ID from the URL
+        const productId = req.params.id;
         console.log("Product ID:", productId);
-        const { ram, storage, color } = req.query; // Extract combo parameters from query
 
-        // Fetch the main product by ID
+        const { ram, storage, color } = req.query;
+
         const product = await Product.findById(productId).lean();
 
         if (!product) {
             return res.status(404).send("Product not found");
         }
 
-        // If specific combo options are provided, find the matching combo
-        let selectedCombo = null;
-        if (ram && storage && color) {
-            selectedCombo = product.combos.find(
-                (combo) => combo.ram === ram && combo.storage === storage && combo.color === color
-            );
-        } else {
-            // Default to the first combo
-            selectedCombo = product.combos[0];
+        if (!product.combos || product.combos.length === 0) {
+            return res.status(404).send("No combos available for this product");
         }
 
-        // Fetch related products (e.g., products from the same category or brand)
+        // Match specific combo or default to the first combo
+        let selectedCombo = product.combos[0];
+        if (ram && storage && color) {
+            selectedCombo = product.combos.find(
+                (combo) =>
+                    combo.ram === ram &&
+                    combo.storage === storage &&
+                    combo.color.includes(color) // Handle color array
+            ) || selectedCombo;
+        }
+
+        // Fetch related products
         const relatedProducts = await Product.find({
-            category: product.category, // Assuming a `category` field exists
-            _id: { $ne: productId }, // Exclude the current product
+            category: product.category, // Match category directly
+            _id: { $ne: productId },
         })
-            .limit(4) // Limit to 4 related products
-            .lean();
+        .limit(4)
+        .lean();
 
-        const brand = await Brand.find({}).limit(7);
+        const brand = await Brand.find({}).limit(7).lean();
 
-        // Pass the data to the view
+        const user = req.session.user;
+        const userData = user ? await User.findById(user) : null;
+
+        // Render the product page
         return res.render("user/product", {
             product,
-            selectedCombo, // Pass selected combo to the view
+            user: userData,
+            selectedCombo,
             ram,
             storage,
             color,
             brand,
-            relatedProducts, // Pass related products to the view
+            relatedProducts,
         });
     } catch (error) {
-        console.log("Error in loading product details:", error.message);
+        console.error("Error in loading product details:", error.message);
         res.status(500).send("Server error");
     }
 };
 
-module.exports = {
-    getProductDetails,
-    loadProductDetails
+const loadComboDetails = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { ram, storage, color } = req.query;
+
+
+        const product = await Product.findById(id);
+
+        const selectedCombo = product.combos.find(
+            (combo) => combo.ram === ram && combo.storage === storage && combo.color.includes(color)
+        );
+
+        if (!selectedCombo) {
+            return res.status(404).json({ success: false, message: "Combo not found" });
+        }
+
+        return res.json({
+            success: true,
+            combo: {
+                salePrice: selectedCombo.salePrice,
+                regularPrice: selectedCombo.regularPrice,
+                quantity: selectedCombo.quantity,
+            },
+        });
+    } catch (error) {
+        console.error("Error loading combo details:", error.message);
+        return res.status(500).json({ success: false, message: "Server error" });
+    }
+};
+
+module.exports = {  
+    loadProductDetails,
+    loadComboDetails
 }

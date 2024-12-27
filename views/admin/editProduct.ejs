@@ -33,7 +33,7 @@
                         <li class="breadcrumb-item"><a href="/admin/products">Products</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Edit Products</li>
                     </ol>
-                </nav>
+                </nav>  
             </div>
             <div class="col-lg-6">
                 <div class="card mb-4">
@@ -49,7 +49,7 @@
                                 <select class="form-select border" name="brand">
                                     <% if (brand && brand.length > 0) { %>
                                         <% for (let i = 0; i < brand.length; i++) { %>
-                                            <option value="<%= brand[i]._id %>"><%= brand[i].brandName %></option>
+                                            <option value="<%= brand[i].brandName%>"><%= brand[i].brandName %></option>
                                         <% } %>
                                     <% } else { %>
                                         <option value="">No Brands Available</option>
@@ -70,27 +70,33 @@
                                                 <!-- Combo fields for RAM, Storage, Quantity, Price -->
                                                 <div class="col-lg-3">
                                                     <label class="form-label">RAM</label>
-                                                    <input name="combos[<%= index %>][ram]" type="text" value="<%= combo.ram %>" class="form-control border" required>
+                                                    <input name="ram" type="text" value="<%= combo.ram %>" class="form-control border" required>
+                                                    <div id="comboRAM-error" class="error-message"></div>
                                                 </div>
                                                 <div class="col-lg-3">
                                                     <label class="form-label">Storage</label>
-                                                    <input name="combos[<%= index %>][storage]" type="text" value="<%= combo.storage %>" class="form-control border" required>
+                                                    <input name="storage" type="text" value="<%= combo.storage %>" class="form-control border" required>
+                                                    <div id="comboStorage-error" class="error-message"></div>
                                                 </div>
                                                 <div class="col-lg-3">
                                                     <label class="form-label">Quantity</label>
-                                                    <input name="combos[<%= index %>][quantity]" type="number" value="<%= combo.quantity %>" class="form-control border" required>
+                                                    <input name="quantity" type="number" value="<%= combo.quantity %>" class="form-control border" required>
+                                                    <div id="comboQuantity-error" class="error-message"></div>
                                                 </div>
                                                 <div class="col-lg-3">
                                                     <label class="form-label">Regular Price</label>
-                                                    <input name="combos[<%= index %>][regularPrice]" type="number" value="<%= combo.regularPrice %>" class="form-control border" required>
+                                                    <input name="regularPrice" type="number" value="<%= combo.regularPrice %>" class="form-control border" required>
+                                                    <div id="comboReg-error" class="error-message"></div>
                                                 </div>
                                                 <div class="col-lg-3">
                                                     <label class="form-label">Sale Price</label>
-                                                    <input name="combos[<%= index %>][salePrice]" type="number" value="<%= combo.salePrice %>" class="form-control border" required>
+                                                    <input name="salePrice" type="number" value="<%= combo.salePrice %>" class="form-control border" required>
+                                                    <div id="comboSale-error" class="error-message"></div>
                                                 </div>
                                                 <div class="col-lg-3">
                                                     <label class="form-label">Color</label>
-                                                    <input name="combos[<%= index %>][color]" type="text" value="<%= combo.color %>" class="form-control border" required>
+                                                    <input name="color" type="text" value="<%= combo.color %>" class="form-control border" required>
+                                                    <div id="comboColor-error" class="error-message"></div>
                                                 </div>
                                                 <div class="col-lg-3 d-flex align-items-center">
                                                     <button type="button" class="btn btn-danger delete-combo-btn">Delete</button>
@@ -119,7 +125,7 @@
                             </div>
                             <div class="card mb-2">
                                 <div class="card-header">
-                                    <h4>Choose images</h4>
+                                    <h4>Delete Images</h4>
                                 </div>
                                 
                                 <% for(let i = 0; i < product.productImage.length; i++) {%>
@@ -141,59 +147,48 @@
                                     </div>
                                
                                 <% } %>
-                                   
-                                <div class="card-body">
-                                    <div class="card-body align-items-center" style="margin-bottom: 20px;">
-                                        <img src="" alt="" id="imgView1">
-                                        <input class="form-control" type="file" name="images" id="input1"
-                                            accept="image/png, image/jpeg, image/jpg"
-                                            onchange="viewImage1(event), viewImage(event, 1)">
-                                            <div id="images-error" class="error-message"></div>
-                                    </div>
-                                    <div class="image-cropper d-flex align-items-center"style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
-                                        <img src="" id="croppedImg1" alt="">
-                                        <button type="button" id="saveButton1" class="btn-sm btn-primary">Save</button>
-                                    </div>
-                                    <div class="row">
-                                        <div class="card-body align-items-center" style="margin-bottom: 20px;">
-                                            <img src="" alt="" id="imgView2">
-                                            <input class="form-control" type="file" name="images" id="input2" accept="image/png, image/jpeg, image/jpg"onchange="viewImage2(event),viewImage(event, 2)">
-                                        </div>
-                                        <div class="image-cropper d-flex align-items-center" style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
-                                            <img src="" id="croppedImg2" alt="">
-                                            <button type="button" id="saveButton2" class="btn-sm btn-primary">Save</button>
+                            </div>
+                            <div class="card mb-2">
+                                <div class="card-header">
+                                    <h4>Choose images</h4>
+                                </div>
+                                <div class="border row p-3" style="gap: 20px;">
+                                    <div class="col-md-3 text-center">
+                                        <img src="" alt="" id="imgView1" class="img-thumbnail">
+                                        <input class="form-control mt-2" type="file" name="images" id="input1" accept="image/png, image/jpeg, image/jpg" onchange="viewImage(event, 1)">
+                                        <div class="image-cropper d-flex flex-column align-items-center" style="display:none;">
+                                            <img src="" id="croppedImg1" alt="" class="img-thumbnail">
+                                            <button type="button" id="saveButton1" class="btn btn-primary btn-sm mt-2">Save</button>
                                         </div>
                                     </div>
-                                                           
-                                    <div class="row">
-                                        <div class="card-body align-items-center" style="margin-bottom: 20px;">
-                                            <img src="" alt="" id="imgView3">
-                                            <input class="form-control" type="file" name="images" id="input3"
-                                                accept="image/png, image/jpeg, image/jpg"
-                                                onchange="viewImage3(event),viewImage(event, 3)">
-                                        </div>
-                                        <div class="image-cropper d-flex align-items-center" style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
-                                            <img src="" id="croppedImg3" alt="">
-                                            <button type="button" id="saveButton3" class="btn-sm btn-primary">Save</button>
+                                    <div class="col-md-3 text-center">
+                                        <img src="" alt="" id="imgView2" class="img-thumbnail">
+                                        <input class="form-control mt-2" type="file" name="images" id="input2" accept="image/png, image/jpeg, image/jpg" onchange="viewImage(event, 2)">
+                                        <div class="image-cropper d-flex flex-column align-items-center" style="display:none;">
+                                            <img src="" id="croppedImg2" alt="" class="img-thumbnail">
+                                            <button type="button" id="saveButton2" class="btn btn-primary btn-sm mt-2">Save</button>
                                         </div>
                                     </div>
-                                                           
-                                    <div class="row">
-                                        <div class="card-body align-items-center" style="margin-bottom: 20px;">
-                                            <img src="" alt="" id="imgView4">
-                                            <input class="form-control" type="file" name="images" id="input4"
-                                                accept="image/png, image/jpeg, image/jpg"
-                                                onchange="viewImage4(event),viewImage(event, 4)">
+                                    <div class="col-md-3 text-center">
+                                        <img src="" alt="" id="imgView3" class="img-thumbnail">
+                                        <input class="form-control mt-2" type="file" name="images" id="input3" accept="image/png, image/jpeg, image/jpg" onchange="viewImage(event, 3)">
+                                        <div class="image-cropper d-flex flex-column align-items-center" style="display:none;">
+                                            <img src="" id="croppedImg3" alt="" class="img-thumbnail">
+                                            <button type="button" id="saveButton3" class="btn btn-primary btn-sm mt-2">Save</button>
                                         </div>
-                                        <div class="image-cropper d-flex align-items-center" style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
-                                            <img src="" id="croppedImg4" alt="">
-                                            <button type="button" id="saveButton4" class="btn-sm btn-primary">Save</button>
+                                    </div>
+                                    <div class="col-md-3 text-center">
+                                        <img src="" alt="" id="imgView4" class="img-thumbnail">
+                                        <input class="form-control mt-2" type="file" name="images" id="input4" accept="image/png, image/jpeg, image/jpg" onchange="viewImage(event, 4)">
+                                        <div class="image-cropper d-flex flex-column align-items-center" style="display:none;">
+                                            <img src="" id="croppedImg4" alt="" class="img-thumbnail">
+                                            <button type="button" id="saveButton4" class="btn btn-primary btn-sm mt-2">Save</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div>
-                                <button class="btn btn-md rounded font-sm hover-up" id="updatebtn"
+                                <button class="btn btn-md rounded font-sm hover-up" id="publishBtn"
                                     type="button"  onclick="">Update</button>
                             </div>
                         </form>
@@ -208,13 +203,11 @@
     </div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script src="/scripts/admin/addProducts.js"></script>
-

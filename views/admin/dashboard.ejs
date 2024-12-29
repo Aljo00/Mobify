@@ -7,6 +7,12 @@
 <!-- Custom CSS -->
 <link rel="stylesheet" href="/styles/admin/dashboard.css">
 
+<style>
+    .card {
+        cursor: pointer;
+    }
+</style>
+
 <div class="d-flex">
     <div class="sidebar">
         <h2 class="text-white">Admin Dashboard</h2>
@@ -24,7 +30,7 @@
             <h1 class="my-4">Welcome to the Admin Dashboard</h1>
             <div class="row">
                 <div class="col-md-4">
-                    <div class="card">
+                    <div class="card" onclick="window.location.href='/admin/users'">
                         <div class="card-body">
                             <h5 class="card-title">Total Users</h5>
                             <p class="card-text"><%= totalUsers %></p>
@@ -32,7 +38,7 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card">
+                    <div class="card" onclick="window.location.href='/admin/products'">
                         <div class="card-body">
                             <h5 class="card-title">Total Products</h5>
                             <p class="card-text"><%= totalProducts %></p>

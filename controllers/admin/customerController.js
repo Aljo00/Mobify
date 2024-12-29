@@ -14,7 +14,7 @@ const customerInfo = async (req, res) => {
             page = parseInt(req.query.page);
         }
 
-        const limit = 3;
+        const limit = 6;
         const userData = await User.find({
             isAdmin: false,
             $or: [
@@ -22,6 +22,7 @@ const customerInfo = async (req, res) => {
                 { email: { $regex: ".*" + search + ".*", $options: "i" } }
             ]
         })
+        .sort({ createdOn: -1 })
         .limit(limit)
         .skip((page - 1) * limit)
         .exec();
@@ -53,7 +54,7 @@ const blockCustomer = async (req,res) => {
 
         const id = req.query.id;
         await User.updateOne({_id:id},{$set:{isBlocked:true}});
-        res.redirect("/admin/users");
+        res.redirect("/admin/users?status=blocked");
         
     } catch (error) {
         console.log("Error found in Blockingcustomer side: ", error.message);
@@ -68,7 +69,7 @@ const unblockCustomer = async (req,res) => {
 
         const id = req.query.id;
         await User.updateOne({_id:id},{$set:{isBlocked:false}});
-        res.redirect("/admin/users");
+        res.redirect("/admin/users?status=unblocked");
         
     } catch (error) {
         console.log("Error found in Blockingcustomer side: ", error.message);

@@ -1,169 +1,177 @@
 <%- include('../../views/layout/header.ejs') %>
 
 <!-- Bootstrap CSS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link
+  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+  rel="stylesheet"
+/>
 <!-- Font Awesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+/>
 <!-- Custom CSS -->
-<link rel="stylesheet" href="/styles/user/home.css">
+<link rel="stylesheet" href="/styles/user/home.css" />
 
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
-    <div class="container">
-        <a class="navbar-brand fw-bold text-primary" href="/">Mobify</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link active" href="/">Home</a></li>
-                <%for(let i = 0; i < brand.length; i++) {%>
-                <li class="nav-item"><a class="nav-link" href="#"><%= brand[i].brandName%></a></li>
-                <%}%>
-            </ul>
-            <form class="d-flex me-3" method="get">
-                <div class="input-group">
-                    <input class="form-control" type="search" name="search" placeholder="Search products...">
-                    <button class="input-group-text search-icon" type="submit">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-            </form>            
-            <div class="icons-group me-2">
-                <a href="#" class="text-dark me-3"><i class="far fa-heart fs-5"></i></a>
-                <a href="#" class="text-dark"><i class="fas fa-shopping-cart fs-5"></i></a>
-            </div>
-            <% if (locals.user) {%>
-                <div class="dropdown">
-                    <a href="#" class="sign-in-link"><%=locals.user.name%></a>
-                    <div class="dropdown-content">
-                        <a href="#">Profile</a>
-                        <a href="/logout">logout</a>
-                    </div>
-                </div>
-            <%} else {%>
-            <div class="d-flex align-items-center">
-                <a href="/login" class="btn btn-outline-primary me-2">Login</a>
-                <a href="/signup" class="btn btn-primary">Sign Up</a>
-            </div>
-            <%}%>
-            
+  <div class="container">
+    <a class="navbar-brand fw-bold text-primary" href="/">Mobify</a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link active" href="/">Home</a></li>
+        <%for(let i = 0; i < brand.length; i++) {%>
+        <li class="nav-item">
+          <a class="nav-link" href="#"><%= brand[i].brandName%></a>
+        </li>
+        <%}%>
+      </ul>
+      <form class="d-flex me-3" method="get">
+        <div class="input-group">
+          <input
+            class="form-control"
+            type="search"
+            name="search"
+            placeholder="Search products..."
+          />
+          <button class="input-group-text search-icon" type="submit">
+            <i class="fas fa-search"></i>
+          </button>
         </div>
+      </form>
+      <div class="icons-group me-2">
+        <a href="#" class="text-dark me-3"><i class="far fa-heart fs-5"></i></a>
+        <a href="#" class="text-dark"
+          ><i class="fas fa-shopping-cart fs-5"></i
+        ></a>
+      </div>;
+      <% if (locals.user) {%>
+      <div class="dropdown">
+        <a href="#" class="sign-in-link"><%=locals.user.name%></a>
+        <div class="dropdown-content">
+          <a href="#">Profile</a>
+          <a href="/logout">logout</a>
+        </div>
+      </div>
+      <%} else {%>
+      <div class="d-flex align-items-center">
+        <a href="/login" class="btn btn-outline-primary me-2">Login</a>
+        <a href="/signup" class="btn btn-primary">Sign Up</a>
+      </div>
+      <%}%>
     </div>
+  </div>
 </nav>
 
 <!-- Main Content -->
 <main class="container py-5 text-center">
-    <section class="product spad">
-        <div class="container">
-            <!-- Refurbished Phones Section -->
-            <div class="row">
-                <div class="col-lg-12">
-                    <h3 class="section-title">Refurbished Phones</h3>
-                </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <h3 class="section-title">New Phones</h3>
+    </div>
+  </div>
+  <div class="product__filter-wrapper">
+    <div class="product__filter d-flex overflow-auto">
+      <% for (let i = 0; i < newPhones.length; i++) { %>
+      <div class="col-lg-2 col-md-3 col-sm-4 col-6 mix new-arrivals">
+        <div class="product__item compact">
+          <a href="/product/<%= newPhones[i]._id %>">
+            <div
+              class="product__item__pic"
+              style="
+                background-image: url('/uploads/re-image/<%= newPhones[i].productImage[0] %>');
+              "
+            >
+              <div class="product-discount">
+                -<%= newPhones[i].discount || 50 %>%
+              </div>
+              <i class="fa fa-heart"></i>
             </div>
-            <div class="row product__filter">
-                <% for (let i = 0; i < refurbishedPhones.length; i++) { %>
-                    <div class="col-lg-2 col-md-3 col-sm-4 col-6 mix new-arrivals">
-                        <div class="product__item compact">
-                            <a href="/product/<%= refurbishedPhones[i]._id %>">
-                                <div class="product__item__pic" 
-                                     style="background-image: url('/uploads/re-image/<%= refurbishedPhones[i].productImage[0] %>');">
-                                    <div class="product-discount">-<%= refurbishedPhones[i].discount || 50 %>%</div>
-                                    <i class="fa fa-heart"></i>
-                                </div>
-                            </a>                                                       
-                            <div class="product__item__text">
-                                <h6 class="product-name"><%= refurbishedPhones[i].productName %></h6>
-                                <h5 class="product-price">
-                                    ₹<%= refurbishedPhones[i].combos[0].salePrice.toLocaleString() %>
-                                    <span class="text-muted">
-                                        <del>₹<%= refurbishedPhones[i].combos[0].regularPrice.toLocaleString() %></del>
-                                    </span>
-                                </h5>
-                                <a href="/addToCart?id=<%= refurbishedPhones[i]._id %>" class="add-cart">Add To Cart</a>
-                            </div>
-                        </div>
-                    </div>
-                <% } %>
-            </div>
-    
-            <!-- Pagination for Refurbished Phones -->
-            <div class="pagination">
-                <% if (currentPage > 1) { %>
-                    <a href="?page=<%= currentPage - 1 %>" class="prev-page">&laquo; Previous</a>
-                <% } %>
-            
-                <% for (let page = 1; page <= totalPagesRefurbished; page++) { %>
-                    <a href="?page=<%= page %>" class="page-number <%= page === currentPage ? 'active' : '' %>">
-                        <%= page %>
-                    </a>
-                <% } %>
-            
-                <% if (currentPage < totalPagesRefurbished) { %>
-                    <a href="?page=<%= currentPage + 1 %>" class="next-page">Next &raquo;</a>
-                <% } %>
-            </div>
-    
-            <!-- New Phones Section -->
-            <div class="row">
-                <div class="col-lg-12">
-                    <h3 class="section-title">New Phones</h3>
-                </div>
-            </div>
-            <div class="row product__filter">
-                <% for (let i = 0; i < newPhones.length; i++) { %>
-                    <div class="col-lg-2 col-md-3 col-sm-4 col-6 mix new-arrivals">
-                        <div class="product__item compact">
-                            <a href="/product/<%= newPhones[i]._id %>">
-                            <div class="product__item__pic" 
-                                 style="background-image: url('/uploads/re-image/<%= newPhones[i].productImage[0] %>');">
-                                <div class="product-discount">-<%= newPhones[i].discount || 50 %>%</div>
-                                <!-- <a href="/addToWishlist?id=" class="wishlist-btn"> -->
-                                    <i class="fa fa-heart"></i>
-                                <!-- </a> -->
-                            </div>
-                        </a>
-                            <div class="product__item__text">
-                                <h6 class="product-name"><%= newPhones[i].productName %></h6>
-                                <h5 class="product-price">
-                                    ₹<%= newPhones[i].combos[0].salePrice.toLocaleString() %>
-                                    <span class="text-muted">
-                                        <del>₹<%= newPhones[i].combos[0].regularPrice.toLocaleString() %></del>
-                                    </span>
-                                </h5>
-                                <a href="/addToCart?id=<%= newPhones[i]._id %>" class="add-cart">Add To Cart</a>
-                            </div>
-                        </div>
-                    </div>
-                <% } %>
-            </div>
-    
-            <!-- Pagination for New Phones -->
-            <div class="pagination">
-                <% if (currentPage > 1) { %>
-                    <a href="?page=<%= currentPage - 1 %>" class="prev-page">&laquo; Previous</a>
-                <% } %>
-            
-                <% for (let page = 1; page <= totalPagesNew; page++) { %>
-                    <a href="?page=<%= page %>" class="page-number <%= page === currentPage ? 'active' : '' %>">
-                        <%= page %>
-                    </a>
-                <% } %>
-            
-                <% if (currentPage < totalPagesNew) { %>
-                    <a href="?page=<%= currentPage + 1 %>" class="next-page">Next &raquo;</a>
-                <% } %>
-            </div>
+          </a>
+          <div class="product__item__text">
+            <h6 class="product-name"><%= newPhones[i].productName %></h6>
+            <h5 class="product-price">
+              ₹<%= newPhones[i].combos[0].salePrice.toLocaleString() %>
+              <span class="text-muted">
+                <del
+                  >₹<%= newPhones[i].combos[0].regularPrice.toLocaleString()
+                  %></del
+                >
+              </span>
+            </h5>
+            <a href="/addToCart?id=<%= newPhones[i]._id %>" class="add-cart"
+              >Add To Cart</a
+            >
+          </div>
         </div>
-    </section>      
+      </div>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-12">
+      <h3 class="section-title">Refurbished Phones</h3>
+    </div>
+  </div>
+  <div class="product__filter-wrapper">
+    <div class="product__filter d-flex overflow-auto">
+      <% for (let i = 0; i < refurbishedPhones.length; i++) { %>
+      <div class="col-lg-2 col-md-3 col-sm-4 col-6 mix new-arrivals">
+        <div class="product__item compact">
+          <a href="/product/<%= refurbishedPhones[i]._id %>">
+            <div
+              class="product__item__pic"
+              style="
+                background-image: url('/uploads/re-image/<%= refurbishedPhones[i].productImage[0] %>');
+              "
+            >
+              <div class="product-discount">
+                -<%= refurbishedPhones[i].discount || 50 %>%
+              </div>
+              <i class="fa fa-heart"></i>
+            </div>
+          </a>
+          <div class="product__item__text">
+            <h6 class="product-name">
+              <%= refurbishedPhones[i].productName %>
+            </h6>
+            <h5 class="product-price">
+              ₹<%= refurbishedPhones[i].combos[0].salePrice.toLocaleString() %>
+              <span class="text-muted">
+                <del
+                  >₹<%=
+                  refurbishedPhones[i].combos[0].regularPrice.toLocaleString()
+                  %></del
+                >
+              </span>
+            </h5>
+            <a
+              href="/addToCart?id=<%= refurbishedPhones[i]._id %>"
+              class="add-cart"
+              >Add To Cart</a
+            >
+          </div>
+        </div>
+      </div>
+      <% } %>
+    </div>
+  </div>
 </main>
 
 <!-- Footer -->
 <footer>
-    <div class="container text-center">
-        <p class="mb-0">&copy; 2023 Mobify. All rights reserved.</p>
-    </div>
+  <div class="container text-center">
+    <p class="mb-0">&copy; 2023 Mobify. All rights reserved.</p>
+  </div>
 </footer>
 
 <!-- Bootstrap JS -->

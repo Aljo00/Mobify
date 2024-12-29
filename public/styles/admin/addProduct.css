@@ -123,6 +123,23 @@
     color: red;
     font-size: 12px;
     margin-top: 5px;
+    display: none; /* Hide by default */
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-5px);
+    }
+    50% {
+        transform: translateX(5px);
+    }
+    75% {
+        transform: translateX(-5px);
+    }
 }
 
 /* Input & Select Fields */
@@ -157,7 +174,6 @@ button:hover {
     border-radius: 5px;
     padding: 5px;
 }
-
 
 footer {
     background-color: #000000;

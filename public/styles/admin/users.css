@@ -1,84 +1,84 @@
 body {
-    background-color: #f8f9fa;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+  background-color: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 .sidebar {
-    height: 100vh;
-    background-color: #343a40;
-    padding: 20px;
+  height: 100vh;
+  background-color: #343a40;
+  padding: 20px;
 }
 .sidebar a {
-    color: white;
-    text-decoration: none;
-    padding: 10px;
-    display: block;
-    border-radius: 5px;
-    margin-bottom: 10px;
+  color: white;
+  text-decoration: none;
+  padding: 10px;
+  display: block;
+  border-radius: 5px;
+  margin-bottom: 10px;
 }
 .sidebar a:hover {
-    background-color: #495057;
+  background-color: #495057;
 }
 .main-content {
-    padding: 20px;
-    flex-grow: 1;
+  padding: 20px;
+  flex-grow: 1;
 }
 
 .breadcrumb-container {
-    margin-bottom: 20px;
-    padding: 10px 15px;
-    background: linear-gradient(90deg, #f8f9fa, #e9ecef);
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  padding: 10px 15px;
+  background: linear-gradient(90deg, #f8f9fa, #e9ecef);
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .breadcrumb {
-    display: flex;
-    align-items: center;
-    margin: 0;
-    padding: 0;
-    background: transparent;
-    font-size: 16px;
-    font-weight: 500;
-    color: #6c757d;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  font-size: 16px;
+  font-weight: 500;
+  color: #6c757d;
 }
 
 .breadcrumb-item + .breadcrumb-item::before {
-    content: ">";
-    margin: 0 10px;
-    color: #adb5bd;
+  content: '>';
+  margin: 0 10px;
+  color: #adb5bd;
 }
 
 .breadcrumb-item a {
-    text-decoration: none;
-    color: #007bff;
-    padding: 5px 10px;
-    border-radius: 5px;
-    transition: background-color 0.3s ease, color 0.3s ease;
+  text-decoration: none;
+  color: #007bff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .breadcrumb-item a:hover {
-    background-color: #007bff;
-    color: white;
-    text-decoration: none;
+  background-color: #007bff;
+  color: white;
+  text-decoration: none;
 }
 
 .breadcrumb-item.active {
-    color: #495057;
-    font-weight: 600;
+  color: #495057;
+  font-weight: 600;
 }
 
 .card {
-    margin-bottom: 20px;
-    border: 1px solid #dee2e6;
-    border-radius: 5px;
-    background-color: #ffffff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  background-color: #ffffff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 footer {
-    background-color: #000000;
-    color: white;
-    text-align: center;
-    padding: 10px 0;
+  background-color: #000000;
+  color: white;
+  text-align: center;
+  padding: 10px 0;
 }

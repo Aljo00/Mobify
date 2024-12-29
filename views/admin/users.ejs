@@ -1,109 +1,196 @@
 <%- include('../../views/layout/header.ejs')%>
 
 <!-- Bootstrap CSS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link
+  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+  rel="stylesheet"
+/>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+/>
 
-<link rel="stylesheet" href="/styles/admin/users.css">
+<link rel="stylesheet" href="/styles/admin/users.css" />
 
 <div class="d-flex">
-    <div class="sidebar">
-        <h2 class="text-white">Admin Dashboard</h2>
-        <a href="/admin/dashboard">Dashboard</a>
-        <a id="live-dashboard-button" href="#" style="background-color: #007bff; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none;">Users</a>
-        <a href="/admin/category">categories</a>
-        <a href="/admin/brands">Brands</a>
-        <a href="/admin/addProducts">Add Products</a>
-        <a href="/admin/products">Products</a>
-        <a href="#">Settings</a>
-        <a href="/admin/logout">Logout</a>
-    </div>
-    <div class="main-content flex-grow-1">
-        <div class="container">
-            <h1 class="my-4">User Management</h1>
-            <!-- Search Bar -->
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <form action="/admin/users" method="get ">
-                        <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Search users..." id="searchInput" name="search">
-                            <button class="btn btn-primary" type="submit">Search</button>
-                        </div>
-                    </form>
-                </div>
+  <div class="sidebar">
+    <h2 class="text-white">Admin Dashboard</h2>
+    <a href="/admin/dashboard">Dashboard</a>
+    <a
+      id="live-dashboard-button"
+      href="/admin/users"
+      style="
+        background-color: #007bff;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+      "
+      >Users</a
+    >
+    <a href="/admin/category">categories</a>
+    <a href="/admin/brands">Brands</a>
+    <a href="/admin/addProducts">Add Products</a>
+    <a href="/admin/products">Products</a>
+    <a href="#">Settings</a>
+    <a href="/admin/logout">Logout</a>
+  </div>
+  <div class="main-content flex-grow-1">
+    <div class="container">
+      <h1 class="my-4">User Management</h1>
+      <!-- Search Bar -->
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <form action="/admin/users" method="get ">
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Search users..."
+                id="searchInput"
+                name="search"
+              />
+              <button class="btn btn-primary" type="submit">Search</button>
             </div>
-
-            <div class="breadcrumb-container">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">User Management</li>
-                    </ol>
-                </nav>
-            </div>
-
-            <!-- User Table -->
-            <div class="card">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Phone</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% for(let i = 0; i < data.length; i++) { %>
-                                <tr> 
-                                    <td><%= data[i].name %></td>
-                                    <td><%= data[i].email %></td>
-                                    <td><%= data[i].phone %></td>
-                                    <td>
-                                        <% if (data[i].isBlocked === false) { %>
-                                            <a href="/admin/blockCustomer?id=<%=data[i]._id%>" class="btn btn-warning btn-sm">Block</a>
-                                        <% } else { %>
-                                            <a href="/admin/unblockCustomer?id=<%=data[i]._id%>" class="btn btn-success btn-sm">Unblock</a>
-                                        <% } %>
-                                    </td>
-                                </tr>
-                                <% }; %>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+          </form>
         </div>
+      </div>
 
-        <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center">
-                <% if (currentPage > 1) { %>
-                    <li class="page-item">
-                        <a class="page-link" href="?page=<%= currentPage - 1 %>">Previous</a>
-                    </li>
-                <% } %>
-                <% for (let i = 1; i <= totalPages; i++) { %>
-                    <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
-                        <a class="page-link" href="?page=<%= i %>"><%= i %></a>
-                    </li>
-                <% } %>
-                <% if (currentPage < totalPages) { %>
-                    <li class="page-item">
-                        <a class="page-link" href="?page=<%= currentPage + 1 %>">Next</a>
-                    </li>
-                <% } %>
-            </ul>
-        </nav>        
+      <div class="breadcrumb-container">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              <a href="/admin/dashboard">Dashboard</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+              User Management
+            </li>
+          </ol>
+        </nav>
+      </div>
 
+      <!-- User Table -->
+      <div class="card">
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% for(let i = 0; i < data.length; i++) { %>
+                <tr>
+                  <td><%= data[i].name %></td>
+                  <td><%= data[i].email %></td>
+                  <td><%= data[i].phone %></td>
+                  <td>
+                    <div>
+                      <% if (data[i].isBlocked === false) { %>
+                      <button
+                        class="btn btn-warning btn-sm"
+                        onclick="confirmAction('<%= data[i]._id %>', '<%= data[i].name %>', true)"
+                      >
+                        Block
+                      </button>
+                      <% } else { %>
+                      <button
+                        class="btn btn-success btn-sm"
+                        onclick="confirmAction('<%= data[i]._id %>', '<%= data[i].name %>', false)"
+                      >
+                        Unblock
+                      </button>
+                      <% } %>
+                    </div>
+                  </td>
+                </tr>
+                <% }; %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <nav aria-label="Page navigation">
+      <ul class="pagination justify-content-center">
+        <% if (currentPage > 1) { %>
+        <li class="page-item">
+          <a class="page-link" href="?page=<%= currentPage - 1 %>">Previous</a>
+        </li>
+        <% } %> <% for (let i = 1; i <= totalPages; i++) { %>
+        <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
+          <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+        </li>
+        <% } %> <% if (currentPage < totalPages) { %>
+        <li class="page-item">
+          <a class="page-link" href="?page=<%= currentPage + 1 %>">Next</a>
+        </li>
+        <% } %>
+      </ul>
+    </nav>
+  </div>
 </div>
+
 <footer>
-    <div class="container text-center">
-        <p class="mb-0">&copy; 2023 Mobify. All rights reserved.</p>
-    </div>
+  <div class="container text-center">
+    <p class="mb-0">&copy; 2023 Mobify. All rights reserved.</p>
+  </div>
 </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  // Function to show SweetAlert
+  function confirmAction(customerId, customerName, isBlocking) {
+    const action = isBlocking ? "block" : "unblock";
+    const actionPast = isBlocking ? "blocked" : "unblocked";
+
+    Swal.fire({
+      title: `Are you sure?`,
+      text: `You are about to ${action} ${customerName}. This action cannot be undone!`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: `Yes, ${action} them!`,
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Redirect to block/unblock route based on the action
+        window.location.href = `/admin/${isBlocking ? "blockCustomer" : "unblockCustomer"}?id=${customerId}`;
+      }
+    });
+  }
+
+  // Check URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const status = urlParams.get('status');
+
+  // Show SweetAlert based on status
+  if (status) {
+    Swal.fire({
+      title: status === "blocked" ? "Customer Blocked" : "Customer Unblocked",
+      text: status === "blocked" ? "The customer has been successfully blocked." : "The customer has been successfully unblocked.",
+      icon: status === "blocked" ? "error" : "success",
+      timer: 3000, // 3 seconds
+      timerProgressBar: true,
+      toast: true,
+      position: "top-end", // Top-right corner
+      showConfirmButton: false,
+      background: status === "blocked" ? "#d9534f" : "#5cb85c", // Custom colors
+      color: "#fff", // White text
+    });
+  }
+</script>
+
 <!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>    
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <%- include('../../views/layout/footer.ejs')%>

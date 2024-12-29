@@ -96,21 +96,25 @@ const editCategory = async (req,res) => {
 }
 
 const softDeleteCategory = async (req, res) => {
-    try {
-        const id = req.params.id;
+  try {
+    const id = req.params.id;
 
-        // Update the category's `isListed` status to false
-        const updateCategory = await Category.findByIdAndUpdate(id, { isListed: false }, { new: true });
+    // Update the category's `isListed` status to false
+    const updateCategory = await Category.findByIdAndUpdate(
+      id,
+      { isListed: false },
+      { new: true }
+    );
 
-        if (updateCategory) {
-            res.status(200).json({ message: "Category soft deleted successfully." });
-        } else {
-            res.status(400).json({ error: "Category not found." });
-        }
-    } catch (error) {
-        console.log("Error in soft deleting category: ", error.message);
-        res.status(500).json({ error: "Internal server error." });
+    if (updateCategory) {
+      res.status(200).json({ message: 'Category soft deleted successfully.' });
+    } else {
+      res.status(400).json({ error: 'Category not found.' });
     }
+  } catch (error) {
+    console.log('Error in soft deleting category: ', error.message);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
 };
 
 

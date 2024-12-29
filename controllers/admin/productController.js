@@ -53,6 +53,7 @@ const addProducts = async (req, res) => {
             // Check if the product already exists
             const existingProduct = await Product.findOne({ productName });
             if (existingProduct) {
+                console.log("Product already exists");
                 return res.status(400).json({ error: "Product already exists" });
             }
 
@@ -68,13 +69,16 @@ const addProducts = async (req, res) => {
             });
 
             await newProduct.save();
-            res.redirect("/admin/addProducts");
+            console.log("Product added successfully");
+            return res.status(200).json({ message: "Product added successfully" });
         } else {
-            res.status(400).json({ error: "Combos data is required" });
+            console.log("Combos data is required");
+            return res.status(400).json({ error: "Combos data is required" });
         }
     } catch (error) {
-        console.error("Error adding product:", error);
-        res.status(500).send("Internal server error");
+        console.error("Error adding product:", error.message);
+        console.error("Stack trace:", error.stack);
+        return res.status(500).json({ error: "Internal server error" });
     }
 };
 
@@ -84,7 +88,7 @@ const getAllProducts = async (req,res) => {
 
         const search = req.query.search || "";
         const page = req.query.page || 1;
-        const limit = 4;
+        const limit = 6;
         const skip = (page-1)*limit;
 
         const productData = await Product.find({
@@ -94,6 +98,7 @@ const getAllProducts = async (req,res) => {
                 {brand:{$regex: new RegExp(".*"+search+".*","i")}}
             ]
         })
+        .sort({ createdAt: -1 }) // Sort by latest added first
         .limit(limit)
         .skip(skip)
         .populate('category')
@@ -135,20 +140,25 @@ const getAllProducts = async (req,res) => {
 }
 
 const softDeleteProduct = async (req, res) => {
-    try {
-        const id = req.params.id;
+  try {
+    const id = req.params.id;
 
-        const updateProduct = await Product.findByIdAndUpdate(id, { isBlocked: true }, { new: true });
+    // Update the product's "isBlocked" field to true
+    const updateProduct = await Product.findByIdAndUpdate(
+      id,
+      { isBlocked: true },
+      { new: true }
+    );
 
-        if (updateProduct) {
-            res.status(200).json({ message: "Product soft deleted successfully." });
-        } else {
-            res.status(400).json({ error: "Product not found." });
-        }
-    } catch (error) {
-        console.log("Error in soft deleting Product: ", error.message);
-        res.status(500).json({ error: "Internal server error." });
+    if (updateProduct) {
+      res.status(200).json({ message: 'Product soft deleted successfully.' });
+    } else {
+      res.status(400).json({ error: 'Product not found.' });
     }
+  } catch (error) {
+    console.error('Error in soft deleting Product: ', error.message);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
 };
 
 const getEditProduct = async (req,res) => {
@@ -219,11 +229,11 @@ const editProduct = async (req, res) => {
 
         await Product.findByIdAndUpdate(id, updateFields, { new: true });
         console.log("Product edited successfully!");
-        res.redirect("/admin/products");
+        res.status(200).json({ message: 'Product edited successfully!' });
 
     } catch (error) {
         console.log("Error found in Edit Product side: ", error.message);
-        res.redirect("/admin/error");
+        res.status(500).json({ error: 'Internal server error.' });
     }
 };
 

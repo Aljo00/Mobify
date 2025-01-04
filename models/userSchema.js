@@ -44,6 +44,10 @@ const userSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "Cart"
     }],
+    address: [{
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "Address" 
+    }],
     wallet: {
         type: Number,
         default: 0

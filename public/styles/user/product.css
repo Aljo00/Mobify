@@ -1,0 +1,322 @@
+/* General Styles */
+body,
+html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  background-color: #dbdcdd; /* Light grey background */
+  color: #333; /* Dark grey text */
+}
+
+.container {
+  width: 100%;
+  padding: 0 15px; /* Adjust padding as needed */
+  margin: 0 auto;
+  max-width: 1200px; /* Max width for container */
+}
+
+/* Dropdown Container */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown Trigger Link */
+.sign-in-link {
+  font-size: 16px;
+  color: #fff; /* White text */
+  background-color: #007bff; /* Blue background */
+  padding: 10px 15px;
+  border-radius: 5px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.sign-in-link:hover {
+  background-color: #0056b3; /* Darker blue background on hover */
+}
+
+/* Dropdown Content */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background-color: #fff; /* White background */
+  color: #000; /* Black text */
+  min-width: 150px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.dropdown-content a {
+  display: block;
+  color: #000; /* Black text */
+  padding: 10px 15px;
+  text-decoration: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f1f1; /* Light grey background on hover */
+  color: #007bff; /* Blue text on hover */
+}
+
+/* Show Dropdown Content on Hover */
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* Navbar Styles */
+.navbar {
+  background-color: #fff; /* White background */
+  border-bottom: 1px solid #ddd; /* Light grey border */
+}
+
+.navbar-brand,
+.navbar-nav .nav-link {
+  color: #333 !important; /* Dark grey text */
+  position: relative;
+}
+
+.navbar-nav .nav-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  display: block;
+  margin-top: 5px;
+  right: 0;
+  background: #007bff; /* Blue line */
+  transition: width 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover::after {
+  width: 100%; /* Full width on hover */
+  left: 0;
+  background: #007bff; /* Blue line */
+}
+
+.navbar-nav .nav-link:hover {
+  color: #007bff !important; /* Blue text on hover */
+}
+
+.navbar-toggler {
+  border-color: #007bff; /* Blue border */
+}
+
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(0, 123, 255, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+/* Dropdown Styles */
+.nav-item.dropdown:hover .dropdown-menu {
+  display: block;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.nav-item.dropdown .dropdown-menu {
+  display: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  min-width: 250px; /* Larger dropdown box */
+  padding: 10px 20px; /* Add padding */
+  border: 1px solid #ddd; /* Light grey border */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Light shadow */
+}
+
+.dropdown-menu .dropdown-item {
+  padding: 10px 15px; /* Add padding */
+  color: #000; /* Black text */
+  text-decoration: none;
+  display: block;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dropdown-menu .dropdown-item:hover {
+  background-color: #f1f1f1; /* Light grey background on hover */
+  color: #007bff; /* Blue text on hover */
+}
+
+/* Icons Group */
+.icons-group a {
+  color: #000 !important; /* Black text */
+}
+
+.icons-group a:hover {
+  color: #333 !important; /* Darker grey text on hover */
+}
+
+/* Product Image Carousel */
+.product-carousel-image {
+  max-height: 500px; /* Max height for product images */
+  object-fit: contain; /* Contain images within the carousel */
+}
+
+/* Thumbnails Section */
+.thumbnail-image {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  margin: 0 5px;
+  cursor: pointer;
+  border: 1px solid #ddd;
+  padding: 5px;
+}
+
+/* Product Details */
+.product-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.brand {
+  font-size: 18px;
+  color: #555;
+}
+
+.product-combos h5 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.combo-buttons .btn {
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+
+.product-price-section {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.product-price-section .text-muted {
+  font-size: 18px;
+}
+
+.action-buttons .btn {
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
+.description {
+  font-size: 16px;
+  color: #555;
+  margin-top: 20px;
+}
+
+/* Related Products */
+.related-products h3 {
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+
+.related-product {
+  text-decoration: none;
+  color: inherit;
+}
+
+.product__item {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+}
+
+.product__item:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.product__item__pic {
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 200px;
+  position: relative;
+}
+
+.product-discount {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #ff9900;
+  color: #fff;
+  padding: 5px 10px;
+  font-size: 14px;
+  border-radius: 3px;
+}
+
+.product__item__text {
+  padding: 15px;
+  text-align: center;
+}
+
+.product__item__text h6 {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.product__item__text h5 {
+  font-size: 18px;
+  color: #007bff;
+}
+
+/* Footer */
+footer {
+  background-color: #fff;
+  padding: 20px 0;
+  border-top: 1px solid #ddd;
+}
+
+footer p {
+  margin: 0;
+  color: #555;
+}
+
+/* Quantity Counter */
+.quantity-counter {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.quantity-counter button {
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  background-color: #f8f9fa;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.quantity-counter button:hover {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.quantity-counter input {
+  width: 60px;
+  height: 40px;
+  text-align: center;
+  font-size: 18px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin: 0 10px;
+  background-color: #fff;
+  color: #333;
+}

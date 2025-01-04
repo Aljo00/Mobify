@@ -2,6 +2,8 @@ const User = require('../../models/userSchema');
 const Brand = require('../../models/brandSchema');
 const Category = require('../../models/categorySchema');
 const Product = require('../../models/productSchema');
+const cart = require('../../models/cartSchema');
+const mongoose = require('mongoose');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const { response } = require('../../app');
@@ -17,37 +19,49 @@ const load_page404 = async (req, res) => {
 
 const load_homePage = async (req, res) => {
   try {
-    const categories = await Category.find({ isListed: true });
-
-    // Fetch Refurbished Phones
-    const refurbishedCount = await Product.countDocuments({
-      isBlocked: false,
-      combos: { $elemMatch: { quantity: { $gt: 0 } } },
-      category: 'Refurbished Phones', // Replace with the actual category identifier for refurbished phones
-    });
 
     const refurbishedPhones = await Product.find({
       isBlocked: false,
       combos: { $elemMatch: { quantity: { $gt: 0 } } },
-      category: 'Refurbished Phones',
+      category: "Refurbished Phones",
     });
 
     const newPhones = await Product.find({
       isBlocked: false,
       combos: { $elemMatch: { quantity: { $gt: 0 } } },
-      category: 'New Phone',
+      category: "New Phone",
     });
+
+    const newArrivals = await Product.find({
+      isBlocked: false,
+      combos: { $elemMatch: { quantity: { $gt: 0 } } },
+    }).sort({ createdAt: -1 }).limit(6);
 
     const user = req.session.user;
     const brand = await Brand.find({}).limit(7);
 
+    // Get cart item count from session or calculate it
+    let cartItemCount = 0;
+    if (user) {
+      console.log("Session User ID:", user); // Log session user ID
+      const userId = new mongoose.Types.ObjectId(user);
+
+      const userCart = await cart.findOne({ userId }); // Query with ObjectId
+      console.log("Cart Retrieved:", userCart); // Log retrieved cart
+      cartItemCount = userCart ? userCart.items.length : 0; // Calculate count
+    } else {
+      console.log("User not logged in or session not set."); // Log if user is missing
+    }
+
     const userData = user ? await User.findById(user) : null;
 
-    return res.render('user/home', {
+    return res.render("user/home", {
       user: userData,
       brand: brand,
       refurbishedPhones,
       newPhones,
+      newArrivals,
+      cartItemCount,
     });
   } catch (error) {
     console.log('Error found: ', error.message);
@@ -236,7 +250,7 @@ const verifyLogin = async (req, res) => {
     }
 
     req.session.user = findUser._id;
-    console.log(req.session.user);
+    
     res.redirect('/');
   } catch (error) {
     console.log('An error occured in the login page :-- ', error.message);

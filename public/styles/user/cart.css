@@ -1,0 +1,291 @@
+/* General Styles */
+body,
+html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  background-color: #f8f9fa; /* Light grey background */
+  color: #000; /* Black text */
+}
+
+.container {
+  width: 100%;
+  padding: 0 15px; /* Adjust padding as needed */
+  margin: 0 auto;
+  max-width: 100%; /* Ensure the container spans the full width */
+}
+
+/* Dropdown Container */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown Trigger Link */
+.sign-in-link {
+  font-size: 16px;
+  color: #fff; /* White text */
+  background-color: #007bff; /* Blue background */
+  padding: 10px 15px;
+  border-radius: 5px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.sign-in-link:hover {
+  background-color: #0056b3; /* Darker blue background on hover */
+}
+
+/* Dropdown Content */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background-color: #fff; /* White background */
+  color: #000; /* Black text */
+  min-width: 150px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.dropdown-content a {
+  display: block;
+  color: #000; /* Black text */
+  padding: 10px 15px;
+  text-decoration: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f1f1; /* Light grey background on hover */
+  color: #007bff; /* Blue text on hover */
+}
+
+/* Show Dropdown Content on Hover */
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* Navbar Styles */
+.navbar {
+  background-color: #fff; /* White background */
+}
+
+.navbar-brand,
+.navbar-nav .nav-link {
+  color: #000 !important; /* Black text */
+  position: relative;
+}
+
+.navbar-nav .nav-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  display: block;
+  margin-top: 5px;
+  right: 0;
+  background: #007bff; /* Blue line */
+  transition: width 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover::after {
+  width: 100%; /* Full width on hover */
+  left: 0;
+  background: #007bff; /* Blue line */
+}
+
+.navbar-nav .nav-link:hover {
+  color: #007bff !important; /* Blue text on hover */
+}
+
+.navbar-toggler {
+  border-color: #007bff; /* Blue border */
+}
+
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(0, 123, 255, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+/* Dropdown Styles */
+.nav-item.dropdown:hover .dropdown-menu {
+  display: block;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.nav-item.dropdown .dropdown-menu {
+  display: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  min-width: 250px; /* Larger dropdown box */
+  padding: 10px 20px; /* Add padding */
+  border: 1px solid #ddd; /* Light grey border */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Light shadow */
+}
+
+.dropdown-menu .dropdown-item {
+  padding: 10px 15px; /* Add padding */
+  color: #000; /* Black text */
+  text-decoration: none;
+  display: block;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dropdown-menu .dropdown-item:hover {
+  background-color: #f1f1f1; /* Light grey background on hover */
+  color: #007bff; /* Blue text on hover */
+}
+
+/* Icons Group */
+.icons-group a {
+  color: #000 !important; /* Black text */
+}
+
+.icons-group a:hover {
+  color: #333 !important; /* Darker grey text on hover */
+}
+
+.cart-container {
+  width: 80%;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 2em;
+  color: #007bff; /* Blue text */
+}
+
+.cart-content {
+  display: flex;
+  justify-content: space-between;
+}
+
+.cart-items {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  width: 60%; /* Adjust width to fit next to cart summary */
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative; /* Add relative positioning */
+}
+
+.item-image {
+  flex: 0 0 100px;
+}
+
+.cart-item img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.item-details {
+  flex-grow: 1;
+  padding: 0 20px;
+}
+
+.item-details h2 {
+  margin: 0 0 10px;
+  font-size: 1.5em;
+  color: #333;
+}
+
+.item-details p {
+  margin: 5px 0;
+  font-size: 1em;
+  color: #555;
+}
+
+.item-price {
+  text-align: right;
+}
+
+.item-price p {
+  margin: 5px 0;
+  font-size: 1em;
+  color: #333;
+}
+
+.item-actions {
+  position: absolute; /* Position the delete button */
+  top: 10px;
+  right: 10px; /* Change to right */
+}
+
+.item-actions .btn-icon {
+  padding: 5px;
+  font-size: 1em;
+  background: none;
+  border: none;
+  color: #dc3545; /* Red color for delete icon */
+  cursor: pointer;
+}
+
+.item-actions .btn-icon:hover {
+  color: #a71d2a; /* Darker red on hover */
+}
+
+.cart-summary {
+  text-align: right;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 35%; /* Adjust width to fit next to cart items */
+}
+
+.cart-summary h2 {
+  margin-bottom: 20px;
+  font-size: 1.5em;
+  color: #007bff; /* Blue text */
+}
+
+.cart-summary p {
+  margin: 10px 0;
+  font-size: 1.2em;
+  color: #333;
+}
+
+.checkout-button {
+  padding: 10px 20px;
+  background-color: #ff9900;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.checkout-button:hover {
+  background-color: #e68a00;
+}

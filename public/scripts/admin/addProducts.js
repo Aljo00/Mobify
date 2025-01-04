@@ -97,8 +97,8 @@ function viewImage(event, index) {
       ready() {
         // Set the crop box dimensions here
         this.cropper.setCropBoxData({
-          width: 283.15,
-          height: 220,
+          width: this.cropper.getContainerData().width * 0.7, // Example: 70% of container width
+          height: this.cropper.getContainerData().height * 0.5, // Example: 50% of container height
         });
       },
     });
@@ -124,7 +124,7 @@ function viewImage(event, index) {
         const fileList = new DataTransfer();
         fileList.items.add(imgFile);
         input.files = fileList.files;
-      });
+      }, 'image/png', 1.0);
 
       cropperContainer.style.display = 'none';
       cropper.destroy();

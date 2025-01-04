@@ -219,17 +219,6 @@ function validateForm() {
     }
   });
 
-  // Validate Images
-  const images = document.querySelectorAll('input[type="file"]');
-  let imageSelected = false;
-  images.forEach((input) => {
-    if (input.files.length > 0) imageSelected = true;
-  });
-  if (!imageSelected) {
-    displayErrorMessage('images-error', 'At least one image must be selected.');
-    isValid = false;
-  }
-
   return isValid; // Return the overall validation result
 }
 

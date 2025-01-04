@@ -1,0 +1,158 @@
+<%- include('../../views/layout/header.ejs') %>
+
+<!-- Bootstrap CSS -->
+<link
+  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+  rel="stylesheet"
+/>
+<!-- Font Awesome -->
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+/>
+
+<link rel="stylesheet" href="/styles/user/address.css" />
+
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold text-primary" href="/">Mobify</a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link active" href="/">Home</a></li>
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link"
+            href="#"
+            id="navbarDropdown"
+            role="button"
+            aria-expanded="false"
+          >
+            Brands
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <% for (let i = 0; i < brand.length; i++) { %>
+            <li>
+              <a class="dropdown-item" href="#"><%= brand[i].brandName %></a>
+            </li>
+            <% } %>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/aboutus">About Us</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/contactus">Contact Us</a>
+        </li>
+      </ul>
+      <form class="d-flex me-3" method="get">
+        <div class="input-group">
+          <input
+            class="form-control"
+            type="search"
+            name="search"
+            placeholder="Search products..."
+          />
+          <button class="input-group-text search-icon" type="submit">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </form>
+      <div class="icons-group me-2">
+        <a href="#" class="text-dark me-3"><i class="far fa-heart fs-5"></i></a>
+        <a href="/cart" class="text-dark"
+          ><i class="fas fa-shopping-cart fs-5"></i
+        ></a>
+      </div>
+      <% if (locals.user) {%>
+      <div class="dropdown">
+        <a href="#" class="sign-in-link">
+          <i class="fas fa-user-circle"></i> <%=locals.user.name%>
+        </a>
+        <div class="dropdown-content">
+          <a href="#">Profile</a>
+          <a href="/logout">logout</a>
+        </div>
+      </div>
+      <%} else {%>
+      <div class="d-flex align-items-center">
+        <a href="/login" class="btn btn-outline-primary me-2">Login</a>
+        <a href="/signup" class="btn btn-primary">Sign Up</a>
+      </div>
+      <%}%>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid mt-5">
+  <div class="row">
+    <div class="col-md-3">
+      <div class="list-group">
+        <a href="/account" class="list-group-item list-group-item-action">
+          <i class="fas fa-user icon-img"></i> Account
+        </a>
+        <a
+          href="/addresses"
+          class="list-group-item list-group-item-action active"
+        >
+          <i class="fas fa-map-marker-alt icon-img"></i> Address
+        </a>
+        <a href="#" class="list-group-item list-group-item-action">
+          <i class="fas fa-box icon-img"></i> Orders
+        </a>
+        <a href="#" class="list-group-item list-group-item-action">
+          <i class="fas fa-heart icon-img"></i> Wishlist
+        </a>
+        <a href="#" class="list-group-item list-group-item-action">
+          <i class="fas fa-key icon-img"></i> Reset Password
+        </a>
+        <a href="/logout" class="list-group-item list-group-item-action">
+          <i class="fas fa-sign-out-alt icon-img"></i> Logout
+        </a>
+      </div>
+    </div>
+    <div class="col-md-9">
+      <h2 class="mb-4">Your Addresses</h2>
+      <% if (user && user.address && user.address.length > 0) { %>
+      <div class="row">
+        <% user.address.forEach(function(addr) { %>
+        <div class="col-md-6 mb-4">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">
+                <%= addr.houseName %> (<%= addr.addressType %>)
+              </h5>
+              <p class="card-text">
+                <%= addr.city %>, <%= addr.state %> - <%= addr.pincode %>
+              </p>
+              <p class="card-text">Landmark: <%= addr.landMark %></p>
+              <p class="card-text">Phone: <%= addr.phone %></p>
+              <p class="card-text">Alt Phone: <%= addr.altPhone %></p>
+            </div>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+      <% } else { %>
+      <p>No addresses found.</p>
+      <% } %>
+      <a href="/add-address" class="btn btn-primary mt-4">Add New Address</a>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <div class="container-fluid text-center">
+    <p class="mb-0">&copy; 2023 Mobify. All rights reserved.</p>
+  </div>
+</footer>
+
+<%- include('../../views/layout/footer.ejs') %>

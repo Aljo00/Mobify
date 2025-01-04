@@ -36,7 +36,7 @@ app.use(session({
     }
 }));
 
-app.use(nocache())
+app.use(nocache());
 
 app.use(passport.initialize());
 app.use(passport.session());

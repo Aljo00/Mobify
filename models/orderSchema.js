@@ -49,16 +49,12 @@ const orderSchema = new Schema({
         required: true,
         enum: ['Pending', 'Processing','Shipped','Delivered','Cancelled','Return Request','Returned']
     },
-    createdOn:{
-        type: Date,
-        default: Date.now
-    },
     couponApplied: {
         type: Boolean,
         default: false
     }
 
-})
+}, {timestamps: true});
 
 const Order = mongoose.model("Order", orderSchema);
 

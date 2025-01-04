@@ -18,6 +18,18 @@ const cartSchema = new Schema({
             type: Number,
             default: 1
         },
+        RAM:{
+            type: String,
+            required: true
+        },
+        Storage:{
+            type: String,
+            required: true
+        },
+        color:{
+            type: String,
+            required: true
+        },
         price: {
             type:Number,
             required: true

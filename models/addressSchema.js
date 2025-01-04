@@ -10,9 +10,9 @@ const addressSchema = new Schema({
     address: [{
         addressType: {
             type: String,
-            require: true
+            required: true
         },
-        name: {
+        houseName: {
             type: String,
             required: true
         },

@@ -12,7 +12,7 @@ const User = require("../models/userSchema");
 
 const userAuth = require("../middleware/userAuth");
 
-user_router.get("/", user_controller.load_homePage);
+user_router.get("/", userAuth.is_UserBlocked, user_controller.load_homePage);
 
 user_router.get("/page404", user_controller.load_page404);
 
@@ -86,6 +86,7 @@ user_router.get("/product/combo/:id", productController.loadComboDetails);
 user_router.get(
   "/add-to-cart/:id",
   userAuth.is_UserLogin,
+  userAuth.is_UserBlocked,
   cartController.addtoCart
 );
 
@@ -93,7 +94,7 @@ user_router.post(
   "/add-to-cart",userAuth.is_UserLogin
 )
 
-user_router.get("/cart", userAuth.is_UserLogin, cartController.loadCartPage);
+user_router.get("/cart", userAuth.is_UserLogin,userAuth.is_UserBlocked, cartController.loadCartPage);
 
 user_router.post(
   "/cart/delete/:id",

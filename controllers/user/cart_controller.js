@@ -11,7 +11,6 @@ const addtoCart = async (req, res) => {
   try {
     const userId = req.session.user;
 
-    // Ensure the user is logged in
     if (!userId) {
       return res
         .status(401)
@@ -20,10 +19,9 @@ const addtoCart = async (req, res) => {
 
     console.log(req.query);
 
-    const { id } = req.params; // Product ID
+    const { id } = req.params;
     const { ram, storage, color, quantity, price } = req.query;
 
-    // Validate query parameters
     if (!id || !ram || !storage || !color || !quantity || !price) {
       return res
         .status(400)
@@ -43,17 +41,14 @@ const addtoCart = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid price" });
     }
 
-    // Calculate the total price for the given quantity
     const totalPrice = parsedQuantity * parsedPrice;
 
-    // Find the user's cart
     let userCart = await cart.findOne({ userId });
 
     if (!userCart) {
       userCart = new cart({ userId, items: [] });
     }
 
-    // Check if the item with the given product, RAM, storage, and color already exists
     const itemIndex = userCart.items.findIndex(
       (item) =>
         item.ProductId.toString() === id &&
@@ -63,11 +58,9 @@ const addtoCart = async (req, res) => {
     );
 
     if (itemIndex > -1) {
-      // Item already exists in the cart, update its quantity and total price
       userCart.items[itemIndex].quantity += parsedQuantity;
       userCart.items[itemIndex].totalPrice += totalPrice;
     } else {
-      // Item doesn't exist in the cart, add a new item
       userCart.items.push({
         ProductId: id,
         quantity: parsedQuantity,
@@ -79,24 +72,24 @@ const addtoCart = async (req, res) => {
       });
     }
 
-    // Save the updated cart
     await userCart.save();
 
-    // Update the cart item count in the session
     req.session.cartItemCount = userCart.items.reduce(
       (acc, item) => acc + item.quantity,
       0
     );
 
-    if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+    if (req.xhr || req.headers.accept.indexOf("json") > -1) {
       return res.json({ success: true, message: "Product successfully added" });
     } else {
       res.redirect("/cart");
     }
   } catch (error) {
     console.error("Error adding to cart:", error);
-    if (req.xhr || req.headers.accept.indexOf('json') > -1) {
-      return res.status(500).json({ success: false, message: "Internal server error" });
+    if (req.xhr || req.headers.accept.indexOf("json") > -1) {
+      return res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     } else {
       res.status(500).send("Internal server error");
     }
@@ -114,17 +107,17 @@ const loadCartPage = async (req, res) => {
         select: "productName productImage", // Select only the required fields
       })
       .lean();
-      
+
     console.log("Populated Cart:", userCart);
 
     const user = req.session.user;
     const userData = user ? await User.findById(user) : null;
 
     res.render("user/cart", {
-            cart: userCart,
-            brand: brandData,
-            user: userData,
-        });
+      cart: userCart,
+      brand: brandData,
+      user: userData,
+    });
   } catch (error) {
     console.error("Error loading cart page:", error);
     res.status(500).send("Internal server error");

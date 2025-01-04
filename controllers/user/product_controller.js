@@ -48,17 +48,20 @@ const loadProductDetails = async (req, res) => {
 
     const brand = await Brand.find({}).limit(7).lean();
 
-    const user = req.session.user;
-    const userData = user ? await User.findById(user) : null;
+    console.log("this from product page",req.user);
+    const userid = req.user?.id || null;
+    let userData = null;
+    if(userid){
+      userData = userid ? await User.findById(userid) : null;
+    }
 
     // Get cart item count from session or calculate it
     let cartItemCount = 0;
-    if (user) {
-      console.log("Session User ID:", user); // Log session user ID
-      const userId = new mongoose.Types.ObjectId(user);
+    if (userid) {
+      const userId = new mongoose.Types.ObjectId(userid);
 
       const userCart = await cart.findOne({ userId }); // Query with ObjectId
-      console.log("Cart Retrieved:", userCart); // Log retrieved cart
+
       cartItemCount = userCart ? userCart.items.length : 0; // Calculate count
     } else {
       console.log("User not logged in or session not set."); // Log if user is missing

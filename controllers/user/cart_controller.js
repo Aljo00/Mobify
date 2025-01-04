@@ -9,7 +9,7 @@ const env = require("dotenv").config();
 
 const addtoCart = async (req, res) => {
   try {
-    const userId = req.session.user;
+    const userId = req.user.id;
 
     if (!userId) {
       return res
@@ -99,7 +99,7 @@ const addtoCart = async (req, res) => {
 const loadCartPage = async (req, res) => {
   try {
     const brandData = await Brand.find({}).lean();
-    const userId = req.session.user;
+    const userId = req.user.id;
     const userCart = await cart
       .findOne({ userId })
       .populate({
@@ -110,8 +110,7 @@ const loadCartPage = async (req, res) => {
 
     console.log("Populated Cart:", userCart);
 
-    const user = req.session.user;
-    const userData = user ? await User.findById(user) : null;
+    const userData = userId ? await User.findById(userId) : null;
 
     res.render("user/cart", {
       cart: userCart,

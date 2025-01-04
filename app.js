@@ -16,6 +16,9 @@ const passport = require("./config/passport");
 
 const nocache = require("nocache")
 
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
+
 //midlleware uses for parsing json data and encoding the url datas
 app.use(express.json());
 app.use(express.urlencoded({extended:true}))

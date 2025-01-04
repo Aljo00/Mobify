@@ -13,7 +13,7 @@ const load_page404 = async (req, res) => {
 const loadAccountPage = async (req, res) => {
   try {
     const brand = await Brand.find({});
-    const user = req.session.user;
+    const user = req.user.id;
     const userData = user ? await User.findById(user).lean() : null;
 
     if (userData) {
@@ -33,7 +33,7 @@ const loadAccountPage = async (req, res) => {
 const loadAddressPage = async (req, res) => {
   try {
     const brand = await Brand.find({});
-    const user = req.session.user;
+    const user = req.user.id;
 
     let userData = null;
 
@@ -72,7 +72,7 @@ const loadAddAddressPage = async (req, res) => {
     const brand = await Brand.find({});
     res.render("user/add-address", {
       brand: brand,
-      user: req.session.user,
+      user: req.user.id,
     });
   } catch (error) {
     res.redirect("/page404");
@@ -91,7 +91,7 @@ const addNewAddress = async (req, res) => {
       phone,
       altPhone,
     } = req.body;
-    const userId = req.session.user;
+    const userId = req.user.id;
 
     const userAddress = await Address.findOne({ userId });
 

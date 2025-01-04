@@ -19,11 +19,13 @@
   "homepage": "https://github.com/Aljo00/Mobify#readme",
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.7",
     "cropper": "^4.1.0",
     "dotenv": "^16.4.7",
     "ejs": "^3.1.10",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
+    "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.11.0",
     "mongoose": "^8.8.4",
     "multer": "^1.4.5-lts.1",

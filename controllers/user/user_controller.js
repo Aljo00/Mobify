@@ -1,25 +1,25 @@
-const User = require('../../models/userSchema');
-const Brand = require('../../models/brandSchema');
-const Category = require('../../models/categorySchema');
-const Product = require('../../models/productSchema');
-const cart = require('../../models/cartSchema');
-const mongoose = require('mongoose');
-const nodemailer = require('nodemailer');
-const bcrypt = require('bcrypt');
-const { response } = require('../../app');
-const env = require('dotenv').config();
+const User = require("../../models/userSchema");
+const Brand = require("../../models/brandSchema");
+const Category = require("../../models/categorySchema");
+const Product = require("../../models/productSchema");
+const cart = require("../../models/cartSchema");
+const mongoose = require("mongoose");
+const nodemailer = require("nodemailer");
+const bcrypt = require("bcrypt");
+const { generateToken } = require("../../config/JWT");
+const env = require("dotenv").config();
 
 const load_page404 = async (req, res) => {
   try {
-    res.status(404).render('user/page404');
+    res.status(404).render("user/page404");
   } catch (error) {
-    res.redirect('/page404');
+    res.redirect("/page404");
   }
 };
 
 const load_homePage = async (req, res) => {
   try {
-
+    // Fetch products
     const refurbishedPhones = await Product.find({
       isBlocked: false,
       combos: { $elemMatch: { quantity: { $gt: 0 } } },
@@ -35,25 +35,35 @@ const load_homePage = async (req, res) => {
     const newArrivals = await Product.find({
       isBlocked: false,
       combos: { $elemMatch: { quantity: { $gt: 0 } } },
-    }).sort({ createdAt: -1 }).limit(6);
+    })
+      .sort({ createdAt: -1 })
+      .limit(6);
 
-    const user = req.session.user;
+    const user = req.user; // Access user data from the decoded JWT
+    console.log("User from Home JWT:", user);
+
     const brand = await Brand.find({}).limit(7);
 
     // Get cart item count from session or calculate it
     let cartItemCount = 0;
+    let userData = null;
+
     if (user) {
-      console.log("Session User ID:", user); // Log session user ID
-      const userId = new mongoose.Types.ObjectId(user);
+      const userId = user.id;
+      console.log("User ID:", userId);
 
-      const userCart = await cart.findOne({ userId }); // Query with ObjectId
-      console.log("Cart Retrieved:", userCart); // Log retrieved cart
-      cartItemCount = userCart ? userCart.items.length : 0; // Calculate count
+      const userCart = await cart.findOne({
+        userId: new mongoose.Types.ObjectId(userId),
+      }); // Query using the extracted ID
+      console.log("Cart Retrieved:", userCart);
+
+      cartItemCount = userCart ? userCart.items.length : 0;
+
+      // Fetch user details from the database
+      userData = await User.findById(userId);
     } else {
-      console.log("User not logged in or session not set."); // Log if user is missing
+      console.log("User not logged in or session not set.");
     }
-
-    const userData = user ? await User.findById(user) : null;
 
     return res.render("user/home", {
       user: userData,
@@ -64,26 +74,26 @@ const load_homePage = async (req, res) => {
       cartItemCount,
     });
   } catch (error) {
-    console.log('Error found: ', error.message);
-    res.status(500).send('Server error');
+    console.log("Error found: ", error.message);
+    res.status(500).send("Server error");
   }
 };
 
 const load_loginpage = async (req, res) => {
   try {
-    res.render('user/login');
+    res.render("user/login");
   } catch (error) {
-    console.log('Error found: ', error.message);
-    res.status(500).send('Server error');
+    console.log("Error found: ", error.message);
+    res.status(500).send("Server error");
   }
 };
 
 const load_signuppage = async (req, res) => {
   try {
-    res.render('user/signup');
+    res.render("user/signup");
   } catch (error) {
-    console.log('Error found: ', error.message);
-    res.status(500).send('Server error');
+    console.log("Error found: ", error.message);
+    res.status(500).send("Server error");
   }
 };
 
@@ -94,7 +104,7 @@ function generateOtp() {
 async function emailVerification(email, otp) {
   try {
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      service: "gmail",
       port: 587,
       secure: false,
       requireTLS: true,
@@ -107,7 +117,7 @@ async function emailVerification(email, otp) {
     const info = await transporter.sendMail({
       from: `"Mobify Support" <${process.env.NODEMAILER_EMAIL}>`,
       to: email,
-      subject: 'Verify Your Account - Mobify',
+      subject: "Verify Your Account - Mobify",
       html: `
                 <h1>Welcome to Mobify!</h1>
                 <p>To complete your sign-up process, please use the OTP below:</p>
@@ -121,7 +131,7 @@ async function emailVerification(email, otp) {
 
     return info.accepted.length > 0;
   } catch (error) {
-    console.log('Email was not sent: ', error.message);
+    console.log("Email was not sent: ", error.message);
     return false;
   }
 }
@@ -131,8 +141,8 @@ const addUser = async (req, res) => {
     const { name, email, phone, password } = req.body;
     const findEmail = await User.findOne({ email });
     if (findEmail) {
-      return res.render('user/signup', {
-        message: 'User with this email already exists',
+      return res.render("user/signup", {
+        message: "User with this email already exists",
       });
     }
 
@@ -140,17 +150,17 @@ const addUser = async (req, res) => {
     const sentOtp = await emailVerification(email, otp);
 
     if (!sentOtp) {
-      return res.json('OTP was not sent');
+      return res.json("OTP was not sent");
     }
 
     req.session.sendOtp = otp;
     req.session.userData = { email, password, phone, name };
 
     console.log(`OTP sent: ${otp}`);
-    res.render('user/verifyOtp');
+    res.render("user/verifyOtp");
   } catch (error) {
-    console.log('Sign-up failed. An error occurred: ', error.message);
-    res.render('user/page404');
+    console.log("Sign-up failed. An error occurred: ", error.message);
+    res.render("user/page404");
   }
 };
 
@@ -159,7 +169,7 @@ const securePassword = async (password) => {
     const hashPassword = await bcrypt.hash(password, 10);
     return hashPassword;
   } catch (error) {
-    console.log('An error occurred: ', error.message);
+    console.log("An error occurred: ", error.message);
   }
 };
 
@@ -179,17 +189,28 @@ const verifyOtp = async (req, res) => {
         password: hashPassword,
       });
 
+      // Generate JWT using the `generateToken` helper function
+      const token = generateToken(user);
+      console.log("Generated Token:", token);
+
+      // Send the token to the client in a secure HTTP-only cookie
+      res.cookie("jwt", token, {
+        httpOnly: true, // Prevent JavaScript access
+        secure: process.env.NODE_ENV === "production", // Use HTTPS in production
+        maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
+      });
+
       await newUser.save();
-      req.session.user = newUser._id;
-      res.json({ success: true, redirectUrl: '/login' });
+
+      res.json({ success: true, redirectUrl: "/login" });
     } else {
       res
         .status(400)
-        .json({ success: false, message: 'Invalid OTP! Please try again.' });
+        .json({ success: false, message: "Invalid OTP! Please try again." });
     }
   } catch (error) {
-    console.log('Verification failed. An error occurred: ', error.message);
-    res.status(500).json({ success: false, message: 'An error occurred' });
+    console.log("Verification failed. An error occurred: ", error.message);
+    res.status(500).json({ success: false, message: "An error occurred" });
   }
 };
 
@@ -199,7 +220,7 @@ const resendOtp = async (req, res) => {
     if (!email) {
       return res
         .status(400)
-        .json({ success: false, message: 'Email not found in the session' });
+        .json({ success: false, message: "Email not found in the session" });
     }
 
     const otp = generateOtp();
@@ -210,16 +231,16 @@ const resendOtp = async (req, res) => {
       console.log(`Resent OTP: ${otp}`);
       res
         .status(200)
-        .json({ success: true, message: 'OTP resent successfully' });
+        .json({ success: true, message: "OTP resent successfully" });
     } else {
       res.status(500).json({
         success: false,
-        message: 'Failed to resend OTP. Please try again.',
+        message: "Failed to resend OTP. Please try again.",
       });
     }
   } catch (error) {
-    console.log('Error in resending OTP: ', error.message);
-    res.status(500).json({ success: false, message: 'An error occurred' });
+    console.log("Error in resending OTP: ", error.message);
+    res.status(500).json({ success: false, message: "An error occurred" });
   }
 };
 
@@ -230,47 +251,55 @@ const verifyLogin = async (req, res) => {
     const findUser = await User.findOne({ isAdmin: 0, email: email });
 
     if (!findUser) {
-      return res.render('user/login', { message: 'No user found' });
+      return res.render("user/login", { message: "No user found" });
     }
 
     if (findUser.isBlocked) {
-      return res.render('user/login', {
-        message: 'User is blocked by the admin',
+      return res.render("user/login", {
+        message: "User is blocked by the admin",
       });
     }
 
     if (findUser.googleId) {
-      return res.render('user/login', { message: 'You used the google sign' });
+      return res.render("user/login", { message: "You used the google sign" });
     }
 
     const passwordMatch = await bcrypt.compare(password, findUser.password);
 
     if (!passwordMatch) {
-      return res.render('user/login', { message: 'Incorrect Password' });
+      return res.render("user/login", { message: "Incorrect Password" });
     }
 
-    req.session.user = findUser._id;
-    
-    res.redirect('/');
+    // Generate JWT using the `generateToken` helper function
+    const token = generateToken(findUser);
+    console.log("Generated Token:", token);
+
+    // Send the token to the client in a secure HTTP-only cookie
+    res.cookie("jwt", token, {
+      httpOnly: true, // Prevent JavaScript access
+      secure: process.env.NODE_ENV === "production", // Use HTTPS in production
+      maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
+    });
+
+    res.redirect("/");
   } catch (error) {
-    console.log('An error occured in the login page :-- ', error.message);
-    res.render('user/login', { message: 'Login Failed! Please try again' });
+    console.log("An error occured in the login page :-- ", error.message);
+    res.render("user/login", { message: "Login Failed! Please try again" });
   }
 };
 
 const logout = async (req, res) => {
   try {
-    req.session.destroy((err) => {
-      if (err) {
-        console.log('Session destroy error:- ', err.message);
-        return res.redirect('/page404');
-      }
-
-      return res.redirect('/');
+    res.clearCookie("jwt", {
+      httpOnly: true, // Ensure the cookie is not accessible via JavaScript
+      secure: process.env.NODE_ENV === "production", // Use HTTPS in production
+      sameSite: "strict", // Ensure the cookie is sent only with same-site requests
     });
+
+    return res.redirect("/");
   } catch (error) {
-    console.log('Session destroy error:- ', error.message);
-    return res.redirect('/page404');
+    console.log("Session destroy error:- ", error.message);
+    return res.redirect("/page404");
   }
 };
 

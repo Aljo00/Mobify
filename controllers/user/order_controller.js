@@ -9,7 +9,7 @@ const env = require("dotenv").config();
 
 const processCheckout = async (req, res) => {
   try {
-    const userId = req.session.user;
+    const userId = req.user.id;
     const userData = userId ? await User.findById(userId) : null;
 
     // Fetch the required data

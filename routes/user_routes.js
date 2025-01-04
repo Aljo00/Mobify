@@ -7,18 +7,25 @@ const cartController = require("../controllers/user/cart_controller");
 const accountController = require("../controllers/user/account_controller");
 const orderController = require("../controllers/user/order_controller");
 const passport = require("passport");
+const userAuth = require("../middleware/JWTUserAuth");
+const { generateToken } = require("../config/JWT");
 
 const User = require("../models/userSchema");
 
-const userAuth = require("../middleware/userAuth");
+// const userAuth = require("../middleware/userAuth");
 
-user_router.get("/", userAuth.is_UserBlocked, user_controller.load_homePage);
+user_router.get(
+  "/",
+  userAuth.notProtect,
+  userAuth.user_IsBlocked,
+  user_controller.load_homePage
+);
 
 user_router.get("/page404", user_controller.load_page404);
 
 user_router.get(
   "/signup",
-  userAuth.is_UserLogout,
+  userAuth.protectLogin,
   user_controller.load_signuppage
 );
 
@@ -30,11 +37,13 @@ user_router.post("/resend-otp", user_controller.resendOtp);
 
 user_router.get(
   "/auth/google",
+  userAuth.protectLogin,
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
 user_router.get(
   "/auth/google/callback",
+  userAuth.protectLogin,
   passport.authenticate("google", { failureRedirect: "/login" }),
   async (req, res) => {
     try {
@@ -42,25 +51,29 @@ user_router.get(
       const user = await User.findById(req.user._id);
 
       if (user.isBlocked) {
-        req.session.destroy((err) => {
-          if (err) {
-            console.error("Error destroying session:", err);
-          }
-          return res.render("user/login", {
-            message: "User is blocked by the admin",
-          });
+        res.clearCookie("jwt", {
+          httpOnly: true, // Ensure the cookie is not accessible via JavaScript
+          secure: process.env.NODE_ENV === "production", // Use HTTPS in production
+          sameSite: "strict", // Ensure the cookie is sent only with same-site requests
+        });
+        return res.render("user/login", {
+          message: "User is blocked by the admin",
         });
       } else {
-        req.session.regenerate((err) => {
-          if (err) {
-            console.error("Error regenerating session:", err);
-            return res.redirect("/login");
-          }
+        const user = req.user;
 
-          req.session.user = req.user._id;
+        // Generate JWT using the `generateToken` helper function
+        const token = generateToken(user);
+        console.log("Generated Token:", token);
 
-          res.redirect("/");
+        // Send the token to the client in a secure HTTP-only cookie
+        res.cookie("jwt", token, {
+          httpOnly: true, // Prevent JavaScript access
+          secure: process.env.NODE_ENV === "production", // Use HTTPS in production
+          maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
         });
+
+        res.redirect("/");
       }
     } catch (error) {
       console.error("Error checking user block status:", error);
@@ -71,68 +84,45 @@ user_router.get(
 
 user_router.get(
   "/login",
-  userAuth.is_UserLogout,
+  userAuth.protectLogin,
   user_controller.load_loginpage
 );
 
 user_router.post("/login", user_controller.verifyLogin);
 
 //Product Detail page
-user_router.get("/product/:id", productController.loadProductDetails);
+user_router.get(
+  "/product/:id",
+  userAuth.notProtect,
+  productController.loadProductDetails
+);
 
-user_router.get("/product/combo/:id", productController.loadComboDetails);
+user_router.get(
+  "/product/combo/:id",
+  userAuth.notProtect,
+  productController.loadComboDetails
+);
 
 //Cart Management
-user_router.get(
-  "/add-to-cart/:id",
-  userAuth.is_UserLogin,
-  userAuth.is_UserBlocked,
-  cartController.addtoCart
-);
+user_router.get("/add-to-cart/:id", userAuth.protect, cartController.addtoCart);
 
-user_router.post(
-  "/add-to-cart",userAuth.is_UserLogin
-)
+user_router.post("/add-to-cart");
 
-user_router.get("/cart", userAuth.is_UserLogin,userAuth.is_UserBlocked, cartController.loadCartPage);
+user_router.get("/cart", userAuth.protect, cartController.loadCartPage);
 
-user_router.post(
-  "/cart/delete/:id",
-  userAuth.is_UserLogin,
-  cartController.deleteFromCart
-);
+user_router.post("/cart/delete/:id", cartController.deleteFromCart);
 
 //Order Management
-user_router.get(
-  "/checkout",
-  userAuth.is_UserLogin,
-  orderController.processCheckout
-);
+user_router.get("/checkout", userAuth.protect, orderController.processCheckout);
 
 //User Profile Management
-user_router.get(
-  "/account",
-  userAuth.is_UserLogin,
-  accountController.loadAccountPage
-);
+user_router.get("/account",userAuth.protect, accountController.loadAccountPage);
 
-user_router.get(
-  "/addresses",
-  userAuth.is_UserLogin,
-  accountController.loadAddressPage
-);
+user_router.get("/addresses", userAuth.protect, accountController.loadAddressPage);
 
-user_router.get(
-  "/add-address",
-  userAuth.is_UserLogin,
-  accountController.loadAddAddressPage
-);
+user_router.get("/add-address", userAuth.protect, accountController.loadAddAddressPage);
 
-user_router.post(
-  "/add-address",
-  userAuth.is_UserLogin,
-  accountController.addNewAddress
-);
+user_router.post("/add-address", userAuth.protect, accountController.addNewAddress);
 
 user_router.get("/logout", user_controller.logout);
 

@@ -290,7 +290,7 @@ const verifyLogin = async (req, res) => {
 
 const logout = async (req, res) => {
   try {
-    res.clearCookie("jwt", {
+    res.clearCookie("userAuth", {
       httpOnly: true, // Ensure the cookie is not accessible via JavaScript
       secure: process.env.NODE_ENV === "production", // Use HTTPS in production
       sameSite: "strict", // Ensure the cookie is sent only with same-site requests

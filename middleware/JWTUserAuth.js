@@ -69,7 +69,7 @@ const user_IsBlocked = async (req, res, next) => {
       const findUser = await User.findOne({ _id: user.id });
       console.log("This is the Finduser",findUser);
       if (findUser.isBlocked) {
-        res.clearCookie("jwt", {
+        res.clearCookie("userAuth", {
           httpOnly: true, // Ensure the cookie is not accessible via JavaScript
           secure: process.env.NODE_ENV === "production", // Use HTTPS in production
           sameSite: "strict", // Ensure the cookie is sent only with same-site requests

@@ -3,8 +3,8 @@ const User = require("../models/userSchema");
 
 const protect = (req, res, next) => {
   try {
-    console.log(req.cookies.jwt);
-    const token = req.cookies.jwt;
+    console.log(req.cookies.userAuth);
+    const token = req.cookies.userAuth;
     console.log(token);
 
     if (!token) {
@@ -22,8 +22,8 @@ const protect = (req, res, next) => {
 
 const protectLogin = (req,res,next) => {
   try {
-    console.log(req.cookies.jwt);
-    const token = req.cookies.jwt;
+    console.log(req.cookies.userAuth);
+    const token = req.cookies.userAuth;
     console.log(token);
 
     if (!token) {
@@ -42,8 +42,8 @@ const protectLogin = (req,res,next) => {
 
 const notProtect = (req, res, next) => {
   try {
-    console.log(req.cookies.jwt);
-    const token = req.cookies.jwt;
+    console.log(req.cookies.userAuth);
+    const token = req.cookies.userAuth;
     console.log(token);
 
     if (token) {

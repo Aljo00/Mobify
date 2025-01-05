@@ -194,7 +194,7 @@ const verifyOtp = async (req, res) => {
       console.log("Generated Token:", token);
 
       // Send the token to the client in a secure HTTP-only cookie
-      res.cookie("jwt", token, {
+      res.cookie("userAuth", token, {
         httpOnly: true, // Prevent JavaScript access
         secure: process.env.NODE_ENV === "production", // Use HTTPS in production
         maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
@@ -275,7 +275,7 @@ const verifyLogin = async (req, res) => {
     console.log("Generated Token:", token);
 
     // Send the token to the client in a secure HTTP-only cookie
-    res.cookie("jwt", token, {
+    res.cookie("userAuth", token, {
       httpOnly: true, // Prevent JavaScript access
       secure: process.env.NODE_ENV === "production", // Use HTTPS in production
       maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds

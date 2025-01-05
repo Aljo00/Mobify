@@ -295,3 +295,26 @@ footer {
   background-color: #f8f9fa;
   transition: background-color 0.3s ease;
 }
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .checkout-container {
+    padding: 10px;
+  }
+
+  .cart-summary {
+    padding: 15px;
+  }
+
+  .cart-summary h2 {
+    font-size: 18px;
+  }
+
+  .cart-summary p {
+    font-size: 14px;
+  }
+
+  .cart-summary .btn {
+    font-size: 14px;
+  }
+}

@@ -41,7 +41,9 @@
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
             <% for (let i = 0; i < brand.length; i++) { %>
             <li>
-              <a class="dropdown-item hover-effect" href="#"><%= brand[i].brandName %></a>
+              <a class="dropdown-item hover-effect" href="#"
+                ><%= brand[i].brandName %></a
+              >
             </li>
             <% } %>
           </ul>
@@ -67,7 +69,9 @@
         </div>
       </form>
       <div class="icons-group me-2">
-        <a href="#" class="text-dark me-3 hover-effect"><i class="far fa-heart fs-5"></i></a>
+        <a href="#" class="text-dark me-3 hover-effect"
+          ><i class="far fa-heart fs-5"></i
+        ></a>
         <a href="/cart" class="text-dark position-relative hover-effect">
           <i class="fas fa-shopping-cart fs-5"></i>
           <% if (cartItemCount && cartItemCount > 0) { %>
@@ -108,17 +112,20 @@
     <div class="col-md-8">
       <h2>Shipping Address</h2>
       <% if (addresses && addresses.length > 0) { %>
-      <form class="checkout-form" action="/checkout" method="post">
+      <form class="checkout-form" action="/place-order" method="post">
         <div class="row">
-          <% addresses.forEach((address, index) => { %> <%
-          address.address.forEach((addr, addrIndex) => { %>
+          <% addresses.forEach((address, index) => { %> 
+          <% address.address.forEach((addr, addrIndex) => { %>
           <!-- Loop through nested address array -->
           <div class="col-md-6 mb-4">
             <div class="card address-card hover-effect">
               <div class="card-body">
-                <input type="radio" id="address<%= index %>-<%= addrIndex %>"
-                name="selectedAddress" value="<%= addr._id %>" <%= index === 0
-                && addrIndex === 0 ? 'checked' : '' %> >
+                <input 
+                  type="radio" 
+                  id="address<%= index %>-<%= addrIndex %>"
+                  name="selectedAddress" 
+                  value="<%= addr._id %>" 
+                  <%= index === 0 && addrIndex === 0 ? 'checked' : '' %>>
                 <label for="address<%= index %>-<%= addrIndex %>">
                   <h5 class="card-title">
                     <%= addr.houseName %> (<%= addr.addressType %>)
@@ -133,27 +140,62 @@
               </div>
             </div>
           </div>
-          <% }) %> <% }) %>
+          <% }) %> 
+          <% }) %>
         </div>
+
+        <div class="payment-options">
+          <h2>Payment Options</h2>
+          <div class="form-check">
+            <input 
+              class="form-check-input" 
+              type="radio" 
+              name="paymentMethod" 
+              id="cod" 
+              value="cod" 
+              checked>
+            <label class="form-check-label" for="cod">
+              Cash on Delivery (COD)
+            </label>
+          </div>
+          <div class="form-check">
+            <input 
+              class="form-check-input" 
+              type="radio" 
+              name="paymentMethod" 
+              id="razorpay" 
+              value="razorpay">
+            <label class="form-check-label" for="razorpay">
+              Razorpay
+            </label>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-success mt-3">
+          Place Order
+        </button>
       </form>
       <% } else { %>
       <p>No addresses found. Please add a new address.</p>
+      <a href="/add-address" class="btn btn-primary">Add New Address</a>
       <% } %>
-
-      <a href="/add-address">
-        <button type="submit" class="btn btn-primary">Add New Address</button>
-      </a>
     </div>
+
     <div class="col-md-4">
       <div class="cart-summary p-3 border rounded">
         <h2>Cart Summary</h2>
+        <% cart.items.forEach(item => { %>
         <p>
-          Total Items: <%= cart.items.reduce((acc, item) => acc + item.quantity,
-          0) %>
+          <strong><%= item.ProductId.productName %></strong>: ₹<%= item.price %>
+        </p>
+        <% }) %>
+        <hr>
+        <p>
+          <strong>Total Items:</strong> <%= cartItemCount %>
         </p>
         <p>
-          Total Price: ₹<%= cart.items.reduce((acc, item) => acc +
-          item.totalPrice, 0) %>
+          <strong>Total Price:</strong> ₹<%= cart.items.reduce((acc, item) => acc + item.totalPrice, 0) %>
         </p>
       </div>
     </div>

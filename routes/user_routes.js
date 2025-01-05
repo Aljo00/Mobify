@@ -104,16 +104,18 @@ user_router.get(
 );
 
 //Cart Management
-user_router.get("/add-to-cart/:id", userAuth.protect, cartController.addtoCart);
+user_router.get("/add-to-cart/:id", userAuth.notProtect, cartController.addtoCart);
 
 user_router.post("/add-to-cart");
 
 user_router.get("/cart", userAuth.protect, cartController.loadCartPage);
 
-user_router.post("/cart/delete/:id", cartController.deleteFromCart);
+user_router.post("/cart/delete/:id", userAuth.protect, cartController.deleteFromCart);
 
 //Order Management
 user_router.get("/checkout", userAuth.protect, orderController.processCheckout);
+
+user_router.post("/place-order", userAuth.protect, orderController.placeOrder);
 
 //User Profile Management
 user_router.get("/account",userAuth.protect, accountController.loadAccountPage);

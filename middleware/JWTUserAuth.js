@@ -3,9 +3,7 @@ const User = require("../models/userSchema");
 
 const protect = (req, res, next) => {
   try {
-    console.log(req.cookies.userAuth);
     const token = req.cookies.userAuth;
-    console.log(token);
 
     if (!token) {
       return res.redirect("/login");
@@ -42,9 +40,7 @@ const protectLogin = (req,res,next) => {
 
 const notProtect = (req, res, next) => {
   try {
-    console.log(req.cookies.userAuth);
     const token = req.cookies.userAuth;
-    console.log(token);
 
     if (token) {
       const decode = jwt.verify(token, process.env.JWT_SECRET);
@@ -65,9 +61,7 @@ const user_IsBlocked = async (req, res, next) => {
 
     if(req.user){
       const user = req.user;
-      console.log("This is the user",user);
       const findUser = await User.findOne({ _id: user.id });
-      console.log("This is the Finduser",findUser);
       if (findUser.isBlocked) {
         res.clearCookie("userAuth", {
           httpOnly: true, // Ensure the cookie is not accessible via JavaScript

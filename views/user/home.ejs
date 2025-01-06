@@ -151,6 +151,7 @@
               class="product__item__pic"
               style="background-image: url('<%= newArrivals[i].productImage[0] %>');"
             >
+              <img src="<%= newArrivals[i].productImage[1] %>" class="hover-image" alt="Second Image">
               <div class="product-category <%= newArrivals[i].category === 'New Phone' ? 'new-phone' : 'refurbished' %>">
                 <%= newArrivals[i].category === 'New Phone' ? 'New Phone' : 'Refurbished' %>
               </div>
@@ -213,6 +214,7 @@
                 background-image: url('<%= newPhones[i].productImage[0] %>');
               "
             >
+              <img src="<%= newPhones[i].productImage[1] %>" class="hover-image" alt="Second Image">
             </div>
           </a>
           <div class="product__item__text">
@@ -272,6 +274,7 @@
                 background-image: url('<%= refurbishedPhones[i].productImage[0] %>');
               "
             >
+              <img src="<%= refurbishedPhones[i].productImage[1] %>" class="hover-image" alt="Second Image">
             </div>
           </a>
           <div class="product__item__text">

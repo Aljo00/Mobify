@@ -413,10 +413,6 @@
               timerProgressBar: true,
               background: "#d4edda",
               color: "#155724",
-              didOpen: (toast) => {
-                toast.addEventListener("mouseenter", Swal.stopTimer);
-                toast.addEventListener("mouseleave", Swal.resumeTimer);
-              },
             }).then(() => {
               window.location.href = window.location.href;
             });
@@ -432,10 +428,6 @@
               timerProgressBar: true,
               background: "#f8d7da",
               color: "#721c24",
-              didOpen: (toast) => {
-                toast.addEventListener("mouseenter", Swal.stopTimer);
-                toast.addEventListener("mouseleave", Swal.resumeTimer);
-              },
             }).then(() => {
               window.location.href = window.location.href;
             });

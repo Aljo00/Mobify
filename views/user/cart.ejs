@@ -113,7 +113,7 @@
         <div class="item-image">
           <% if (item.ProductId && item.ProductId.productImage.length > 0) { %>
           <img
-            src="/uploads/re-image/<%= item.ProductId.productImage[0] %>"
+            src="<%= item.ProductId.productImage[0] %>"
             alt="<%= item.ProductId.productName %>"
           />
           <% } else { %>

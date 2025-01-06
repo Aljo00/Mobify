@@ -106,7 +106,7 @@ user_router.get(
 //Cart Management
 user_router.get("/add-to-cart/:id", userAuth.notProtect, cartController.addtoCart);
 
-user_router.post("/add-to-cart");
+user_router.get("/addToCart",userAuth.notProtect, cartController.addToCartFromHome);
 
 user_router.get("/cart", userAuth.protect, cartController.loadCartPage);
 

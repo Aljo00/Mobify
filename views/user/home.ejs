@@ -114,20 +114,42 @@
   <div id="bannerCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
     <div class="carousel-inner">
       <div class="carousel-item active">
-        <img src="/Banner Images/Banner.1.webp" class="d-block w-100" alt="Custom Banner 1">
+        <img
+          src="/Banner Images/Banner.1.webp"
+          class="d-block w-100"
+          alt="Custom Banner 1"
+        />
       </div>
       <div class="carousel-item">
-        <img src="/Banner Images/Banner2.webp" class="d-block w-100" alt="Custom Banner 2">
+        <img
+          src="/Banner Images/Banner2.webp"
+          class="d-block w-100"
+          alt="Custom Banner 2"
+        />
       </div>
       <div class="carousel-item">
-        <img src="/Banner Images/Banner3.webp" class="d-block w-100" alt="Custom Banner 3">
+        <img
+          src="/Banner Images/Banner3.webp"
+          class="d-block w-100"
+          alt="Custom Banner 3"
+        />
       </div>
     </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
+    <button
+      class="carousel-control-prev"
+      type="button"
+      data-bs-target="#bannerCarousel"
+      data-bs-slide="prev"
+    >
       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Previous</span>
     </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#bannerCarousel" data-bs-slide="next">
+    <button
+      class="carousel-control-next"
+      type="button"
+      data-bs-target="#bannerCarousel"
+      data-bs-slide="next"
+    >
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Next</span>
     </button>
@@ -149,11 +171,20 @@
           <a href="/product/<%= newArrivals[i]._id %>">
             <div
               class="product__item__pic"
-              style="background-image: url('<%= newArrivals[i].productImage[0] %>');"
+              style="
+                background-image: url('<%= newArrivals[i].productImage[0] %>');
+              "
             >
-              <img src="<%= newArrivals[i].productImage[1] %>" class="hover-image" alt="Second Image">
-              <div class="product-category <%= newArrivals[i].category === 'New Phone' ? 'new-phone' : 'refurbished' %>">
-                <%= newArrivals[i].category === 'New Phone' ? 'New Phone' : 'Refurbished' %>
+              <img
+                src="<%= newArrivals[i].productImage[1] %>"
+                class="hover-image"
+                alt="Second Image"
+              />
+              <div
+                class="product-category <%= newArrivals[i].category === 'New Phone' ? 'new-phone' : 'refurbished' %>"
+              >
+                <%= newArrivals[i].category === 'New Phone' ? 'New Phone' :
+                'Refurbished' %>
               </div>
             </div>
           </a>
@@ -177,8 +208,12 @@
               <% } %>
             </h5>
             <div class="action-buttons">
-              <a href="/addToCart?id=<%= newArrivals[i]._id %>" class="add-cart"
-                >Add To Cart</a
+              <a
+                href="/addToCart?id=<%= newArrivals[i]._id %>"
+                class="add-cart"
+                data-id="<%= newArrivals[i]._id %>"
+              >
+                Add To Cart</a
               >
               <a
                 href="/addToWishlist?id=<%= newArrivals[i]._id %>"
@@ -214,7 +249,11 @@
                 background-image: url('<%= newPhones[i].productImage[0] %>');
               "
             >
-              <img src="<%= newPhones[i].productImage[1] %>" class="hover-image" alt="Second Image">
+              <img
+                src="<%= newPhones[i].productImage[1] %>"
+                class="hover-image"
+                alt="Second Image"
+              />
             </div>
           </a>
           <div class="product__item__text">
@@ -237,7 +276,10 @@
               <% } %>
             </h5>
             <div class="action-buttons">
-              <a href="/addToCart?id=<%= newPhones[i]._id %>" class="add-cart"
+              <a
+                href="/addToCart?id=<%= newPhones[i]._id %>"
+                class="add-cart"
+                data-id="<%= newPhones[i]._id %>"
                 >Add To Cart</a
               >
               <a
@@ -274,7 +316,11 @@
                 background-image: url('<%= refurbishedPhones[i].productImage[0] %>');
               "
             >
-              <img src="<%= refurbishedPhones[i].productImage[1] %>" class="hover-image" alt="Second Image">
+              <img
+                src="<%= refurbishedPhones[i].productImage[1] %>"
+                class="hover-image"
+                alt="Second Image"
+              />
             </div>
           </a>
           <div class="product__item__text">
@@ -303,6 +349,7 @@
               <a
                 href="/addToCart?id=<%= refurbishedPhones[i]._id %>"
                 class="add-cart"
+                data-id="<%= refurbishedPhones[i]._id %>"
                 >Add To Cart</a
               >
               <a
@@ -330,46 +377,89 @@
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const addToCartButtons = document.querySelectorAll(".add-cart");
+  document.addEventListener("DOMContentLoaded", () => {
+    // Store the scroll position when the page is about to reload
+    window.onbeforeunload = () => {
+      sessionStorage.setItem("scrollPosition", window.scrollY);
+    };
 
-    addToCartButtons.forEach((button) => {
-      button.addEventListener("click", function (event) {
+    const addCartButtons = document.querySelectorAll(".add-cart");
+
+    addCartButtons.forEach((button) => {
+      button.addEventListener("click", async (event) => {
         event.preventDefault();
-        const url = this.href;
 
-        fetch(url)
-          .then((response) => {
-            if (response.ok) {
-              Swal.fire({
-                icon: "success",
-                title: "Product successfully added",
-                showConfirmButton: false,
-                timer: 1500,
-              });
-              this.classList.add("disabled");
-              this.textContent = "Added to Cart";
-            } else {
-              Swal.fire({
-                icon: "error",
-                title: "Failed to add product",
-                showConfirmButton: false,
-                timer: 1500,
-              });
-            }
-          })
-          .catch((error) => {
-            console.error("Error adding to cart:", error);
+        const productId = button.getAttribute("data-id");
+        const url = `/addToCart?id=${productId}`;
+
+        try {
+          const response = await fetch(url, { method: "GET" });
+          const data = await response.json();
+
+          if (data.success) {
+            Swal.fire({
+              icon: "success",
+              title: "Added to Cart",
+              text: data.message,
+              toast: true,
+              position: "top-end",
+              showConfirmButton: false,
+              timer: 1000,
+              timerProgressBar: true,
+              background: "#d4edda",
+              color: "#155724",
+            }).then(() => {
+              // Refresh the page after success
+              window.location.href = window.location.href;
+            });
+          } else {
             Swal.fire({
               icon: "error",
-              title: "Failed to add product",
+              title: "Error",
+              text: data.message || "An error occurred while adding to cart.",
+              toast: true,
+              position: "top-end",
               showConfirmButton: false,
               timer: 1500,
+              timerProgressBar: true,
+              background: "#f8d7da",
+              color: "#721c24",
+            }).then(() => {
+              // Refresh the page after error
+              window.location.href = window.location.href;
             });
+          }
+        } catch (error) {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: data.message || "An error occurred while adding to cart.",
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 1500,
+            timerProgressBar: true,
+            background: "#f8d7da",
+            color: "#721c24",
+          }).then(() => {
+            // Refresh the page after error
+            window.location.href = window.location.href;
           });
+          console.error(error);
+        }
       });
     });
+
+    // Restore the scroll position after the page reloads
+    const previousScrollPosition = sessionStorage.getItem("scrollPosition");
+    if (previousScrollPosition) {
+      window.scrollTo({
+        top: previousScrollPosition,
+        behavior: "smooth", // Smooth scroll to the saved position
+      });
+    }
   });
 </script>
 

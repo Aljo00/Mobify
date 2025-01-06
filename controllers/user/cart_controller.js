@@ -76,6 +76,13 @@ const addtoCart = async (req, res) => {
       userCart = new cart({ userId, items: [] });
     }
 
+    if (userCart.items.length >= 5) {
+      return res.json({
+        success: false,
+        message: "You can add a maximum of 5 items",
+      });
+    }
+
     const itemIndex = userCart.items.findIndex(
       (item) =>
         item.ProductId.toString() === id &&
@@ -147,6 +154,105 @@ const addtoCart = async (req, res) => {
   }
 };
 
+const addToCartFromHome = async (req, res) => {
+  try {
+    const userId = req.user ? req.user.id : null;
+
+    if (!userId) {
+      return res
+        .status(401)
+        .json({ success: false, message: "User not logged in" });
+    }
+
+    console.log(req.query);
+    const id = req.query.id;
+    console.log("Product ID:", id);
+
+    const product = await Product.findById(id);
+    if (!product) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found" });
+    }
+
+    const selectedCombo = product.combos[0];
+    const quantity = 1;
+
+    const totalPrice = selectedCombo.salePrice * quantity;
+
+    let userCart = await cart.findOne({ userId });
+
+    if (!userCart) {
+      userCart = new cart({ userId, items: [] });
+    }
+
+    if (userCart.items.length >= 5) {
+      return res.json({
+        success: false,
+        message: "You can add a maximum of 5 items",
+      });
+    }
+
+    const itemIndex = userCart.items.findIndex(
+      (item) =>
+        item.ProductId.toString() === id &&
+        item.RAM === selectedCombo.ram &&
+        item.Storage === selectedCombo.storage &&
+        item.color === selectedCombo.color[0]
+    );
+
+    let currentCartQuantity = 0;
+
+    if (itemIndex > -1) {
+      currentCartQuantity = userCart.items[itemIndex].quantity;
+    }
+
+    const totalRequestedQuantity = currentCartQuantity + quantity;
+
+    if (totalRequestedQuantity > 5) {
+      return res.status(400).json({
+        success: false,
+        message: "You cannot add more than 5 same items",
+      });
+    }
+
+    if (totalRequestedQuantity > selectedCombo.quantity) {
+      return res.status(400).json({
+        success: false,
+        message: `Only ${selectedCombo.quantity} items are available in stock`,
+      });
+    }
+
+    if (itemIndex > -1) {
+      userCart.items[itemIndex].quantity = totalRequestedQuantity;
+      userCart.items[itemIndex].totalPrice =
+        totalRequestedQuantity * selectedCombo.salePrice;
+    } else {
+      userCart.items.push({
+        ProductId: id,
+        quantity: quantity,
+        RAM: selectedCombo.ram,
+        Storage: selectedCombo.storage,
+        color: selectedCombo.color[0],
+        price: selectedCombo.salePrice,
+        totalPrice: totalPrice,
+      });
+    }
+
+    await userCart.save();
+
+    req.session.cartItemCount = userCart.items.reduce(
+      (acc, item) => acc + item.quantity,
+      0
+    );
+
+    res.json({ success: true, message: "Product successfully added" });
+  } catch (error) {
+    console.log("Error adding to cart from home:", error.message);
+    res.redirect("/page404");
+  }
+};
+
 const loadCartPage = async (req, res) => {
   try {
     const brandData = await Brand.find({}).lean();
@@ -160,7 +266,7 @@ const loadCartPage = async (req, res) => {
       .lean();
 
     const userData = userId ? await User.findById(userId) : null;
-    
+
     console.log("Cart page rendered of the user:", userData.name);
     res.render("user/cart", {
       cart: userCart,
@@ -216,6 +322,7 @@ const deleteFromCart = async (req, res) => {
 
 module.exports = {
   addtoCart,
+  addToCartFromHome,
   loadCartPage,
   deleteFromCart,
 };

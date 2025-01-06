@@ -5,6 +5,7 @@ const User = require("../../models/userSchema");
 const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp");
+const cloudinary = require("../../config/cloudinary");
 
 const loadProductAddPage = async (req, res) => {
   try {
@@ -28,25 +29,12 @@ const addProducts = async (req, res) => {
     const imagePaths = [];
     if (req.files && req.files.length > 0) {
       for (let i = 0; i < req.files.length; i++) {
-        const originalPath = path.join(
-          req.files[i].destination,
-          req.files[i].filename
-        ); // Original uploaded image
-        const resizedPath = path.join(
-          req.files[i].destination,
-          `resized-${req.files[i].filename}`
-        ); // New path for resized image
 
-        // Process image with sharp
-        await sharp(originalPath)
-          .resize({ width: 800, height: 800 }) // Resize image to 800x800 pixels
-          .jpeg({ quality: 100 }) // Adjust quality as needed
-          .toFile(resizedPath); // Save resized image to a new file
+        const result = await cloudinary.uploader.upload(req.files[i].path, {
+          quailty: "100"
+        });
 
-        imagePaths.push(`resized-${req.files[i].filename}`); // Add resized image path to the array
-
-        // Optionally, delete the original image to save storage space
-        // fs.unlinkSync(originalPath);
+        imagePaths.push(result.secure_url);
       }
     }
 
@@ -209,7 +197,11 @@ const editProduct = async (req, res) => {
 
     if (req.files && req.files.length > 0) {
       for (let i = 0; i < req.files.length; i++) {
-        images.push(req.files[i].filename);
+        const result = await cloudinary.uploader.upload(req.files[i].path, {
+          quailty: "100",
+        });
+
+        images.push(result.secure_url);
       }
     }
 
@@ -244,30 +236,55 @@ const editProduct = async (req, res) => {
 
 const deleteSingleImage = async (req, res) => {
   try {
-    const { imageNameToServer, productIdToServer } = req.body;
-    const product = await Product.findByIdAndUpdate(productIdToServer, {
-      $pull: { productImage: imageNameToServer },
-    });
-    const imagePath = path.join(
-      "public",
-      "uploads",
-      "re-image",
-      imageNameToServer
-    );
-    if (fs.existsSync(imagePath)) {
-      await fs.unlinkSync(imagePath);
-      console.log(`image ${imageNameToServer} deleted successfully`);
-    } else {
-      console.log(`image ${imageNameToServer} not found`);
+    let { imagePublicId, productIdToServer } = req.body;
+
+    console.log("Original imagePublicId:", imagePublicId);
+
+    // Extract public_id from the URL
+    if (imagePublicId.startsWith("http")) {
+      const parts = imagePublicId.split("/");
+      const fileName = parts[parts.length - 1]; // Extract 'fwnq7d0jqo2cjgg8w4np.png'
+      imagePublicId = fileName.split(".")[0]; // Extract 'fwnq7d0jqo2cjgg8w4np'
     }
 
-    res.send({ status: true });
+    console.log("Extracted public_id:", imagePublicId);
+
+    // Step 1: Delete the image from Cloudinary
+    const result = await cloudinary.uploader.destroy(imagePublicId);
+
+    if (result.result !== "ok") {
+      console.error("Error deleting image from Cloudinary:", result);
+      return res.status(500).send({
+        status: false,
+        message: "Failed to delete image from Cloudinary",
+        error: result,
+      });
+    }
+
+    console.log(`Image ${imagePublicId} deleted from Cloudinary successfully.`);
+
+    // Step 2: Remove image reference from the database
+    const product = await Product.findByIdAndUpdate(productIdToServer, {
+      $pull: { productImage: imagePublicId },
+    });
+
+    if (!product) {
+      return res
+        .status(404)
+        .send({ status: false, message: "Product not found" });
+    }
+
+    // Step 3: Respond with success
+    res.send({ status: true, message: "Image deleted successfully" });
   } catch (error) {
-    console.log(
-      "Error found in deletion of image in Edit Product side: ",
-      error.message
-    );
-    res.redirect("/admin/error");
+    console.error("Error in deleteSingleImage:", error.message);
+    res
+      .status(500)
+      .send({
+        status: false,
+        message: "Internal Server Error",
+        error: error.message,
+      });
   }
 };
 

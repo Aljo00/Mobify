@@ -1,6 +1,6 @@
 // Attach event listener to publish button
-const publishButton = document.getElementById('publishBtn');
-publishButton.addEventListener('click', validateAndSubmit);
+const publishButton = document.getElementById("publishBtn");
+publishButton.addEventListener("click", validateAndSubmit);
 
 function validateAndSubmit(event) {
   event.preventDefault();
@@ -8,7 +8,7 @@ function validateAndSubmit(event) {
   if (validateForm()) {
     // Collect combo data from the form
     let combos = [];
-    const comboRows = document.querySelectorAll('.combo-row');
+    const comboRows = document.querySelectorAll(".combo-row");
 
     comboRows.forEach((row) => {
       const ram = row.querySelector('input[name="ram"]').value;
@@ -31,45 +31,59 @@ function validateAndSubmit(event) {
     });
 
     // Add combos as a hidden field (sending JSON string)
-    const combosField = document.createElement('input');
-    combosField.type = 'hidden';
-    combosField.name = 'combos';
+    const combosField = document.createElement("input");
+    combosField.type = "hidden";
+    combosField.name = "combos";
     combosField.value = JSON.stringify(combos); // Convert the combos array to a JSON string
     document.forms[0].appendChild(combosField);
 
     // Submit the form using AJAX
+    // Get the preloader element
+    const preloader = document.getElementById("preloader");
+
+    // Submit the form using AJAX
     const formData = new FormData(document.forms[0]);
+
+    // Show the preloader before starting the request
+    preloader.style.display = "flex";
+
     fetch(document.forms[0].action, {
-      method: 'POST',
+      method: "POST",
       body: formData,
     })
       .then((response) => response.json())
       .then((data) => {
+        // Hide the preloader after the request completes
+        preloader.style.display = "none";
+
         if (data.message) {
           Swal.fire({
-            icon: 'success',
-            title: 'Success',
+            icon: "success",
+            title: "Success",
             text: data.message,
             timer: 1000,
             showConfirmButton: false,
           }).then(() => {
-            window.location.href = '/admin/products';
+            window.location.href = "/admin/products";
           });
         } else {
           Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: data.error || 'An error occurred while editing the product.',
+            icon: "error",
+            title: "Error",
+            text: data.error || "An error occurred while editing the product.",
             timer: 1000,
             showConfirmButton: false,
           });
         }
       })
       .catch((error) => {
+        // Hide the preloader in case of an error
+        preloader.style.display = "none";
+
         Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'An error occurred while editing the product.',
+          icon: "error",
+          title: "Error",
+          text: "An error occurred while editing the product.",
           timer: 1000,
           showConfirmButton: false,
         });
@@ -84,7 +98,7 @@ function viewImage(event, index) {
 
   reader.onload = () => {
     const dataURL = reader.result;
-    const image = document.getElementById('imgView' + index);
+    const image = document.getElementById("imgView" + index);
     image.src = dataURL;
 
     const cropper = new Cropper(image, {
@@ -104,31 +118,32 @@ function viewImage(event, index) {
     });
 
     const cropperContainer = document.querySelector(
-      '#croppedImg' + index
+      "#croppedImg" + index
     ).parentNode;
-    cropperContainer.style.display = 'block';
+    cropperContainer.style.display = "block";
 
-    const saveButton = document.querySelector('#saveButton' + index);
-    saveButton.addEventListener('click', async () => {
+    const saveButton = document.querySelector("#saveButton" + index);
+    saveButton.addEventListener("click", async () => {
       const croppedCanvas = cropper.getCroppedCanvas({
-        width: 283.15,
-        height: 220,
+        width: image.naturalWidth, // Use the natural width of the image
+        height: image.naturalHeight, // Use the natural height of the image
       });
-      const croppedImage = document.getElementById('croppedImg' + index);
-      croppedImage.src = croppedCanvas.toDataURL('image/jpeg', 1.0);
+
+      const croppedImage = document.getElementById("croppedImg" + index);
+      croppedImage.src = croppedCanvas.toDataURL("image/png"); // Use lossless PNG format
 
       const timestamp = new Date().getTime();
       const fileName = `cropped-img-${timestamp}-${index}.png`;
 
       await croppedCanvas.toBlob((blob) => {
-        const input = document.getElementById('input' + index);
+        const input = document.getElementById("input" + index);
         const imgFile = new File([blob], fileName, { type: blob.type });
         const fileList = new DataTransfer();
         fileList.items.add(imgFile);
         input.files = fileList.files;
-      });
+      }, "image/png"); // Use lossless format
 
-      cropperContainer.style.display = 'none';
+      cropperContainer.style.display = "none";
       cropper.destroy();
     });
   };
@@ -143,29 +158,29 @@ function validateForm() {
   const comboSet = new Set();
 
   // Validate Product Name
-  const name = document.getElementsByName('productName')[0].value.trim();
+  const name = document.getElementsByName("productName")[0].value.trim();
   if (!/^[a-zA-Z0-9\s]+$/.test(name)) {
     // Allow letters, numbers, and spaces
     displayErrorMessage(
-      'productName-error',
-      'Product name should contain only alphabetic characters and numbers.'
+      "productName-error",
+      "Product name should contain only alphabetic characters and numbers."
     );
     isValid = false;
   }
 
   // Validate Product Description
-  const description = document.getElementById('descriptionid').value.trim();
+  const description = document.getElementById("descriptionid").value.trim();
   if (!/.+/.test(description)) {
     // Allows any character (at least one)
     displayErrorMessage(
-      'description-error',
-      'Product description cannot be empty.'
+      "description-error",
+      "Product description cannot be empty."
     );
     isValid = false;
   }
 
   // Validate Combos
-  const combos = document.querySelectorAll('.combo-row');
+  const combos = document.querySelectorAll(".combo-row");
   combos.forEach((combo) => {
     const ram = combo.querySelector('input[name="ram"]').value.trim();
     const storage = combo.querySelector('input[name="storage"]').value.trim();
@@ -179,40 +194,40 @@ function validateForm() {
     const color = combo.querySelector('input[name="color"]').value.trim();
 
     // Check if any field is empty
-    if (ram === '') {
-      displayErrorMessage('comboRAM-error', 'This is Empty');
+    if (ram === "") {
+      displayErrorMessage("comboRAM-error", "This is Empty");
       isValid = false;
     }
 
-    if (storage === '') {
-      displayErrorMessage('comboStorage-error', 'This is Empty');
+    if (storage === "") {
+      displayErrorMessage("comboStorage-error", "This is Empty");
       isValid = false;
     }
 
-    if (quantity === '') {
-      displayErrorMessage('comboQuantity-error', 'This is Empty');
+    if (quantity === "") {
+      displayErrorMessage("comboQuantity-error", "This is Empty");
       isValid = false;
     }
 
-    if (regularPrice === '') {
-      displayErrorMessage('comboReg-error', 'This is Empty');
+    if (regularPrice === "") {
+      displayErrorMessage("comboReg-error", "This is Empty");
       isValid = false;
     }
 
-    if (salePrice === '') {
-      displayErrorMessage('comboSale-error', 'This is Empty');
+    if (salePrice === "") {
+      displayErrorMessage("comboSale-error", "This is Empty");
       isValid = false;
     }
 
-    if (color === '') {
-      displayErrorMessage('comboColor-error', 'This is Empty');
+    if (color === "") {
+      displayErrorMessage("comboColor-error", "This is Empty");
       isValid = false;
     }
 
     // Check for duplicate combos
     const comboKey = `${ram}-${storage}-${regularPrice}-${salePrice}-${color}`;
     if (comboSet.has(comboKey)) {
-      displayErrorMessage('combo-error', 'Duplicate combo detected.');
+      displayErrorMessage("combo-error", "Duplicate combo detected.");
       isValid = false;
     } else {
       comboSet.add(comboKey); // Add comboKey to the set if unique
@@ -222,14 +237,14 @@ function validateForm() {
   return isValid; // Return the overall validation result
 }
 
-const addComboBtn = document.getElementById('addComboBtn');
-const productCombosContainer = document.getElementById('product-combos');
+const addComboBtn = document.getElementById("addComboBtn");
+const productCombosContainer = document.getElementById("product-combos");
 
 // Add Event Listener for "Add Another Combo" Button
-addComboBtn.addEventListener('click', () => {
+addComboBtn.addEventListener("click", () => {
   // Create a new combo row
-  const newRow = document.createElement('div');
-  newRow.classList.add('row', 'combo-row');
+  const newRow = document.createElement("div");
+  newRow.classList.add("row", "combo-row");
 
   newRow.innerHTML = `
         <div class="col-lg-3">
@@ -272,30 +287,30 @@ addComboBtn.addEventListener('click', () => {
 
   // Attach delete functionality to the "Delete" button of the new row
   newRow
-    .querySelector('.delete-combo-btn')
-    .addEventListener('click', handleDeleteRow);
+    .querySelector(".delete-combo-btn")
+    .addEventListener("click", handleDeleteRow);
 });
 
 // Function to Handle Row Deletion
 function handleDeleteRow() {
-  const comboRows = document.querySelectorAll('.combo-row');
+  const comboRows = document.querySelectorAll(".combo-row");
 
   // Prevent deletion if it's the only remaining row
   if (comboRows.length > 1) {
-    this.closest('.combo-row').remove(); // Remove the current row
+    this.closest(".combo-row").remove(); // Remove the current row
   } else {
-    alert('At least one combo is required.'); // Alert the user
+    alert("At least one combo is required."); // Alert the user
   }
 }
 
-document.querySelectorAll('.delete-combo-btn').forEach((btn) => {
-  btn.addEventListener('click', handleDeleteRow);
+document.querySelectorAll(".delete-combo-btn").forEach((btn) => {
+  btn.addEventListener("click", handleDeleteRow);
 });
 
 // Add event listeners for existing delete buttons (if any)
-document.querySelectorAll('.delete-combo-btn').forEach((btn) => {
-  btn.addEventListener('click', function () {
-    btn.closest('.combo-row').remove(); // Remove the row
+document.querySelectorAll(".delete-combo-btn").forEach((btn) => {
+  btn.addEventListener("click", function () {
+    btn.closest(".combo-row").remove(); // Remove the row
   });
 });
 
@@ -303,28 +318,28 @@ document.querySelectorAll('.delete-combo-btn').forEach((btn) => {
 function displayErrorMessage(elementId, message) {
   const errorElement = document.getElementById(elementId);
   errorElement.innerText = message;
-  errorElement.style.display = 'block';
+  errorElement.style.display = "block";
 }
 
 function clearErrorMessages() {
-  const errorElements = document.getElementsByClassName('error-message');
+  const errorElements = document.getElementsByClassName("error-message");
   Array.from(errorElements).forEach((element) => {
-    element.innerText = '';
-    element.style.display = 'none';
+    element.innerText = "";
+    element.style.display = "none";
   });
 }
 
 function deleteSingleImage(imageId, productId) {
   $.ajax({
-    url: '/admin/deleteimage',
-    method: 'POST',
-    data: { imageNameToServer: imageId, productIdToServer: productId },
+    url: "/admin/deleteimage",
+    method: "POST",
+    data: { imagePublicId: imageId, productIdToServer: productId },
     success: (response) => {
       if (response.status === true) {
         Swal.fire({
-          icon: 'success',
-          title: 'Image Deleted',
-          text: 'The image has been successfully deleted.',
+          icon: "success",
+          title: "Image Deleted",
+          text: "The image has been successfully deleted.",
           timer: 1000,
           showConfirmButton: false,
         }).then(() => {
@@ -332,9 +347,9 @@ function deleteSingleImage(imageId, productId) {
         });
       } else {
         Swal.fire({
-          icon: 'error',
-          title: 'Deletion Failed',
-          text: 'There was an error deleting the image. Please try again.',
+          icon: "error",
+          title: "Deletion Failed",
+          text: "There was an error deleting the image. Please try again.",
           timer: 1000,
           showConfirmButton: false,
         });
@@ -342,9 +357,9 @@ function deleteSingleImage(imageId, productId) {
     },
     error: (err) => {
       Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Something went wrong. Please try again later.',
+        icon: "error",
+        title: "Error",
+        text: "Something went wrong. Please try again later.",
         timer: 1000,
         showConfirmButton: false,
       });

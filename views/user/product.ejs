@@ -91,7 +91,7 @@
           <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
             <div class="zoom-container">
               <img
-                src="/uploads/re-image/<%= image %>"
+                src="<%= image %>"
                 class="d-block w-100 product-carousel-image"
                 alt="Product Image"
               />
@@ -124,7 +124,7 @@
       <div class="product-thumbnails mt-3 d-flex justify-content-center">
         <% product.productImage.forEach((image, index) => { %>
         <img
-          src="/uploads/re-image/<%= image %>"
+          src="<%= image %>"
           class="thumbnail-image <%= index === 0 ? 'selected' : '' %>"
           data-bs-target="#productCarousel"
           data-bs-slide-to="<%= index %>"
@@ -229,7 +229,7 @@
             <div
               class="product__item__pic"
               style="
-                background-image: url('/uploads/re-image/<%= related.productImage[0] %>');
+                background-image: url('<%= related.productImage[0] %>');
               "
             >
               <div class="product-discount">

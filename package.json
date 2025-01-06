@@ -19,6 +19,7 @@
   "homepage": "https://github.com/Aljo00/Mobify#readme",
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "cloudinary": "^2.5.1",
     "cookie-parser": "^1.4.7",
     "cropper": "^4.1.0",
     "dotenv": "^16.4.7",

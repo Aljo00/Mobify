@@ -2,7 +2,6 @@ const User = require('../../models/userSchema');
 const Brand = require('../../models/brandSchema');
 const Category = require('../../models/categorySchema');
 const Product = require('../../models/productSchema');
-const { response } = require('../../app');
 const env = require("dotenv").config();
 const cart = require("../../models/cartSchema");
 const mongoose = require("mongoose");

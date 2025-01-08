@@ -18,7 +18,7 @@ const userSchema = new Schema({
   dob: {
     type: String,
   },
-  profilePicture: {
+  profileImage: {
     type: String,
     default: "", // Default empty string if no picture is uploaded
   },

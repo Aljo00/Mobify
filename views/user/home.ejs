@@ -79,15 +79,42 @@
           <% } %>
         </a>
       </div>
-      <% if (locals.user) {%>
+      <% if (locals.user) { %>
       <div class="dropdown">
-        <a href="#" class="sign-in-link">
-          <i class="fas fa-user-circle"></i> <%=locals.user.name%>
-        </a>
+        <% if (locals.user.profileImage && locals.user.profileImage !== "") { %>
+        <!-- Display profile picture -->
+        <img
+          src="<%= locals.user.profileImage %>"
+          alt="Profile"
+          style="
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+          "
+        />
+        <% } else { %>
+        <!-- Display initials -->
+        <div
+          style="
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #007bff;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+          "
+        >
+          <%= locals.user.initials %>
+        </div>
+        <% } %>
         <div class="dropdown-content">
           <a href="/account">Profile</a>
           <a href="/addresses">Address</a>
-          <a href="/logout">logout</a>
+          <a href="/logout">Logout</a>
         </div>
       </div>
       <%} else {%>

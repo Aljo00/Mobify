@@ -135,6 +135,25 @@
     <div class="col-md-9">
       <!-- Account details content goes here -->
       <div class="account-details">
+        <div class="d-flex justify-content-center mb-4">
+              <div
+                class="position-relative"
+                style="width: 100px; height: 100px"
+              >
+                <!-- Clickable image for cropping -->
+                <img
+                  src="<%= locals.user.profileImage %>"
+                  alt="User Image"
+                  id="profileImagePreview"
+                  class="rounded-circle"
+                  style="
+                    width: 100px;
+                    height: 100px;
+                    object-fit: cover;
+                  "
+                />
+              </div>
+            </div>
         <div class="row mb-3">
           <div class="col-md-6">
             <label for="name" class="form-label"><strong>Name:</strong></label>

@@ -8,6 +8,11 @@ const accountController = require("../controllers/user/account_controller");
 const orderController = require("../controllers/user/order_controller");
 const passport = require("passport");
 const userAuth = require("../middleware/JWTUserAuth");
+const multer = require("multer");
+
+const storage = require("../helpers/multer");
+
+const uploads = multer({ storage: storage });
 const { generateToken } = require("../config/JWT");
 
 const User = require("../models/userSchema");
@@ -124,7 +129,12 @@ user_router.get("/account",userAuth.protect, accountController.loadAccountPage);
 
 user_router.get("/update-account",userAuth.protect,accountController.loadEditAccountPage)
 
-user_router.post("/update-account",userAuth.protect,accountController.editAccount)
+user_router.post(
+  "/update-account",
+  userAuth.protect,
+  uploads.single("profileImage"),
+  accountController.editAccount
+);
 
 user_router.get("/addresses", userAuth.protect, accountController.loadAddressPage);
 

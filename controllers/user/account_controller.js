@@ -7,6 +7,8 @@ const cart = require("../../models/cartSchema");
 const User = require("../../models/userSchema");
 const Brand = require("../../models/brandSchema");
 const Address = require("../../models/addressSchema");
+const cloudinary = require("../../config/cloudinary");
+const { profile } = require("console");
 
 const load_page404 = async (req, res) => {
   try {
@@ -66,26 +68,44 @@ const loadEditAccountPage = async (req, res) => {
 
 const editAccount = async (req, res) => {
   try {
-    console.log(req.body);
-    const { name, dob, email, altEmail, phone, altPhone } = req.body;
-    const user = req.user.id;
-    const updateAccount = await User.updateOne(
-      { _id: user },
-      {
-        $set: {
-          name: name,
-          dob: dob,
-          email: email,
-          altEmail: altEmail,
-          phone: phone,
-          altPhone: altPhone,
-        },
-      }
-    );
+   const { name, dob, email, altEmail, phone, altPhone } = req.body;
+   const user = req.user.id;
 
-    res
-      .status(200)
-      .json({ success: true, message: "Account updated successfully" });
+   // Handle file upload to Cloudinary
+   let profileImageUrl = null;
+   console.log(req.file)
+   if (req.file) {
+     // Upload image to Cloudinary
+     const result = await cloudinary.uploader.upload(req.file.path, {
+       folder: "profile_images", // specify the folder in Cloudinary
+     });
+
+     // Get the URL of the uploaded image
+     profileImageUrl = result.secure_url;
+   }
+
+   console.log(profileImageUrl)
+
+   const updateFields = {
+     name,
+     dob,
+     email,
+     altEmail,
+     phone,
+     altPhone,
+   };
+
+   if (profileImageUrl) {
+     updateFields.profileImage = profileImageUrl;
+   }
+
+   const a = await User.updateOne({ _id: user }, { $set: updateFields });
+
+   console.log(a)
+
+   res
+     .status(200)
+     .json({ success: true, message: "Account updated successfully" });
   } catch (error) {
     console.error("Error editing account page:", error);
     res.redirect("/page404");

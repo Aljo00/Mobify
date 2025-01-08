@@ -39,8 +39,7 @@ const load_homePage = async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(6);
 
-    const user = req.user; // Access user data from the decoded JWT
-    console.log("User from Home JWT:", user);
+    const user = req.user;
 
     const brand = await Brand.find({}).limit(7);
 
@@ -50,17 +49,25 @@ const load_homePage = async (req, res) => {
 
     if (user) {
       const userId = user.id;
-      console.log("User ID:", userId);
 
       const userCart = await cart.findOne({
         userId: new mongoose.Types.ObjectId(userId),
-      }); // Query using the extracted ID
-      console.log("Cart Retrieved:", userCart);
+      });
 
       cartItemCount = userCart ? userCart.items.length : 0;
 
       // Fetch user details from the database
       userData = await User.findById(userId);
+
+      // Generate initials if no profile picture exists
+      if (!userData.profileImage) {
+        const name = userData.name || "";
+        userData.initials = name
+          .replace(/\s+/g, "") // Remove all spaces in the name
+          .slice(0, 2) // Take the first two characters
+          .toUpperCase(); // Convert to uppercase
+      }
+
     } else {
       console.log("User not logged in or session not set.");
     }

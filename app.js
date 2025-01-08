@@ -29,7 +29,7 @@ db.connectDB();
 
 app.use((req,res,next,err)=>{
     if(err){
-        console.log(err);
+        console.log(err.message);
         res.redirect("/page404"); 
     }else{
         next();

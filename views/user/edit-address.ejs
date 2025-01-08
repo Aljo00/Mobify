@@ -11,7 +11,7 @@
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
 />
 
-<link rel="stylesheet" href="/styles/user/address.css" />
+<link rel="stylesheet" href="/styles/user/add-address.css" />
 
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg shadow-sm sticky-top">
@@ -136,112 +136,124 @@
       </div>
     </div>
     <div class="col-md-9">
-      <h2 class="mb-4">Your Addresses</h2>
-      <% if (user && user.address && user.address.length > 0) { %>
-      <div class="row">
-        <% user.address.forEach(function(addr) { %>
-        <div class="col-md-6 mb-4">
-          <div class="card">
-            <div class="card-body">
-              <div
-                class="d-flex justify-content-between align-items-center mb-2"
-              >
-                <h5 class="card-title mb-0">
-                  <%= addr.houseName %> (<%= addr.addressType %>)
-                </h5>
-                <div>
-                  <a
-                    href="/edit-address/<%= addr._id %>"
-                    class="text-primary me-3"
-                  >
-                    <i class="fas fa-pen"></i> Edit
-                  </a>
-                  <a
-                    href="#"
-                    class="text-danger"
-                    onclick="deleteAddress('<%= addr._id %>')"
-                  >
-                    <i class="fas fa-trash"></i> Delete
-                  </a>
-                </div>
-              </div>
-              <p class="card-text">
-                <%= addr.city %>, <%= addr.state %> - <%= addr.pincode %>
-              </p>
-              <p class="card-text">Landmark: <%= addr.landMark %></p>
-              <p class="card-text">Phone: <%= addr.phone %></p>
-              <p class="card-text">Alt Phone: <%= addr.altPhone %></p>
-            </div>
+      <h2 class="mb-4">Add New Address</h2>
+      <form id="addAddressForm" action="" data-address-id="<%= address.address[0].id %>" method="post">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="houseName" class="form-label">House Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="houseName"
+              name="houseName"
+              value="<%= address.address[0].houseName%>"
+            />
+            <div class="invalid-feedback" id="houseNameError"></div>
+          </div>
+          <div class="col-md-6">
+            <label for="city" class="form-label">City</label>
+            <input
+              type="text"
+              class="form-control"
+              id="city"
+              name="city"
+              value="<%= address.address[0].city%>"
+            />
+            <div class="invalid-feedback" id="cityError"></div>
           </div>
         </div>
-        <% }) %>
-      </div>
-      <% } else { %>
-      <p>No addresses found.</p>
-      <% } %>
-      <a href="/add-address" class="btn btn-primary mt-4">Add New Address</a>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="landMark" class="form-label">Landmark</label>
+            <input
+              type="text"
+              class="form-control"
+              id="landMark"
+              name="landMark"
+              value="<%= address.address[0].landMark %>"
+            />
+            <div class="invalid-feedback" id="landMarkError"></div>
+          </div>
+          <div class="col-md-6">
+            <label for="state" class="form-label">State</label>
+            <input
+              type="text"
+              class="form-control"
+              id="state"
+              name="state"
+              value="<%= address.address[0].state %>"
+            />
+            <div class="invalid-feedback" id="stateError"></div>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="pincode" class="form-label">Pincode</label>
+            <input
+              type="number"
+              class="form-control"
+              id="pincode"
+              name="pincode"
+              value="<%= address.address[0].pincode %>"
+            />
+            <div class="invalid-feedback" id="pincodeError"></div>
+          </div>
+          <div class="col-md-6">
+            <label for="phone" class="form-label">Phone</label>
+            <input
+              type="text"
+              class="form-control"
+              id="phone"
+              name="phone"
+              value="<%= address.address[0].phone %>"
+            />
+            <div class="invalid-feedback" id="phoneError"></div>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="altPhone" class="form-label">Alternate Phone</label>
+            <input
+              type="text"
+              class="form-control"
+              id="altPhone"
+              name="altPhone"
+              value="<%= address.address[0].altPhone %>"
+            />
+            <div class="invalid-feedback" id="altPhoneError"></div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Address Type</label>
+            <div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="addressType"
+                id="home" value="Home" <%= address.address[0].addressType ===
+                'Home' ? 'checked' : '' %> />
+                <label class="form-check-label" for="home">Home</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="addressType"
+                id="work" value="Work" <%= address.address[0].addressType ===
+                'Work' ? 'checked' : '' %> />
+                <label class="form-check-label" for="work">Work</label>
+              </div>
+            </div>
+            <div class="invalid-feedback" id="addressTypeError"></div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary mb-4">Add Address</button>
+      </form>
     </div>
   </div>
 </div>
 
+
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<script>
-  function deleteAddress(addressId) {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to undo this action!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // Send DELETE request
-        fetch(`/delete-address/${addressId}`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((response) => response.json()) // Parse the JSON response
-          .then((data) => {
-            if (data.message === "Address deleted successfully") {
-              Swal.fire({
-                title: "Deleted!",
-                text: data.message,
-                icon: "success",
-                timer: 1500, // Auto-close after 1500ms
-                timerProgressBar: true,
-              }).then(() => {
-                window.location.reload(); // Reload the page after the alert closes
-              });
-            } else {
-              Swal.fire({
-                title: "Failed!",
-                text:
-                  data.message ||
-                  "Failed to delete the address. Please try again.",
-                icon: "error",
-                timer: 1500, // Auto-close after 1500ms
-                timerProgressBar: true,
-              });
-            }
-          })
-          .catch((error) => {
-            console.error("Error deleting address:", error);
-            Swal.fire({
-              title: "Error!",
-              text: "An error occurred. Please try again later.",
-              icon: "error",
-              timer: 1500, // Auto-close after 1500ms
-              timerProgressBar: true,
-            });
-          });
-      }
-    });
-  }
-</script>
+<!-- Include jQuery before your script -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="/scripts/user/edit-address.js"></script>
 
 <%- include('../../views/layout/footer.ejs') %>

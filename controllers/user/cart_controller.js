@@ -360,7 +360,7 @@ const updateCart = async (req, res) => {
         item.color === color
     );
 
-    const totalRequestedQuantity =  parsedQuantity;
+    const totalRequestedQuantity = parsedQuantity;
 
     if (totalRequestedQuantity > selectedCombo.quantity) {
       return res.status(400).json({

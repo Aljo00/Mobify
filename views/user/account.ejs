@@ -13,8 +13,9 @@
 
 <link rel="stylesheet" href="/styles/user/account.css" />
 
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
-  <div class="container-fluid">
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg shadow-sm sticky-top">
+  <div class="container">
     <a class="navbar-brand fw-bold text-primary" href="/">Mobify</a>
     <button
       class="navbar-toggler"
@@ -67,9 +68,16 @@
       </form>
       <div class="icons-group me-2">
         <a href="#" class="text-dark me-3"><i class="far fa-heart fs-5"></i></a>
-        <a href="/cart" class="text-dark"
-          ><i class="fas fa-shopping-cart fs-5"></i
-        ></a>
+        <a href="/cart" class="text-dark position-relative">
+          <i class="fas fa-shopping-cart fs-5"></i>
+          <% if (cartItemCount && cartItemCount > 0) { %>
+          <span
+            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+          >
+            <%= cartItemCount %>
+          </span>
+          <% } %>
+        </a>
       </div>
       <% if (locals.user) {%>
       <div class="dropdown">
@@ -77,14 +85,23 @@
           <i class="fas fa-user-circle"></i> <%=locals.user.name%>
         </a>
         <div class="dropdown-content">
-          <a href="#">Profile</a>
+          <a href="/account">Profile</a>
+          <a href="/addresses">Address</a>
           <a href="/logout">logout</a>
         </div>
       </div>
       <%} else {%>
       <div class="d-flex align-items-center">
-        <a href="/login" class="btn btn-outline-primary me-2">Login</a>
-        <a href="/signup" class="btn btn-primary">Sign Up</a>
+        <a
+          href="/login"
+          class="btn btn-primary text-primary bg-white border-primary me-2"
+          >Login</a
+        >
+        <a
+          href="/signup"
+          class="btn btn-primary text-primary bg-white border-primary"
+          >Sign Up</a
+        >
       </div>
       <%}%>
     </div>
@@ -117,10 +134,7 @@
     </div>
     <div class="col-md-9">
       <!-- Account details content goes here -->
-      <h2>Account Details</h2>
-      <p>Welcome, <%= locals.user.name %>!</p>
       <div class="account-details">
-        <h3>Personal Information</h3>
         <div class="row mb-3">
           <div class="col-md-6">
             <label for="name" class="form-label"><strong>Name:</strong></label>
@@ -145,7 +159,6 @@
             />
           </div>
         </div>
-        <h3>Contact Information</h3>
         <div class="row mb-3">
           <div class="col-md-6">
             <label for="email" class="form-label"
@@ -204,12 +217,5 @@
     </div>
   </div>
 </div>
-
-<!-- Footer -->
-<footer>
-  <div class="container-fluid text-center">
-    <p class="mb-0">&copy; 2023 Mobify. All rights reserved.</p>
-  </div>
-</footer>
 
 <%- include('../../views/layout/footer.ejs') %>

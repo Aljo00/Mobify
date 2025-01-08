@@ -3,6 +3,7 @@ const env = require("dotenv").config();
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 
+const cart = require("../../models/cartSchema");
 const User = require("../../models/userSchema");
 const Brand = require("../../models/brandSchema");
 const Address = require("../../models/addressSchema");
@@ -26,11 +27,18 @@ const loadAccountPage = async (req, res) => {
       userData.address = userAddress ? userAddress.address : [];
     }
 
+    // const cartItemCount = userData.items.length;
+    const usercart = await cart.findOne({ userId: user });
+    const cartItemCount = usercart.items.length;
+
     res.status(200).render("user/account", {
       brand: brand,
       user: userData,
+      cartItemCount: cartItemCount
+      
     });
   } catch (error) {
+    console.log(error.message)
     res.redirect("/page404");
   }
 };
@@ -49,6 +57,9 @@ const loadAddressPage = async (req, res) => {
       // Fetch address details
       const userAddress = await Address.findOne({ userId: user }).lean();
 
+
+      
+
       // Add address details to userData
       if (userAddress && userAddress.address.length > 0) {
         userData.address = userAddress.address; // Detailed address objects
@@ -56,15 +67,14 @@ const loadAddressPage = async (req, res) => {
         userData.address = []; // Empty array if no addresses exist
       }
     }
-
-    console.log(
-      "Final User Data Passed to View:",
-      JSON.stringify(userData, null, 2)
-    );
+    const usercart = await cart.findOne({ userId: user });
+    const cartItemCount = usercart.items.length;
+   
 
     res.render("user/address", {
       brand: brand,
       user: userData, // Pass updated userData with detailed address
+      cartItemCount: cartItemCount
     });
   } catch (error) {
     console.error("Error loading address page:", error);
@@ -75,11 +85,27 @@ const loadAddressPage = async (req, res) => {
 const loadAddAddressPage = async (req, res) => {
   try {
     const brand = await Brand.find({});
+
+    const userId = req.user.id;
+
+    const userCart = await cart
+      .findOne({ userId })
+      .populate({
+        path: "items.ProductId", // Populate ProductId
+        select: "productName productImage", // Select only the required fields
+      })
+      .lean();
+
+    const userData = userId ? await User.findById(userId) : null;
+
+    const cartItemCount = userCart.items.length;
     res.render("user/add-address", {
       brand: brand,
-      user: req.user.id,
+      user: userData,
+      cartItemCount: cartItemCount
     });
   } catch (error) {
+    console.log(error.message)
     res.redirect("/page404");
   }
 };
@@ -139,6 +165,104 @@ const addNewAddress = async (req, res) => {
     res.redirect("/page404");
   }
 };
+
+const loadEditAddressPage = async (req,res) => {
+
+  try {
+
+    const brand = await Brand.find({});
+
+    const userId = req.user.id;
+
+    const userData = userId ? await User.findById(userId) : null;
+
+    const usercart = await cart.findOne({ userId: userId });
+    const cartItemCount = usercart.items.length;
+
+    const { id } = req.params;
+
+    const address = await Address.findOne(
+      { "address._id": id },
+      { "address.$": 1 }
+    );
+    res.render("user/edit-address",{
+      address: address,
+      user: userData,
+      cartItemCount: cartItemCount,
+      brand: brand
+    })
+    
+  } catch (error) {
+    console.error("Error loading editing address page:", error);
+    res.redirect("/page404");
+  }
+  
+}
+
+const updateAddress = async (req,res) => {
+
+  try {
+
+    const { id } = req.params;
+    const {
+      addressType,
+      houseName,
+      city,
+      landMark,
+      state,
+      pincode,
+      phone,
+      altPhone,
+    } = req.body;
+
+    console.log(req.body,id)
+
+    const result = await Address.updateOne(
+      { "address._id": id }, // Find the address by its _id
+      {
+        $set: {
+          "address.$.addressType": addressType,
+          "address.$.houseName": houseName,
+          "address.$.city": city,
+          "address.$.landMark": landMark,
+          "address.$.state": state,
+          "address.$.pincode": pincode,
+          "address.$.phone": phone,
+          "address.$.altPhone": altPhone,
+        },
+      }
+    );
+
+    res
+      .status(200)
+      .json({ success: true, message: "Address updated successfully" });
+    
+  } catch (error) {
+    console.error("Error editing address:", error);
+    res.redirect("/page404");
+  }
+  
+}
+
+const deleteAddress = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await Address.updateOne(
+      { "address._id": id },
+      { $pull: { address: { _id: id } } }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(404).send("Address not found");
+    }
+
+    res.json({ message: "Address deleted successfully" });
+  } catch (error) {
+    console.error("Error Deleting address:", error);
+    res.redirect("/page404"); // Redirect in case of error
+  }
+};
+
 
 const loadForgotPasswordPage = async (req, res) => {
   try {
@@ -290,4 +414,7 @@ module.exports = {
   verifyEmail,
   loadResetPassword,
   resetPassword,
+  loadEditAddressPage,
+  deleteAddress,
+  updateAddress
 };

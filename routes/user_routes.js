@@ -128,6 +128,12 @@ user_router.get("/add-address", userAuth.protect, accountController.loadAddAddre
 
 user_router.post("/add-address", userAuth.protect, accountController.addNewAddress);
 
+user_router.get("/edit-address/:id",userAuth.protect,accountController.loadEditAddressPage)
+
+user_router.post("/edit-address/:id",userAuth.protect,accountController.updateAddress);
+
+user_router.delete("/delete-address/:id",userAuth.protect,accountController.deleteAddress)
+
 user_router.get("/forgot-password",accountController.loadForgotPasswordPage);
 
 user_router.post("/forgot-password",accountController.verifyEmail);

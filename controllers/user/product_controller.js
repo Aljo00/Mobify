@@ -10,8 +10,8 @@ const mongoose = require("mongoose");
 const loadProductDetails = async (req, res) => {
   try {
     const productId = req.params.id;
-    console.log("Product ID:", productId);
 
+    console.log(req.query);
     const { ram, storage, color } = req.query;
 
     const product = await Product.findById(productId).lean();
@@ -20,23 +20,23 @@ const loadProductDetails = async (req, res) => {
       return res.status(404).send("Product not found");
     }
 
-    if (!product.combos || product.combos.length === 0) {
-      return res.status(404).send("No combos available for this product");
-    }
+    // if (!product.combos || product.combos.length === 0) {
+    //   return res.status(404).send("No combos available for this product");
+    // }
 
     // Match specific combo or default to the first combo
     let selectedCombo = product.combos[0];
-    if (ram && storage && color) {
-      selectedCombo =
-        product.combos.find(
-          (combo) =>
-            combo.ram === ram &&
-            combo.storage === storage &&
-            (Array.isArray(combo.color)
-              ? combo.color.includes(color)
-              : combo.color === color)
-        ) || selectedCombo;
-    }
+    // if (ram && storage && color) {
+    //   selectedCombo =
+    //     product.combos.find(
+    //       (combo) =>
+    //         combo.ram === ram &&
+    //         combo.storage === storage &&
+    //         (Array.isArray(combo.color)
+    //           ? combo.color.includes(color)
+    //           : combo.color === color)
+    //     ) || selectedCombo;
+    // }
 
     // Fetch related products
     const relatedProducts = await Product.find({

@@ -7,6 +7,35 @@ const Order = require("../../models/orderSchema");
 const Address = require("../../models/addressSchema");
 const env = require("dotenv").config();
 
+const loadCartPage = async (req, res) => {
+  try {
+    const brandData = await Brand.find({}).lean();
+    const userId = req.user.id;
+    const userCart = await cart
+      .findOne({ userId })
+      .populate({
+        path: "items.ProductId", // Populate ProductId
+        select: "productName productImage", // Select only the required fields
+      })
+      .lean();
+
+    const userData = userId ? await User.findById(userId) : null;
+
+    const cartItemCount = userCart.items.length;
+
+    console.log("Cart page rendered of the user:", userData.name);
+    res.render("user/cart", {
+      cart: userCart,
+      brand: brandData,
+      user: userData,
+      cartItemCount,
+    });
+  } catch (error) {
+    console.error("Error loading cart page:", error);
+    res.status(500).send("Internal server error");
+  }
+};
+
 const addtoCart = async (req, res) => {
   try {
     const userId = req.user ? req.user.id : null;
@@ -69,7 +98,7 @@ const addtoCart = async (req, res) => {
     }
 
     // Validate stock availability
-    const totalPrice = parsedQuantity * parsedPrice;
+    const totalPrice = parsedQuantity * selectedCombo.salePrice;
     let userCart = await cart.findOne({ userId });
 
     if (!userCart) {
@@ -106,10 +135,10 @@ const addtoCart = async (req, res) => {
       });
     }
 
-    if (totalRequestedQuantity > 5) {
+    if (totalRequestedQuantity > 10) {
       return res.status(400).json({
         success: false,
-        message: "You cannot add more than 5 items of the same product combo",
+        message: "You cannot add more than 10 items of the same product combo",
       });
     }
 
@@ -117,7 +146,7 @@ const addtoCart = async (req, res) => {
     if (itemIndex > -1) {
       userCart.items[itemIndex].quantity = totalRequestedQuantity;
       userCart.items[itemIndex].totalPrice =
-        totalRequestedQuantity * parsedPrice;
+        totalRequestedQuantity * selectedCombo.salePrice;
     } else {
       userCart.items.push({
         ProductId: id,
@@ -164,9 +193,7 @@ const addToCartFromHome = async (req, res) => {
         .json({ success: false, message: "User not logged in" });
     }
 
-    console.log(req.query);
     const id = req.query.id;
-    console.log("Product ID:", id);
 
     const product = await Product.findById(id);
     if (!product) {
@@ -186,10 +213,10 @@ const addToCartFromHome = async (req, res) => {
       userCart = new cart({ userId, items: [] });
     }
 
-    if (userCart.items.length >= 5) {
+    if (userCart.items.length >= 10) {
       return res.json({
         success: false,
-        message: "You can add a maximum of 5 items",
+        message: "You can add a maximum of 10 items",
       });
     }
 
@@ -253,29 +280,137 @@ const addToCartFromHome = async (req, res) => {
   }
 };
 
-const loadCartPage = async (req, res) => {
+const updateCart = async (req, res) => {
   try {
-    const brandData = await Brand.find({}).lean();
     const userId = req.user.id;
-    const userCart = await cart
-      .findOne({ userId })
-      .populate({
-        path: "items.ProductId", // Populate ProductId
-        select: "productName productImage", // Select only the required fields
-      })
-      .lean();
+    console.log(req.body);
+    let { id, quantity, ram, storage, color, price } = req.body;
 
-    const userData = userId ? await User.findById(userId) : null;
+    price = parseFloat(price.replace("₹", "").trim());
+    console.log(price);
+    if (!id || !ram || !storage || !color || !quantity || !price) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing product details" });
+    }
 
-    console.log("Cart page rendered of the user:", userData.name);
-    res.render("user/cart", {
-      cart: userCart,
-      brand: brandData,
-      user: userData,
+    const parsedQuantity = parseInt(quantity);
+    console.log(parsedQuantity);
+    const parsedPrice = parseFloat(price);
+
+    if (isNaN(parsedQuantity) || parsedQuantity <= 0) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid quantity" });
+    }
+
+    if (parsedQuantity > 5) {
+      return res
+        .status(400)
+        .json({ success: false, message: "You can add a maximum of 5 items" });
+    }
+
+    if (isNaN(parsedPrice) || parsedPrice <= 0) {
+      return res.status(400).json({ success: false, message: "Invalid price" });
+    }
+
+    // Fetch product details
+    const product = await Product.findById(id);
+    if (!product) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found" });
+    }
+
+    // Find the selected combo
+    const selectedCombo = product.combos.find(
+      (combo) =>
+        combo.ram === ram &&
+        combo.storage === storage &&
+        combo.color.includes(color)
+    );
+
+    if (!selectedCombo) {
+      return res.status(400).json({
+        success: false,
+        message: "The selected configuration is not available",
+      });
+    }
+
+    // Validate stock availability
+    const totalPrice = parsedQuantity * selectedCombo.salePrice;
+    let userCart = await cart.findOne({ userId });
+
+    if (!userCart) {
+      userCart = new cart({ userId, items: [] });
+    }
+
+    if (userCart.items.length >= 10) {
+      return res.json({
+        success: false,
+        message: "You can add a maximum of 10 items",
+      });
+    }
+
+    const itemIndex = userCart.items.findIndex(
+      (item) =>
+        item.ProductId.toString() === id &&
+        item.RAM === ram &&
+        item.Storage === storage &&
+        item.color === color
+    );
+
+    const totalRequestedQuantity =  parsedQuantity;
+
+    if (totalRequestedQuantity > selectedCombo.quantity) {
+      return res.status(400).json({
+        success: false,
+        message: `Only ${selectedCombo.quantity} items are available in stock`,
+      });
+    }
+
+    if (totalRequestedQuantity > 10) {
+      return res.status(400).json({
+        success: false,
+        message: "You cannot add more than 10 items of the same product combo",
+      });
+    }
+
+    // Update cart item or add new one
+    if (itemIndex > -1) {
+      userCart.items[itemIndex].quantity = totalRequestedQuantity;
+      userCart.items[itemIndex].totalPrice =
+        totalRequestedQuantity * selectedCombo.salePrice;
+    } else {
+      userCart.items.push({
+        ProductId: id,
+        quantity: parsedQuantity,
+        RAM: ram,
+        Storage: storage,
+        color: color,
+        price: parsedPrice,
+        totalPrice: totalPrice,
+      });
+    }
+
+    await userCart.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Cart updated successfully",
+      totalItems: userCart.items.reduce((sum, item) => sum + item.quantity, 0), // Total items in cart
+      totalPrice: userCart.items.reduce(
+        (sum, item) => sum + item.totalPrice,
+        0
+      ), // Total price of cart
+      itemTotalPrice: totalPrice, // Total price of the updated item
     });
   } catch (error) {
-    console.error("Error loading cart page:", error);
-    res.status(500).send("Internal server error");
+    console.error("Error updating cart:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while updating the cart",
+    });
   }
 };
 
@@ -324,5 +459,6 @@ module.exports = {
   addtoCart,
   addToCartFromHome,
   loadCartPage,
+  updateCart,
   deleteFromCart,
 };

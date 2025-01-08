@@ -73,7 +73,7 @@ html {
 
 /* Navbar Styles */
 .navbar {
-  background-color: #dbdcdd; /* White background */
+  background-color: #ffffff; /* White background */
 }
 
 .navbar-nav .nav-link {
@@ -377,12 +377,12 @@ html {
 }
 
 /* Footer */
-footer {
-  background-color: #000; /* Black background */
-  color: #fff; /* White text */
-  text-align: center;
-  padding: 10px 0;
-}
+/* footer { */
+  /* background-color: #000; Black background */
+  /* color: #fff; White text */
+  /* text-align: center; */
+  /* padding: 10px 0; */
+/* } */
 
 /* Scroll Buttons */
 .nav-btn {
@@ -464,33 +464,4 @@ footer {
 .carousel-inner img {
   height: 400px; /* Adjust height as needed */
   object-fit: contain; /* Change to 'contain' to fit the section without filling it */
-}
-
-/* Timer Scroller Section */
-.timer-scroller {
-  background-color: #f8f9fa;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.timer-scroller h5 {
-  font-weight: bold;
-}
-
-#timer {
-  display: flex;
-  gap: 10px;
-}
-
-.timer-box {
-  background-color: #007bff;
-  color: #fff;
-  padding: 5px 10px;
-  border-radius: 5px;
-  text-align: center;
-}
-
-.timer-box span {
-  display: block;
 }

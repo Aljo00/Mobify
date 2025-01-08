@@ -13,8 +13,8 @@
 <!-- Custom CSS -->
 <link rel="stylesheet" href="/styles/user/cart.css" />
 
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
-  <div class="container-fluid">
+<nav class="navbar navbar-expand-lg shadow-sm sticky-top">
+  <div class="container">
     <a class="navbar-brand fw-bold text-primary" href="/">Mobify</a>
     <button
       class="navbar-toggler"
@@ -26,9 +26,7 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link active" href="/">Home</a>
-        </li>
+        <li class="nav-item"><a class="nav-link active" href="/">Home</a></li>
         <li class="nav-item dropdown">
           <a
             class="nav-link"
@@ -69,9 +67,16 @@
       </form>
       <div class="icons-group me-2">
         <a href="#" class="text-dark me-3"><i class="far fa-heart fs-5"></i></a>
-        <a href="/cart" class="text-dark"
-          ><i class="fas fa-shopping-cart fs-5"></i
-        ></a>
+        <a href="/cart" class="text-dark position-relative">
+          <i class="fas fa-shopping-cart fs-5"></i>
+          <% if (cartItemCount && cartItemCount > 0) { %>
+          <span
+            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+          >
+            <%= cartItemCount %>
+          </span>
+          <% } %>
+        </a>
       </div>
       <% if (locals.user) {%>
       <div class="dropdown">
@@ -80,13 +85,22 @@
         </a>
         <div class="dropdown-content">
           <a href="/account">Profile</a>
+          <a href="/addresses">Address</a>
           <a href="/logout">logout</a>
         </div>
       </div>
       <%} else {%>
       <div class="d-flex align-items-center">
-        <a href="/login" class="btn btn-outline-primary me-2">Login</a>
-        <a href="/signup" class="btn btn-primary">Sign Up</a>
+        <a
+          href="/login"
+          class="btn btn-primary text-primary bg-white border-primary me-2"
+          >Login</a
+        >
+        <a
+          href="/signup"
+          class="btn btn-primary text-primary bg-white border-primary"
+          >Sign Up</a
+        >
       </div>
       <%}%>
     </div>
@@ -121,16 +135,26 @@
           <% } %>
         </div>
         <div class="item-details">
-          <h2><%= item.ProductId.productName %></h2>
-          <p>RAM: <%= item.RAM %></p>
-          <p>Storage: <%= item.Storage %></p>
-          <p>Color: <%= item.color %></p>
-          <p>Quantity: <%= item.quantity %></p>
-        </div>
-        <div class="item-price">
-          <p>Price: ₹<%= item.price %></p>
-          <p>Total: ₹<%= item.totalPrice %></p>
-        </div>
+  <h2>
+    <a href="/product/<%= item.ProductId._id.toString() %>">
+      <%= item.ProductId.productName %>
+    </a>
+  </h2>
+  <p>RAM: <%= item.RAM %></p>
+  <p>Storage: <%= item.Storage %></p>
+  <p>Color: <%= item.color %></p>
+  <p>Quantity: 
+    <select name="quantity" class="form-select d-inline w-auto ms-2" onchange="updateCartItem(this, '<%= item.ProductId._id.toString() %>')">
+      <% for (let i = 1; i <= 5; i++) { %>
+        <option value="<%= i %>" <%= item.quantity === i ? 'selected' : '' %>><%= i %></option>
+      <% } %>
+    </select>
+  </p>
+</div>
+<div class="item-price">
+  <p>Price: ₹<%= item.price %></p>
+  <p>Total: ₹<%= item.totalPrice %></p>
+</div>
       </div>
       <% }); %> <% } else { %>
       <p>Your cart is empty.</p>
@@ -139,8 +163,7 @@
     <div class="cart-summary">
       <h2>Cart Summary</h2>
       <p>
-        Total Items: <%= cart.items.reduce((acc, item) => acc + item.quantity,
-        0) %>
+        Total Items: <%= cart.items.length%>
       </p>
       <p>
         Total Price: ₹<%= cart.items.reduce((acc, item) => acc +
@@ -148,12 +171,50 @@
       </p>
       <a href="/checkout">
         <button class="checkout-button">Proceed to Checkout</button>
-      </a>
+      </a>  
     </div>
   </div>
 </div>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+ function updateCartItem(selectElement, productId) {
+  const quantity = selectElement.value;
+  const itemElement = selectElement.closest('.cart-item');
+
+  // Extract additional details
+  const RAM = itemElement.querySelector('.item-details p:nth-child(2)').innerText.split(": ")[1];
+  const Storage = itemElement.querySelector('.item-details p:nth-child(3)').innerText.split(": ")[1];
+  const color = itemElement.querySelector('.item-details p:nth-child(4)').innerText.split(": ")[1];
+  const price = itemElement.querySelector('.item-price p:nth-child(1)').innerText.split(": ")[1];
+
+  // Make fetch request to update cart
+  fetch(`/cart/update`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ id: productId, quantity, ram: RAM, storage: Storage, color, price }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        // Refresh the page on success
+        window.location.reload();
+      } else {
+        // Show error message if update fails
+        alert(data.message || 'Failed to update cart');
+        window.location.reload();
+      }
+    })
+    .catch((error) => {
+      console.error('Error updating cart:', error);
+      alert('An error occurred. Please try again.');
+      window.location.reload();
+    });
+}
+</script>
 
 <%- include('../../views/layout/footer.ejs') %>

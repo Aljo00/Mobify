@@ -108,6 +108,8 @@ user_router.get("/add-to-cart/:id", userAuth.notProtect, cartController.addtoCar
 
 user_router.get("/addToCart",userAuth.notProtect, cartController.addToCartFromHome);
 
+user_router.post("/cart/update",userAuth.protect, cartController.updateCart);
+
 user_router.get("/cart", userAuth.protect, cartController.loadCartPage);
 
 user_router.post("/cart/delete/:id", userAuth.protect, cartController.deleteFromCart);

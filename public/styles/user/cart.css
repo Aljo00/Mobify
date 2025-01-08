@@ -1,11 +1,10 @@
-/* General Styles */
 body,
 html {
   margin: 0;
   padding: 0;
   width: 100%;
   overflow-x: hidden; /* Prevent horizontal scrolling */
-  background-color: #f8f9fa; /* Light grey background */
+  background-color: #dbdcdd; /* Offwhite background */
   color: #000; /* Black text */
 }
 
@@ -13,7 +12,7 @@ html {
   width: 100%;
   padding: 0 15px; /* Adjust padding as needed */
   margin: 0 auto;
-  max-width: 100%; /* Ensure the container spans the full width */
+  max-width: 1400px; /* Ensure the container spans the full width */
 }
 
 /* Dropdown Container */
@@ -73,17 +72,16 @@ html {
 
 /* Navbar Styles */
 .navbar {
-  background-color: #fff; /* White background */
+  background-color: #fdfeff; /* White background */
 }
 
-.navbar-brand,
 .navbar-nav .nav-link {
   color: #000 !important; /* Black text */
   position: relative;
 }
 
 .navbar-nav .nav-link::after {
-  content: '';
+  content: "";
   position: absolute;
   width: 0;
   height: 2px;
@@ -159,8 +157,7 @@ html {
   width: 80%;
   margin: 20px auto;
   padding: 20px;
-  background-color: #fff;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
 }
 
@@ -218,6 +215,16 @@ h1 {
   color: #333;
 }
 
+.item-details h2 a {
+  text-decoration: none; /* Remove underline by default */
+  color: inherit; /* Inherit color from parent */
+}
+
+.item-details h2 a:hover {
+  text-decoration: underline; /* Show underline on hover */
+  color: #007bff;
+}
+
 .item-details p {
   margin: 5px 0;
   font-size: 1em;
@@ -254,13 +261,15 @@ h1 {
 }
 
 .cart-summary {
-  text-align: right;
+  text-align: left;
   padding: 20px;
   border: 1px solid #ddd;
   border-radius: 5px;
   background-color: #f9f9f9;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   width: 35%; /* Adjust width to fit next to cart items */
+  max-height: 300px; /* Set a maximum height */
+  overflow-y: auto; /* Add vertical scroll if content exceeds max height */
 }
 
 .cart-summary h2 {
@@ -288,4 +297,25 @@ h1 {
 
 .checkout-button:hover {
   background-color: #e68a00;
+}
+
+.item-details table {
+  width: 100%;
+  margin-top: 10px;
+  border-collapse: collapse;
+}
+
+.item-details th, .item-details td {
+  padding: 10px;
+  text-align: left;
+}
+
+.item-details th {
+  background-color: #f1f1f1;
+  color: #333;
+}
+
+.item-details td {
+  background-color: #fff;
+  color: #555;
 }

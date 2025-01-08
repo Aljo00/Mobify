@@ -1,11 +1,10 @@
-/* General Styles */
 body,
 html {
   margin: 0;
   padding: 0;
   width: 100%;
   overflow-x: hidden; /* Prevent horizontal scrolling */
-  background-color: #fff; /* White background */
+  background-color: #dbdcdd; /* Offwhite background */
   color: #000; /* Black text */
 }
 
@@ -13,7 +12,7 @@ html {
   width: 100%;
   padding: 0 15px; /* Adjust padding as needed */
   margin: 0 auto;
-  max-width: 100%; /* Ensure the container spans the full width */
+  max-width: 1400px; /* Ensure the container spans the full width */
 }
 
 /* Dropdown Container */
@@ -73,10 +72,9 @@ html {
 
 /* Navbar Styles */
 .navbar {
-  background-color: #fff; /* White background */
+  background-color: #fdfeff; /* White background */
 }
 
-.navbar-brand,
 .navbar-nav .nav-link {
   color: #000 !important; /* Black text */
   position: relative;
@@ -318,3 +316,93 @@ footer {
     font-size: 14px;
   }
 }
+
+/* ...existing code... */
+
+.form-check-label i {
+  margin-right: 10px;
+}
+
+/* ...existing code... */
+
+.transition-hidden {
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+  transition: opacity 0.5s ease, height 0.5s ease;
+}
+
+/* ...existing code... */
+
+/* Progress Bar */
+.progress-bar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border: 2px solid #ccc;
+  border-radius: 50%;
+  background-color: #f9f9f9;
+  position: relative;
+  color: #999;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.progress-step i {
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+
+.progress-step.active {
+  border-color: #007bff;
+  background-color: #007bff;
+  color: white;
+}
+
+.progress-line {
+  flex-grow: 1;
+  height: 2px;
+  background-color: #ccc;
+  margin: 0 10px;
+}
+
+.progress-line.active {
+  background-color: #007bff;
+}
+
+/* Section Transitions */
+.section {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.transition-wipe-hidden {
+  opacity: 0;
+  transform: translateX(-100%);
+}
+
+.transition-wipe {
+  transition: transform 0.5s ease, opacity 0.5s ease;
+  transform: translateX(0);
+  opacity: 1;
+}
+
+#paymentOptions {
+  margin-top: 20px;
+  opacity: 1;
+  height: auto;
+  transition: opacity 0.5s ease, height 0.5s ease;
+}
+
+/* ...existing code... */

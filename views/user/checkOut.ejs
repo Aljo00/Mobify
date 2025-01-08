@@ -13,9 +13,47 @@
 <!-- Custom CSS -->
 <link rel="stylesheet" href="/styles/user/checkOut.css" />
 
+<style>
+  .hidden {
+    display: none;
+  }
+
+  .progress-bar-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .progress-step {
+    text-align: center;
+  }
+
+  .progress-line {
+    flex: 1;
+    height: 2px;
+    background: #ccc;
+    margin: auto;
+  }
+
+  .section {
+    margin-bottom: 30px;
+  }
+
+  .order-complete-message {
+    text-align: center;
+    margin-top: 50px;
+  }
+
+  .success-icon {
+    font-size: 50px;
+    color: green;
+    margin-bottom: 20px;
+  }
+</style>
+
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
-  <div class="container-fluid">
+<nav class="navbar navbar-expand-lg shadow-sm sticky-top">
+  <div class="container">
     <a class="navbar-brand fw-bold text-primary" href="/">Mobify</a>
     <button
       class="navbar-toggler"
@@ -41,9 +79,7 @@
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
             <% for (let i = 0; i < brand.length; i++) { %>
             <li>
-              <a class="dropdown-item hover-effect" href="#"
-                ><%= brand[i].brandName %></a
-              >
+              <a class="dropdown-item" href="#"><%= brand[i].brandName %></a>
             </li>
             <% } %>
           </ul>
@@ -69,10 +105,8 @@
         </div>
       </form>
       <div class="icons-group me-2">
-        <a href="#" class="text-dark me-3 hover-effect"
-          ><i class="far fa-heart fs-5"></i
-        ></a>
-        <a href="/cart" class="text-dark position-relative hover-effect">
+        <a href="#" class="text-dark me-3"><i class="far fa-heart fs-5"></i></a>
+        <a href="/cart" class="text-dark position-relative">
           <i class="fas fa-shopping-cart fs-5"></i>
           <% if (cartItemCount && cartItemCount > 0) { %>
           <span
@@ -96,8 +130,16 @@
       </div>
       <%} else {%>
       <div class="d-flex align-items-center">
-        <a href="/login" class="btn btn-outline-primary me-2">Login</a>
-        <a href="/signup" class="btn btn-primary">Sign Up</a>
+        <a
+          href="/login"
+          class="btn btn-primary text-primary bg-white border-primary me-2"
+          >Login</a
+        >
+        <a
+          href="/signup"
+          class="btn btn-primary text-primary bg-white border-primary"
+          >Sign Up</a
+        >
       </div>
       <%}%>
     </div>
@@ -105,108 +147,136 @@
 </nav>
 
 <div class="checkout-container">
+  <!-- Progress Bar -->
+  <div class="progress-bar-container">
+    <div class="progress-step" id="step1">
+      <i class="fas fa-map-marker-alt"></i>
+      <p>Address</p>
+    </div>
+    <div class="progress-line"></div>
+    <div class="progress-step" id="step2">
+      <i class="fas fa-credit-card"></i>
+      <p>Payment</p>
+    </div>
+    <div class="progress-line"></div>
+    <div class="progress-step" id="step3">
+      <i class="fas fa-check"></i>
+      <p>Order Complete</p>
+    </div>
+  </div>
+
   <div class="checkout-header">
     <h1>Checkout</h1>
   </div>
-  <div class="row">
-    <div class="col-md-8">
+
+  <form
+    class="checkout-form"
+    action="/place-order"
+    method="post"
+    id="checkoutForm"
+  >
+    <!-- Step 1: Address Section -->
+    <div id="addressSection" class="section">
       <h2>Shipping Address</h2>
-      <% if (addresses && addresses.length > 0) { %>
-      <form class="checkout-form" action="/place-order" method="post">
-        <div class="row">
-          <% addresses.forEach((address, index) => { %> 
-          <% address.address.forEach((addr, addrIndex) => { %>
-          <!-- Loop through nested address array -->
-          <div class="col-md-6 mb-4">
-            <div class="card address-card hover-effect">
-              <div class="card-body">
-                <input 
-                  type="radio" 
-                  id="address<%= index %>-<%= addrIndex %>"
-                  name="selectedAddress" 
-                  value="<%= addr._id %>" 
-                  <%= index === 0 && addrIndex === 0 ? 'checked' : '' %>>
-                <label for="address<%= index %>-<%= addrIndex %>">
-                  <h5 class="card-title">
-                    <%= addr.houseName %> (<%= addr.addressType %>)
-                  </h5>
-                  <p class="card-text">
-                    <%= addr.city %>, <%= addr.state %> - <%= addr.pincode %>
-                  </p>
-                  <p class="card-text">Landmark: <%= addr.landMark %></p>
-                  <p class="card-text">Phone: <%= addr.phone %></p>
-                  <p class="card-text">Alt Phone: <%= addr.altPhone %></p>
-                </label>
-              </div>
-            </div>
-          </div>
-          <% }) %> 
-          <% }) %>
-        </div>
-
-        <div class="payment-options">
-          <h2>Payment Options</h2>
-          <div class="form-check">
-            <input 
-              class="form-check-input" 
-              type="radio" 
-              name="paymentMethod" 
-              id="cod" 
-              value="cod" 
-              checked>
-            <label class="form-check-label" for="cod">
-              Cash on Delivery (COD)
-            </label>
-          </div>
-          <div class="form-check">
-            <input 
-              class="form-check-input" 
-              type="radio" 
-              name="paymentMethod" 
-              id="razorpay" 
-              value="razorpay">
-            <label class="form-check-label" for="razorpay">
-              Razorpay
+      <% addresses.forEach((address, index) => { %> <%
+      address.address.forEach((addr, addrIndex) => { %>
+      <div class="col-md-6 mb-4">
+        <div class="card address-card hover-effect">
+          <div class="card-body">
+            <input type="radio" id="address<%= index %>-<%= addrIndex %>"
+            name="selectedAddress" value="<%= addr._id %>" <%= index === 0 &&
+            addrIndex === 0 ? 'checked' : '' %>>
+            <label for="address<%= index %>-<%= addrIndex %>">
+              <h5 class="card-title">
+                <%= addr.houseName %> (<%= addr.addressType %>)
+              </h5>
+              <p class="card-text">
+                <%= addr.city %>, <%= addr.state %> - <%= addr.pincode %>
+              </p>
+              <p class="card-text">Landmark: <%= addr.landMark %></p>
+              <p class="card-text">Phone: <%= addr.phone %></p>
+              <p class="card-text">Alt Phone: <%= addr.altPhone %></p>
             </label>
           </div>
         </div>
-
-        <!-- Submit Button -->
-        <button type="submit" class="btn btn-success mt-3">
-          Place Order
-        </button>
-      </form>
-      <% } else { %>
-      <p>No addresses found. Please add a new address.</p>
-      <a href="/add-address" class="btn btn-primary">Add New Address</a>
-      <% } %>
+      </div>
+      <% }) %> <% }) %>
+      <button type="button" class="btn btn-primary mt-3" id="goToPayment">
+        Next: Payment Options
+      </button>
     </div>
 
-    <div class="col-md-4">
-      <div class="cart-summary p-3 border rounded">
-        <h2>Cart Summary</h2>
-        <% cart.items.forEach(item => { %>
+    <!-- Step 2: Payment Options Section -->
+    <div id="paymentOptions" class="section hidden">
+      <h2>Payment Options</h2>
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="radio"
+          name="paymentMethod"
+          id="cod"
+          value="cod"
+          checked
+        />
+        <label class="form-check-label" for="cod">
+          <i class="fas fa-money-bill-wave"></i> Cash on Delivery (COD)
+        </label>
+      </div>
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="radio"
+          name="paymentMethod"
+          id="razorpay"
+          value="razorpay"
+        />
+        <label class="form-check-label" for="razorpay">
+          <i class="fas fa-credit-card"></i> Razorpay
+        </label>
+      </div>
+      <button type="button" class="btn btn-secondary mt-3" id="goToAddress">
+        Back to Address
+      </button>
+      <button type="button" class="btn btn-primary mt-3" id="goToSummary">
+        Next: Order Summary
+      </button>
+    </div>
+
+    <!-- Step 3: Order Summary & Completion Section -->
+    <div id="orderCompleteSection" class="section hidden">
+      <h2>Order Complete</h2>
+      <div class="order-complete-message">
+        <div class="success-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <p>Your order is Completed</p>
         <p>
-          <strong><%= item.ProductId.productName %></strong>: ₹<%= item.price %>
+          Thank you for your order! We will update you with the order status via
+          email.
         </p>
-        <% }) %>
-        <hr>
-        <p>
-          <strong>Total Items:</strong> <%= cartItemCount %>
-        </p>
-        <p>
-          <strong>Total Price:</strong> ₹<%= cart.items.reduce((acc, item) => acc + item.totalPrice, 0) %>
-        </p>
+        <p>Expected Delivery: <strong>Tue, Sep 2024</strong></p>
+        <a href="/view-order" class="btn btn-success">View Order</a>
+        <a href="/shop" class="btn btn-secondary">Continue Shopping</a>
       </div>
     </div>
-  </div>
+  </form>
 </div>
 
-<!-- Footer -->
-<footer>
-  <div class="container-fluid text-center">
-    <p class="mb-0">&copy; 2023 Mobify. All rights reserved.</p>
-  </div>
-</footer>
+<script>
+  document.getElementById('goToPayment').addEventListener('click', () => {
+    document.getElementById('addressSection').classList.add('hidden');
+    document.getElementById('paymentOptions').classList.remove('hidden');
+  });
+
+  document.getElementById('goToAddress').addEventListener('click', () => {
+    document.getElementById('paymentOptions').classList.add('hidden');
+    document.getElementById('addressSection').classList.remove('hidden');
+  });
+
+  document.getElementById('goToSummary').addEventListener('click', () => {
+    document.getElementById('paymentOptions').classList.add('hidden');
+    document.getElementById('orderCompleteSection').classList.remove('hidden');
+  });
+</script>
 
 <%- include('../../views/layout/footer.ejs') %>

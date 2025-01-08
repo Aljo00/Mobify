@@ -11,7 +11,7 @@
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
 />
 
-<link rel="stylesheet" href="/styles/user/account.css" />
+<link rel="stylesheet" href="/styles/user/editAccount.css" />
 
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg shadow-sm sticky-top">
@@ -112,7 +112,10 @@
   <div class="row">
     <div class="col-md-3">
       <div class="list-group">
-        <a href="/account" class="list-group-item list-group-item-action active">
+        <a
+          href="/account"
+          class="list-group-item list-group-item-action active"
+        >
           <i class="fas fa-user icon-img"></i> Account
         </a>
         <a href="/addresses" class="list-group-item list-group-item-action">
@@ -135,89 +138,99 @@
     <div class="col-md-9">
       <!-- Account details content goes here -->
       <div class="account-details">
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label for="name" class="form-label"><strong>Name:</strong></label>
-            <input
-              type="text"
-              class="form-control"
-              id="name"
-              value="<%= locals.user.name %>"
-              readonly
-            />
+        <form id="editAccountForm" action="/update-account" method="POST" novalidate>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="name" class="form-label"><strong>Name:</strong></label>
+              <input
+                type="text"
+                class="form-control"
+                id="name"
+                name="name"
+                value="<%= locals.user.name %>"
+                required
+              />
+              <div class="invalid-feedback">Name is required.</div>
+            </div>
+            <div class="col-md-6">
+              <label for="dob" class="form-label"><strong>Date of Birth:</strong></label>
+              <input
+                type="date"
+                class="form-control"
+                id="dob"
+                name="dob"
+                value="<%= locals.user.dob %>"
+                required
+              />
+              <div class="invalid-feedback">Date of Birth is required.</div>
+            </div>
           </div>
-          <div class="col-md-6">
-            <label for="dob" class="form-label"
-              ><strong>Date of Birth:</strong></label
-            >
-            <input
-              type="date"
-              class="form-control"
-              id="dob"
-              value="<%= locals.user.dob %>"
-              readonly
-            />
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="email" class="form-label"><strong>Email:</strong></label>
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                name="email"
+                value="<%= locals.user.email %>"
+                readonly
+              />
+            </div>
+            <div class="col-md-6">
+              <label for="altEmail" class="form-label"><strong>Alternate Email:</strong></label>
+              <input
+                type="email"
+                class="form-control"
+                id="altEmail"
+                name="altEmail"
+                value="<%= locals.user.altEmail %>"
+                required
+              />
+              <div class="invalid-feedback">Valid alternate email is required.</div>
+            </div>
           </div>
-        </div>
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label for="email" class="form-label"
-              ><strong>Email:</strong></label
-            >
-            <input
-              type="email"
-              class="form-control"
-              id="email"
-              value="<%= locals.user.email %>"
-              readonly
-            />
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="phone" class="form-label"><strong>Phone:</strong></label>
+              <input
+                type="text"
+                class="form-control"
+                id="phone"
+                name="phone"
+                value="<%= locals.user.phone %>"
+                required
+                pattern="^\d{10}$"
+              />
+              <div class="invalid-feedback">Phone number must be 10 digits.</div>
+            </div>
+            <div class="col-md-6">
+              <label for="altPhone" class="form-label"><strong>Alternate Phone Number:</strong></label>
+              <input
+                type="text"
+                class="form-control"
+                id="altPhone"
+                name="altPhone"
+                value="<%= locals.user.altPhone %>"
+                required
+                pattern="^\d{10}$"
+              />
+              <div class="invalid-feedback">Alternate phone number must be 10 digits.</div>
+            </div>
           </div>
-          <div class="col-md-6">
-            <label for="altEmail" class="form-label"
-              ><strong>Alternate Email:</strong></label
-            >
-            <input
-              type="email"
-              class="form-control"
-              id="altEmail"
-              value="<%= locals.user.altEmail %>"
-              readonly
-            />
+          <div class="d-flex justify-content-center">
+            <button type="submit" class="btn btn-primary mt-3">Complete</button>
           </div>
-        </div>
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label for="phone" class="form-label"
-              ><strong>Phone:</strong></label
-            >
-            <input
-              type="text"
-              class="form-control"
-              id="phone"
-              value="<%= locals.user.phone %>"
-              readonly
-            />
-          </div>
-          <div class="col-md-6">
-            <label for="altPhone" class="form-label"
-              ><strong>Alternate Phone Number:</strong></label
-            >
-            <input
-              type="text"
-              class="form-control"
-              id="altPhone"
-              value="<%= locals.user.altPhone %>"
-              readonly
-            />
-          </div>
-        </div>
-        <!-- Add more personal information fields as needed -->
-         <a href="/update-account">
-          <button class="btn btn-primary mt-3">Update</button>
-         </a>
+        </form>
       </div>
     </div>
   </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script src="/scripts/user/edit-account.js"></script>
 
 <%- include('../../views/layout/footer.ejs') %>

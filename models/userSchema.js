@@ -12,7 +12,24 @@ const userSchema = new Schema({
     required: true,
     unique: true,
   },
+  altEmail: {
+    type: String,
+  },
+  dob: {
+    type: String,
+  },
+  profilePicture: {
+    type: String,
+    default: "", // Default empty string if no picture is uploaded
+  },
   phone: {
+    type: String,
+    required: false,
+    unique: false,
+    default: null,
+    sparse: true,
+  },
+  altPhone: {
     type: String,
     required: false,
     unique: false,

@@ -122,6 +122,10 @@ user_router.post("/place-order", userAuth.protect, orderController.placeOrder);
 //User Profile Management
 user_router.get("/account",userAuth.protect, accountController.loadAccountPage);
 
+user_router.get("/update-account",userAuth.protect,accountController.loadEditAccountPage)
+
+user_router.post("/update-account",userAuth.protect,accountController.editAccount)
+
 user_router.get("/addresses", userAuth.protect, accountController.loadAddressPage);
 
 user_router.get("/add-address", userAuth.protect, accountController.loadAddAddressPage);

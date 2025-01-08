@@ -34,11 +34,60 @@ const loadAccountPage = async (req, res) => {
     res.status(200).render("user/account", {
       brand: brand,
       user: userData,
-      cartItemCount: cartItemCount
-      
+      cartItemCount: cartItemCount,
     });
   } catch (error) {
-    console.log(error.message)
+    console.log(error.message);
+    res.redirect("/page404");
+  }
+};
+
+const loadEditAccountPage = async (req, res) => {
+  try {
+    const brand = await Brand.find({});
+    const user = req.user.id;
+
+    const userData = user ? await User.findById(user).lean() : null;
+
+    // const cartItemCount = userData.items.length;
+    const usercart = await cart.findOne({ userId: user });
+    const cartItemCount = usercart.items.length;
+
+    res.status(200).render("user/editAccount", {
+      brand: brand,
+      user: userData,
+      cartItemCount: cartItemCount,
+    });
+  } catch (error) {
+    console.error("Error loading editing address page:", error);
+    res.redirect("/page404");
+  }
+};
+
+const editAccount = async (req, res) => {
+  try {
+    console.log(req.body);
+    const { name, dob, email, altEmail, phone, altPhone } = req.body;
+    const user = req.user.id;
+    const updateAccount = await User.updateOne(
+      { _id: user },
+      {
+        $set: {
+          name: name,
+          dob: dob,
+          email: email,
+          altEmail: altEmail,
+          phone: phone,
+          altPhone: altPhone,
+        },
+      }
+    );
+
+    res
+      .status(200)
+      .json({ success: true, message: "Account updated successfully" });
+  } catch (error) {
+    console.error("Error editing account page:", error);
     res.redirect("/page404");
   }
 };
@@ -57,9 +106,6 @@ const loadAddressPage = async (req, res) => {
       // Fetch address details
       const userAddress = await Address.findOne({ userId: user }).lean();
 
-
-      
-
       // Add address details to userData
       if (userAddress && userAddress.address.length > 0) {
         userData.address = userAddress.address; // Detailed address objects
@@ -69,12 +115,11 @@ const loadAddressPage = async (req, res) => {
     }
     const usercart = await cart.findOne({ userId: user });
     const cartItemCount = usercart.items.length;
-   
 
     res.render("user/address", {
       brand: brand,
       user: userData, // Pass updated userData with detailed address
-      cartItemCount: cartItemCount
+      cartItemCount: cartItemCount,
     });
   } catch (error) {
     console.error("Error loading address page:", error);
@@ -102,10 +147,10 @@ const loadAddAddressPage = async (req, res) => {
     res.render("user/add-address", {
       brand: brand,
       user: userData,
-      cartItemCount: cartItemCount
+      cartItemCount: cartItemCount,
     });
   } catch (error) {
-    console.log(error.message)
+    console.log(error.message);
     res.redirect("/page404");
   }
 };
@@ -166,10 +211,8 @@ const addNewAddress = async (req, res) => {
   }
 };
 
-const loadEditAddressPage = async (req,res) => {
-
+const loadEditAddressPage = async (req, res) => {
   try {
-
     const brand = await Brand.find({});
 
     const userId = req.user.id;
@@ -185,24 +228,20 @@ const loadEditAddressPage = async (req,res) => {
       { "address._id": id },
       { "address.$": 1 }
     );
-    res.render("user/edit-address",{
+    res.render("user/edit-address", {
       address: address,
       user: userData,
       cartItemCount: cartItemCount,
-      brand: brand
-    })
-    
+      brand: brand,
+    });
   } catch (error) {
     console.error("Error loading editing address page:", error);
     res.redirect("/page404");
   }
-  
-}
+};
 
-const updateAddress = async (req,res) => {
-
+const updateAddress = async (req, res) => {
   try {
-
     const { id } = req.params;
     const {
       addressType,
@@ -215,7 +254,7 @@ const updateAddress = async (req,res) => {
       altPhone,
     } = req.body;
 
-    console.log(req.body,id)
+    console.log(req.body, id);
 
     const result = await Address.updateOne(
       { "address._id": id }, // Find the address by its _id
@@ -236,13 +275,11 @@ const updateAddress = async (req,res) => {
     res
       .status(200)
       .json({ success: true, message: "Address updated successfully" });
-    
   } catch (error) {
     console.error("Error editing address:", error);
     res.redirect("/page404");
   }
-  
-}
+};
 
 const deleteAddress = async (req, res) => {
   try {
@@ -262,7 +299,6 @@ const deleteAddress = async (req, res) => {
     res.redirect("/page404"); // Redirect in case of error
   }
 };
-
 
 const loadForgotPasswordPage = async (req, res) => {
   try {
@@ -416,5 +452,7 @@ module.exports = {
   resetPassword,
   loadEditAddressPage,
   deleteAddress,
-  updateAddress
+  updateAddress,
+  loadEditAccountPage,
+  editAccount,
 };

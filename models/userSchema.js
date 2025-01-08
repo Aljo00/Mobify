@@ -1,94 +1,107 @@
 const { name } = require("ejs");
 const mongoose = require("mongoose");
-const {Schema} = mongoose;
+const { Schema } = mongoose;
 
 const userSchema = new Schema({
-    name: {
-        type: String,
-        required: true
+  name: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  phone: {
+    type: String,
+    required: false,
+    unique: false,
+    default: null,
+    sparse: true,
+  },
+  googleId: {
+    type: String,
+    unique: true,
+    default: null,
+  },
+  googleId: {
+    type: String,
+    sparse: true,
+  },
+  password: {
+    type: String,
+    required: false,
+  },
+  isBlocked: {
+    type: Boolean,
+    default: false,
+  },
+  isAdmin: {
+    type: Boolean,
+    default: false,
+  },
+  cart: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Cart",
     },
-    email: {
-        type: String,
-        required: true,
-        unique: true
+  ],
+  address: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Address",
     },
-    phone: {
-        type: String,
-        required: false,
-        unique: false,
-        default: null,
-        sparse:true
+  ],
+  wallet: {
+    type: Number,
+    default: 0,
+  },
+  wishlist: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Wishlist",
     },
-    googleId: {
-        type: String,
-        unique: true,
-        default: null
+  ],
+  orderHistory: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Order",
     },
-    googleId: {
-        type: String,
-        sparse: true
+  ],
+  createdOn: {
+    type: Date,
+    default: Date.now,
+  },
+  referralCode: {
+    type: String,
+  },
+  redeemed: {
+    type: Boolean,
+  },
+  redeemedUsers: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "User",
     },
-    password: {
-        type: String,
-        required: false,
-    },
-    isBlocked: {
-        type: Boolean,
-        default: false
-    },
-    isAdmin: {
-        type: Boolean,
-        default: false
-    },
-    cart:[{
+  ],
+  searchHistory: [
+    {
+      category: {
         type: Schema.Types.ObjectId,
-        ref: "Cart"
-    }],
-    address: [{
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "Address" 
-    }],
-    wallet: {
-        type: Number,
-        default: 0
-    },
-    wishlist: [{
-        type: Schema.Types.ObjectId,
-        ref:"Wishlist"
-    }],
-    orderHistory: [{
-        type: Schema.Types.ObjectId,
-        ref: "Order"
-    }],
-    createdOn: {
+        ref: "Category",
+      },
+      brand: {
+        type: String,
+      },
+      searchOn: {
         type: Date,
-        default: Date.now
+        default: Date.now,
+      },
     },
-    referralCode: {
-        type: String
-    },
-    redeemed: {
-        type: Boolean
-    },
-    redeemedUsers: [{
-        type: Schema.Types.ObjectId,
-        ref: "User"
-    }],
-    searchHistory: [{
-        category:{
-            type:Schema.Types.ObjectId,
-            ref: "Category"
-        },
-        brand:{
-            type: String
-        },
-        searchOn:{
-            type: Date,
-            default: Date.now
-        }
-    }]
-
-})
+  ],
+  resetPasswordToken: { type: String },
+  resetPasswordExpires: { type: Date },
+});
 
 const User = mongoose.model("User", userSchema);
 

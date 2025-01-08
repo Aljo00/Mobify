@@ -204,7 +204,7 @@ const verifyOtp = async (req, res) => {
 
       res.json({ success: true, redirectUrl: "/login" });
     } else {
-      res
+      res 
         .status(400)
         .json({ success: false, message: "Invalid OTP! Please try again." });
     }

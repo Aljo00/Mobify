@@ -27,6 +27,15 @@ app.use(express.urlencoded({extended:true}))
 const db = require("./config/db");
 db.connectDB();
 
+app.use((req,res,next,err)=>{
+    if(err){
+        console.log(err);
+        res.redirect("/page404"); 
+    }else{
+        next();
+    }
+})
+
 //intializing the session
 app.use(session({
     secret: process.env.SECRET_KEY,

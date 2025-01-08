@@ -128,6 +128,14 @@ user_router.get("/add-address", userAuth.protect, accountController.loadAddAddre
 
 user_router.post("/add-address", userAuth.protect, accountController.addNewAddress);
 
+user_router.get("/forgot-password",accountController.loadForgotPasswordPage);
+
+user_router.post("/forgot-password",accountController.verifyEmail);
+
+user_router.get("/reset-password/:token",accountController.loadResetPassword);
+
+user_router.post("/reset-password/:token",accountController.resetPassword)
+
 user_router.get("/logout", user_controller.logout);
 
 module.exports = user_router;

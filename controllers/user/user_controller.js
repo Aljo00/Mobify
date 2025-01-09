@@ -22,26 +22,23 @@ const load_homePage = async (req, res) => {
     // Fetch products
     const refurbishedPhones = await Product.find({
       isBlocked: false,
-      combos: { $elemMatch: { quantity: { $gt: 0 } } },
       category: "Refurbished Phones",
     });
 
     const newPhones = await Product.find({
       isBlocked: false,
-      combos: { $elemMatch: { quantity: { $gt: 0 } } },
       category: "New Phone",
     });
 
     const newArrivals = await Product.find({
       isBlocked: false,
-      combos: { $elemMatch: { quantity: { $gt: 0 } } },
     })
       .sort({ createdAt: -1 })
       .limit(6);
 
     const user = req.user;
 
-    const brand = await Brand.find({}).limit(7);
+    const brand = await Brand.find({});
 
     // Get cart item count from session or calculate it
     let cartItemCount = 0;
@@ -88,7 +85,10 @@ const load_homePage = async (req, res) => {
 
 const load_loginpage = async (req, res) => {
   try {
-    res.render("user/login");
+    const brand = await Brand.find({});
+    res.render("user/login",{
+      brand: brand
+    });
   } catch (error) {
     console.log("Error found: ", error.message);
     res.status(500).send("Server error");

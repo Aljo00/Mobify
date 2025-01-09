@@ -1,3 +1,4 @@
+/* General Styles */
 body,
 html {
   margin: 0;
@@ -72,7 +73,7 @@ html {
 
 /* Navbar Styles */
 .navbar {
-  background-color: #fdfeff; /* White background */
+  background-color: #ffffff; /* White background */
 }
 
 .navbar-nav .nav-link {
@@ -163,10 +164,10 @@ footer {
 
 /* Checkout Page Styles */
 .checkout-container {
-  max-width: 800px;
-  margin: 0 auto;
+  max-width: 1200px;
+  margin: 49px auto;
   padding: 20px;
-  background-color: #f9f9f9;
+  background-color: #e2dada;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }

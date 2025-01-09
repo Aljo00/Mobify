@@ -49,13 +49,17 @@
   <p>RAM: <%= item.RAM %></p>
   <p>Storage: <%= item.Storage %></p>
   <p>Color: <%= item.color %></p>
+  <% if (item.outOfStock) { %>
+  <p class="text-danger">Out of stock</p>
+<% } else { %>
   <p>Quantity: 
     <select name="quantity" class="form-select d-inline w-auto ms-2" onchange="updateCartItem(this, '<%= item.ProductId._id.toString() %>')">
-      <% for (let i = 1; i <= 5; i++) { %>
+      <% for (let i = 1; i <= item.quantity; i++) { %>
         <option value="<%= i %>" <%= item.quantity === i ? 'selected' : '' %>><%= i %></option>
       <% } %>
     </select>
   </p>
+<% } %>
 </div>
 <div class="item-price">
   <p>Price: ₹<%= item.price %></p>

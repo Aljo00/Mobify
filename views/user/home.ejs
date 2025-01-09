@@ -13,8 +13,6 @@
 <!-- Custom CSS -->
 <link rel="stylesheet" href="/styles/user/home.css" />
 
-
-
 <!-- Main Content -->
 <main class="container py-5 text-center">
   <!-- Banner Section -->
@@ -115,6 +113,7 @@
               <% } %>
             </h5>
             <div class="action-buttons">
+              <% if (newArrivals[i].combos[0].quantity !== 0){%>
               <a
                 href="/addToCart?id=<%= newArrivals[i]._id %>"
                 class="add-cart"
@@ -122,6 +121,9 @@
               >
                 Add To Cart</a
               >
+              <% } else {%>
+              <span class="add-cart" style="background-color: red;">Out of Stock</span>
+              <% } %>
               <a
                 href="/addToWishlist?id=<%= newArrivals[i]._id %>"
                 class="wishlist-btn"
@@ -183,12 +185,16 @@
               <% } %>
             </h5>
             <div class="action-buttons">
+              <% if (newPhones[i].combos[0].quantity !== 0){%>
               <a
                 href="/addToCart?id=<%= newPhones[i]._id %>"
                 class="add-cart"
                 data-id="<%= newPhones[i]._id %>"
                 >Add To Cart</a
               >
+              <% } else {%>
+              <span class="add-cart" style="background-color: red;">Out of Stock</span>
+              <% } %>
               <a
                 href="/addToWishlist?id=<%= newPhones[i]._id %>"
                 class="wishlist-btn"
@@ -253,12 +259,16 @@
               <% } %>
             </h5>
             <div class="action-buttons">
+              <% if (refurbishedPhones[i].combos[0].quantity !== 0){%>
               <a
                 href="/addToCart?id=<%= refurbishedPhones[i]._id %>"
                 class="add-cart"
                 data-id="<%= refurbishedPhones[i]._id %>"
                 >Add To Cart</a
               >
+              <% } else {%>
+              <span class="add-cart" style="background-color: red;">Out of Stock</span>
+              <% } %>
               <a
                 href="/addToWishlist?id=<%= refurbishedPhones[i]._id %>"
                 class="wishlist-btn"

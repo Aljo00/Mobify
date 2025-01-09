@@ -6,6 +6,7 @@ const productController = require("../controllers/user/product_controller");
 const cartController = require("../controllers/user/cart_controller");
 const accountController = require("../controllers/user/account_controller");
 const orderController = require("../controllers/user/order_controller");
+const shopController = require("../controllers/user/shop_controller");
 const passport = require("passport");
 const userAuth = require("../middleware/JWTUserAuth");
 const multer = require("multer");
@@ -154,7 +155,10 @@ user_router.post("/forgot-password",accountController.verifyEmail);
 
 user_router.get("/reset-password/:token",accountController.loadResetPassword);
 
-user_router.post("/reset-password/:token",accountController.resetPassword)
+user_router.post("/reset-password/:token",accountController.resetPassword);
+
+//Shop Management
+user_router.get("/shop",userAuth.notProtect,shopController.loadShopPage)
 
 user_router.get("/logout", user_controller.logout);
 

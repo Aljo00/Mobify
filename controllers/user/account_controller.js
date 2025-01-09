@@ -23,6 +23,14 @@ const loadAccountPage = async (req, res) => {
     const brand = await Brand.find({});
     const user = req.user.id;
     const userData = user ? await User.findById(user).lean() : null;
+    // Generate initials if no profile picture exists
+    if (!userData.profileImage) {
+      const name = userData.name || "";
+      userData.initials = name
+        .replace(/\s+/g, "") // Remove all spaces in the name
+        .slice(0, 2) // Take the first two characters
+        .toUpperCase(); // Convert to uppercase
+    }
 
     if (userData) {
       const userAddress = await Address.findOne({ userId: user }).lean();
@@ -50,6 +58,14 @@ const loadEditAccountPage = async (req, res) => {
     const user = req.user.id;
 
     const userData = user ? await User.findById(user).lean() : null;
+    // Generate initials if no profile picture exists
+    if (!userData.profileImage) {
+      const name = userData.name || "";
+      userData.initials = name
+        .replace(/\s+/g, "") // Remove all spaces in the name
+        .slice(0, 2) // Take the first two characters
+        .toUpperCase(); // Convert to uppercase
+    }
 
     // const cartItemCount = userData.items.length;
     const usercart = await cart.findOne({ userId: user });
@@ -122,6 +138,14 @@ const loadAddressPage = async (req, res) => {
     if (user) {
       // Fetch user data
       userData = await User.findById(user).lean();
+      // Generate initials if no profile picture exists
+      if (!userData.profileImage) {
+        const name = userData.name || "";
+        userData.initials = name
+          .replace(/\s+/g, "") // Remove all spaces in the name
+          .slice(0, 2) // Take the first two characters
+          .toUpperCase(); // Convert to uppercase
+      }
 
       // Fetch address details
       const userAddress = await Address.findOne({ userId: user }).lean();
@@ -238,6 +262,14 @@ const loadEditAddressPage = async (req, res) => {
     const userId = req.user.id;
 
     const userData = userId ? await User.findById(userId) : null;
+    // Generate initials if no profile picture exists
+    if (!userData.profileImage) {
+      const name = userData.name || "";
+      userData.initials = name
+        .replace(/\s+/g, "") // Remove all spaces in the name
+        .slice(0, 2) // Take the first two characters
+        .toUpperCase(); // Convert to uppercase
+    }
 
     const usercart = await cart.findOne({ userId: userId });
     const cartItemCount = usercart.items.length;

@@ -13,101 +13,6 @@
 
 <link rel="stylesheet" href="/styles/user/add-address.css" />
 
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg shadow-sm sticky-top">
-  <div class="container">
-    <a class="navbar-brand fw-bold text-primary" href="/">Mobify</a>
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#navbarNav"
-    >
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item"><a class="nav-link active" href="/">Home</a></li>
-        <li class="nav-item dropdown">
-          <a
-            class="nav-link"
-            href="#"
-            id="navbarDropdown"
-            role="button"
-            aria-expanded="false"
-          >
-            Brands
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <% for (let i = 0; i < brand.length; i++) { %>
-            <li>
-              <a class="dropdown-item" href="#"><%= brand[i].brandName %></a>
-            </li>
-            <% } %>
-          </ul>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/aboutus">About Us</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/contactus">Contact Us</a>
-        </li>
-      </ul>
-      <form class="d-flex me-3" method="get">
-        <div class="input-group">
-          <input
-            class="form-control"
-            type="search"
-            name="search"
-            placeholder="Search products..."
-          />
-          <button class="input-group-text search-icon" type="submit">
-            <i class="fas fa-search"></i>
-          </button>
-        </div>
-      </form>
-      <div class="icons-group me-2">
-        <a href="#" class="text-dark me-3"><i class="far fa-heart fs-5"></i></a>
-        <a href="/cart" class="text-dark position-relative">
-          <i class="fas fa-shopping-cart fs-5"></i>
-          <% if (cartItemCount && cartItemCount > 0) { %>
-          <span
-            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-          >
-            <%= cartItemCount %>
-          </span>
-          <% } %>
-        </a>
-      </div>
-      <% if (locals.user) {%>
-      <div class="dropdown">
-        <a href="#" class="sign-in-link">
-          <i class="fas fa-user-circle"></i> <%=locals.user.name%>
-        </a>
-        <div class="dropdown-content">
-          <a href="/account">Profile</a>
-          <a href="/addresses">Address</a>
-          <a href="/logout">logout</a>
-        </div>
-      </div>
-      <%} else {%>
-      <div class="d-flex align-items-center">
-        <a
-          href="/login"
-          class="btn btn-primary text-primary bg-white border-primary me-2"
-          >Login</a
-        >
-        <a
-          href="/signup"
-          class="btn btn-primary text-primary bg-white border-primary"
-          >Sign Up</a
-        >
-      </div>
-      <%}%>
-    </div>
-  </div>
-</nav>
-
 <div class="container-fluid mt-5">
   <div class="row">
     <div class="col-md-3">
@@ -190,11 +95,12 @@
           <div class="col-md-6">
             <label for="pincode" class="form-label">Pincode</label>
             <input
-              type="number"
+              type="text"
               class="form-control"
               id="pincode"
               name="pincode"
               value="<%= address.address[0].pincode %>"
+              maxlength="6"
             />
             <div class="invalid-feedback" id="pincodeError"></div>
           </div>
@@ -206,6 +112,7 @@
               id="phone"
               name="phone"
               value="<%= address.address[0].phone %>"
+              maxlength="10"
             />
             <div class="invalid-feedback" id="phoneError"></div>
           </div>
@@ -219,6 +126,7 @@
               id="altPhone"
               name="altPhone"
               value="<%= address.address[0].altPhone %>"
+              maxlength="10"
             />
             <div class="invalid-feedback" id="altPhoneError"></div>
           </div>

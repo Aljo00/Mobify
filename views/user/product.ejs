@@ -13,248 +13,177 @@
 <!-- Custom CSS -->
 <link rel="stylesheet" href="/styles/user/product.css" />
 
-<div class="container-fluid">
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg shadow-sm sticky-top">
-    <div class="container-fluid">
-      <a class="navbar-brand fw-bold text-primary" href="/">Mobify</a>
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarNav"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item"><a class="nav-link active" href="/">Home</a></li>
-          <%for(let i = 0; i < brand.length; i++) {%>
-          <li class="nav-item">
-            <a class="nav-link" href="#"><%= brand[i].brandName%></a>
-          </li>
-          <%}%>
-        </ul>
-        <form class="d-flex me-3" method="get">
-          <div class="input-group">
-            <input
-              class="form-control"
-              type="search"
-              name="search"
-              placeholder="Search products..."
-            />
-            <button class="input-group-text search-icon" type="submit">
-              <i class="fas fa-search"></i>
-            </button>
-          </div>
-        </form>
-        <div class="icons-group me-2">
-          <a href="#" class="text-dark me-3"
-            ><i class="far fa-heart fs-5"></i
-          ></a>
-          <a href="/cart" class="text-dark position-relative">
-            <i class="fas fa-shopping-cart fs-5"></i>
-            <% if (cartItemCount && cartItemCount > 0) { %>
-            <span
-              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-            >
-              <%= cartItemCount %>
-            </span>
-            <% } %>
-          </a>
-        </div>
-        <% if (locals.user) {%>
-        <div class="dropdown">
-          <a href="#" class="sign-in-link"><%=locals.user.name%></a>
-          <div class="dropdown-content">
-            <a href="/account">Profile</a>
-          <a href="/addresses">Address</a>
-          <a href="/logout">logout</a>
-          </div>
-        </div>
-        <%} else {%>
-        <div class="d-flex align-items-center">
-          <a href="/login" class="btn btn-outline-primary me-2">Login</a>
-          <a href="/signup" class="btn btn-primary">Sign Up</a>
-        </div>
-        <%}%>
-      </div>
-    </div>
-  </nav>
-
-  <div class="row">
-    <!-- Product Image Carousel -->
-    <div class="col-lg-6 col-md-12">
-      <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
-        <!-- Main Carousel -->
-        <div class="carousel-inner">
-          <% product.productImage.forEach((image, index) => { %>
-          <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
-            <div class="zoom-container">
-              <img
-                src="<%= image %>"
-                class="d-block w-100 product-carousel-image"
-                alt="Product Image"
-              />
-            </div>
-          </div>
-          <% }) %>
-        </div>
-        <!-- Carousel Controls -->
-        <button
-          class="carousel-control-prev"
-          type="button"
-          data-bs-target="#productCarousel"
-          data-bs-slide="prev"
-        >
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Previous</span>
-        </button>
-        <button
-          class="carousel-control-next"
-          type="button"
-          data-bs-target="#productCarousel"
-          data-bs-slide="next"
-        >
-          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Next</span>
-        </button>
-      </div>
-
-      <!-- Thumbnails Section -->
-      <div class="product-thumbnails mt-3 d-flex justify-content-center">
-        <% product.productImage.forEach((image, index) => { %>
-        <img
-          src="<%= image %>"
-          class="thumbnail-image <%= index === 0 ? 'selected' : '' %>"
-          data-bs-target="#productCarousel"
-          data-bs-slide-to="<%= index %>"
-          alt="Thumbnail Image"
-        />
-        <% }) %>
-      </div>
-    </div>
-
-    <!-- Product Details -->
-    <div class="col-lg-6">
-      <h1 class="product-title"><%= product.productName %></h1>
-      <p class="brand">Brand: <%= product.brand %></p>
-
-      <p class="description">
-        <%= product.description || "No description available" %>
-      </p>
-
-      <div class="product-combos">
-        <h5>Available Combos:</h5>
-        <div class="combo-buttons">
-          <% product.combos.forEach((combo, index) => { %>
-          <button
-            type="button"
-            class="btn <%= index === 0 ? 'btn-primary' : 'btn-outline-primary' %> combo-option"
-            data-ram="<%= combo.ram %>"
-            data-storage="<%= combo.storage %>"
-            data-color="<%= combo.color %>"
-            onclick="selectCombo('<%= combo.ram %>', '<%= combo.storage %>', '<%= combo.color %>')"
-          >
-            <%= combo.ram %>GB / <%= combo.storage %>GB / <%= combo.color %>
-          </button>
-          <% }); %>
-        </div>
-      </div>
-
-      <!-- Product Price Section -->
-      <div id="priceSection" class="product-price-section mt-4">
-        <h3 class="product-price">
-          ₹<span id="currentPrice"
-            ><%= product.combos[0].salePrice.toLocaleString() %></span
-          >
-          <span id="regularPrice" class="text-muted">
-            <del>₹<%= product.combos[0].regularPrice.toLocaleString() %></del>
-          </span>
-        </h3>
-        <div class="quantity-counter">
-          <button id="decreaseQuantity" class="btn btn-outline-secondary">
-            -
-          </button>
-          <input
-            type="number"
-            id="quantityInput"
-            value="1"
-            min="1"
-            name="quantity"
-            max="5"
-          />
-          <button id="increaseQuantity" class="btn btn-outline-secondary">
-            +
-          </button>
-        </div>
-        <p id="quantityStatus" class="text-primary">
-          <% if (product.combos[0].quantity === 0) { %> Out of Stock <% } else {
-          %>
-          <span>Available Quantity: <%= product.combos[0].quantity %></span>
-          <% } %>
-        </p>
-      </div>
-
-      <!-- Add to Cart and Buy Now Buttons -->
-      <div id="actionButtons" class="action-buttons mt-3">
-        <% if (product.combos[0].quantity > 0) { %>
-        <a
-          id="addToCartBtn"
-          href="/add-to-cart/<%= product._id %>?ram=<%= product.combos[0].ram %>&storage=<%= product.combos[0].storage %>&color=<%= product.combos[0].color %>&quantity=1&price=<%= product.combos[0].salePrice %>"
-        >
-          <button class="btn btn-success">Add to Cart</button>
-        </a>
-
-        <a
-          id="buyNowBtn"
-          href="/buy-now/<%= product._id %>?ram=<%= product.combos[0].ram %>&storage=<%= product.combos[0].storage %>&color=<%= product.combos[0].color %>"
-        >
-          <button class="btn btn-primary">Buy Now</button>
-        </a>
-        <% } else { %>
-        <button class="btn btn-danger" disabled>Out of Stock</button>
-        <% } %>
-      </div>
-    </div>
-  </div>
-
-  <!-- Related Products -->
-  <div class="related-products">
-    <h3>Related Products</h3>
+<main>
+  <div class="container-fluid">
     <div class="row">
-      <% relatedProducts.forEach(related => { %>
-      <div class="col-lg-3 col-md-4 col-sm-6">
-        <a href="/product/<%= related._id %>" class="related-product">
-          <div class="product__item">
-            <div
-              class="product__item__pic"
-              style="
-                background-image: url('<%= related.productImage[0] %>');
-              "
-            >
-              <div class="product-discount">
-                -<%= related.discount || 50 %>%
+      <!-- Product Image Carousel -->
+      <div class="col-lg-6 col-md-12">
+        <div
+          id="productCarousel"
+          class="carousel slide"
+          data-bs-ride="carousel"
+        >
+          <!-- Main Carousel -->
+          <div class="carousel-inner">
+            <% product.productImage.forEach((image, index) => { %>
+            <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+              <div class="zoom-container">
+                <img
+                  src="<%= image %>"
+                  class="d-block w-100 product-carousel-image"
+                  alt="Product Image"
+                />
               </div>
             </div>
-            <div class="product__item__text">
-              <h6><%= related.productName %></h6>
-              <h5>₹<%= related.combos[0].salePrice.toLocaleString() %></h5>
-            </div>
+            <% }) %>
           </div>
-        </a>
+          <!-- Carousel Controls -->
+          <button
+            class="carousel-control-prev"
+            type="button"
+            data-bs-target="#productCarousel"
+            data-bs-slide="prev"
+          >
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button
+            class="carousel-control-next"
+            type="button"
+            data-bs-target="#productCarousel"
+            data-bs-slide="next"
+          >
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+
+        <!-- Thumbnails Section -->
+        <div class="product-thumbnails mt-3 d-flex justify-content-center">
+          <% product.productImage.forEach((image, index) => { %>
+          <img
+            src="<%= image %>"
+            class="thumbnail-image <%= index === 0 ? 'selected' : '' %>"
+            data-bs-target="#productCarousel"
+            data-bs-slide-to="<%= index %>"
+            alt="Thumbnail Image"
+          />
+          <% }) %>
+        </div>
       </div>
-      <% }); %>
+
+      <!-- Product Details -->
+      <div class="col-lg-6">
+        <h1 class="product-title"><%= product.productName %></h1>
+        <p class="brand">Brand: <%= product.brand %></p>
+
+        <p class="description">
+          <%= product.description || "No description available" %>
+        </p>
+
+        <div class="product-combos">
+          <h5>Available Combos:</h5>
+          <div class="combo-buttons">
+            <% product.combos.forEach((combo, index) => { %>
+            <button
+              type="button"
+              class="btn <%= index === 0 ? 'btn-primary' : 'btn-outline-primary' %> combo-option"
+              data-ram="<%= combo.ram %>"
+              data-storage="<%= combo.storage %>"
+              data-color="<%= combo.color %>"
+              onclick="selectCombo('<%= combo.ram %>', '<%= combo.storage %>', '<%= combo.color %>')"
+            >
+              <%= combo.ram %>GB / <%= combo.storage %>GB / <%= combo.color %>
+            </button>
+            <% }); %>
+          </div>
+        </div>
+
+        <!-- Product Price Section -->
+        <div id="priceSection" class="product-price-section mt-4">
+          <h3 class="product-price">
+            ₹<span id="currentPrice"
+              ><%= product.combos[0].salePrice.toLocaleString() %></span
+            >
+            <span id="regularPrice" class="text-muted">
+              <del>₹<%= product.combos[0].regularPrice.toLocaleString() %></del>
+            </span>
+          </h3>
+          <div class="quantity-counter">
+            <button id="decreaseQuantity" class="btn btn-outline-secondary">
+              -
+            </button>
+            <input
+              type="number"
+              id="quantityInput"
+              value="1"
+              min="1"
+              name="quantity"
+              max="5"
+            />
+            <button id="increaseQuantity" class="btn btn-outline-secondary">
+              +
+            </button>
+          </div>
+          <p id="quantityStatus" class="text-primary">
+            <% if (product.combos[0].quantity === 0) { %> Out of Stock <% } else
+            { %>
+            <span>Available Quantity: <%= product.combos[0].quantity %></span>
+            <% } %>
+          </p>
+        </div>
+
+        <!-- Add to Cart and Buy Now Buttons -->
+        <div id="actionButtons" class="action-buttons mt-3">
+          <% if (product.combos[0].quantity > 0) { %>
+          <a
+            id="addToCartBtn"
+            href="/add-to-cart/<%= product._id %>?ram=<%= product.combos[0].ram %>&storage=<%= product.combos[0].storage %>&color=<%= product.combos[0].color %>&quantity=1&price=<%= product.combos[0].salePrice %>"
+          >
+            <button class="btn btn-success">Add to Cart</button>
+          </a>
+
+          <a
+            id="buyNowBtn"
+            href="/buy-now/<%= product._id %>?ram=<%= product.combos[0].ram %>&storage=<%= product.combos[0].storage %>&color=<%= product.combos[0].color %>"
+          >
+            <button class="btn btn-primary">Buy Now</button>
+          </a>
+          <% } else { %>
+          <button class="btn btn-danger" disabled>Out of Stock</button>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Products -->
+    <div class="related-products">
+      <h3>Related Products</h3>
+      <div class="row">
+        <% relatedProducts.forEach(related => { %>
+        <div class="col-lg-3 col-md-4 col-sm-6">
+          <a href="/product/<%= related._id %>" class="related-product">
+            <div class="product__item">
+              <div
+                class="product__item__pic"
+                style="background-image: url('<%= related.productImage[0] %>')"
+              >
+                <div class="product-discount">
+                  -<%= related.discount || 50 %>%
+                </div>
+              </div>
+              <div class="product__item__text">
+                <h6><%= related.productName %></h6>
+                <h5>₹<%= related.combos[0].salePrice.toLocaleString() %></h5>
+              </div>
+            </div>
+          </a>
+        </div>
+        <% }); %>
+      </div>
     </div>
   </div>
-</div>
-
-<!-- Footer -->
-<footer>
-  <div class="container text-center">
-    <p class="mb-0">&copy; 2023 Mobify. All rights reserved.</p>
-  </div>
-</footer>
+</main>
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 

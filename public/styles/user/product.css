@@ -277,11 +277,6 @@ footer {
   border-top: 1px solid #ddd;
 }
 
-footer p {
-  margin: 0;
-  color: #555;
-}
-
 /* Quantity Counter */
 .quantity-counter {
   display: flex;

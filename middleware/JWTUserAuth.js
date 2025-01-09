@@ -20,9 +20,7 @@ const protect = (req, res, next) => {
 
 const protectLogin = (req,res,next) => {
   try {
-    console.log(req.cookies.userAuth);
     const token = req.cookies.userAuth;
-    console.log(token);
 
     if (!token) {
       next();

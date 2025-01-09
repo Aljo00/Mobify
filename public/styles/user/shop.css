@@ -164,16 +164,38 @@ html {
 
 .filters-section h3 {
   margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
 }
 
 .filters-section .form-label {
   font-weight: bold;
+  color: #555;
+}
+
+.filters-section .form-select {
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  padding: 10px;
+  font-size: 14px;
+  color: #333;
+}
+
+.filters-section .form-check-label {
+  font-size: 14px;
+  color: #555;
+}
+
+.filters-section .form-check-input {
+  margin-right: 10px;
 }
 
 .filters-section .btn {
   background-color: #007bff;
   color: #fff;
-  padding: 10px 15px;
+  width: 113px;
+  padding: 7px 4px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -222,7 +244,7 @@ html {
 .product__item__pic img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .product__item__pic .hover-image {
@@ -282,8 +304,8 @@ html {
   position: absolute;
   top: 10px;
   right: 10px;
-  padding: 2px 6px;
-  border-radius: 3px;
+  padding: 5px 10px;
+  border-radius: 5px;
   font-size: 12px;
   font-weight: bold;
   z-index: 100; /* Ensure it is above other elements */
@@ -360,4 +382,17 @@ html {
 /* Remove old wishlist button position */
 .product__item__pic .wishlist-btn {
   display: none;
+}
+
+/* No Products Available Message */
+.no-products {
+  padding: 50px 0;
+  font-size: 24px;
+  color: #ff0000; /* Red color for the message */
+  font-weight: bold;
+}
+
+.btn-secondary {
+  margin-top: 10px;
+  width: 100%;
 }

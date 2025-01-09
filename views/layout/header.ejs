@@ -36,9 +36,9 @@
               <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <% for (let i = 0; i < brand.length; i++) { %>
                 <li>
-                  <a class="dropdown-item" href="#"
-                    ><%= brand[i].brandName %></a
-                  >
+                  <a class="dropdown-item" href="/shop?brand=<%= brand[i].brandName %>">
+                    <%= brand[i].brandName %>
+                  </a>
                 </li>
                 <% } %>
               </ul>

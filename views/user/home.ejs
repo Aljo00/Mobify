@@ -13,6 +13,12 @@
 <!-- Custom CSS -->
 <link rel="stylesheet" href="/styles/user/home.css" />
 
+<style>
+  .section-title {
+    cursor: pointer;
+  }
+</style>
+
 <!-- Main Content -->
 <main class="container py-5 text-center">
   <!-- Banner Section -->
@@ -64,7 +70,7 @@
     <div class="col-lg-3">
       <div class="section-title-wrapper">
         <i class="fas fa-star"></i>
-        <h3 class="section-title">New Arrivals</h3>
+        <h3 class="section-title" onclick="window.location.href='/shop?sort=newArrivals'">New Arrivals <i class="fas fa-arrow-right"></i></h3>
       </div>
     </div>
   </div>
@@ -142,7 +148,7 @@
     <div class="col-lg-3">
       <div class="section-title-wrapper">
         <i class="fas fa-mobile-alt"></i>
-        <h3 class="section-title">New Phones</h3>
+        <h3 class="section-title" onclick="window.location.href='/shop?category=New Phone'">New Phones <i class="fas fa-arrow-right"></i></h3>
       </div>
     </div>
   </div>
@@ -213,7 +219,7 @@
     <div class="col-lg-3">
       <div class="section-title-wrapper">
         <i class="fas fa-sync-alt"></i>
-        <h3 class="section-title">Refurbished Phones</h3>
+        <h3 class="section-title" onclick="window.location.href='/shop?category=Refurbished Phones'">Refurbished Phones <i class="fas fa-arrow-right"></i></h3>
       </div>
     </div>
   </div>

@@ -13,44 +13,141 @@
 <!-- Custom CSS -->
 <link rel="stylesheet" href="/styles/user/shop.css" />
 
-<div class="container-fluid mt-5">
+<div class="container mt-5">
+  <!-- Breadcrumbs -->
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      <li class="breadcrumb-item"><a href="/shop">Shop</a></li>
+      <% if (selectedCategory) { %>
+      <li class="breadcrumb-item active" aria-current="page"><%= selectedCategory %></li>
+      <% } %>
+      <% if (selectedBrand) { %>
+      <li class="breadcrumb-item active" aria-current="page"><%= selectedBrand %></li>
+      <% } %>
+      <% if (selectedPriceRange) { %>
+      <li class="breadcrumb-item active" aria-current="page">Up to ₹<%= selectedPriceRange %></li>
+      <% } %>
+      <% if (selectedRam) { %>
+      <li class="breadcrumb-item active" aria-current="page"><%= selectedRam %>GB RAM</li>
+      <% } %>
+      <% if (selectedStorage) { %>
+      <li class="breadcrumb-item active" aria-current="page"><%= selectedStorage %>GB Storage</li>
+      <% } %>
+      <% if (selectedColor) { %>
+      <li class="breadcrumb-item active" aria-current="page"><%= selectedColor %></li>
+      <% } %>
+      <% if (selectedSort) { %>
+      <li class="breadcrumb-item active" aria-current="page"><%= selectedSort.replace(/([A-Z])/g, ' $1').trim() %></li>
+      <% } %>
+    </ol>
+  </nav>
+
   <div class="row">
     <!-- Filters Section -->
     <div class="col-md-3">
-      <div class="filters-section">
-        <h3>Filters</h3>
-        <form id="filtersForm">
-          <div class="mb-3">
+      <div class="filters-section p-3 mb-4 bg-white rounded shadow-sm">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h3 class="mb-0">Filters</h3>
+          <button type="button" class="btn btn-secondary" onclick="clearFilters()">Clear Filters</button>
+        </div>
+        <form id="filtersForm" method="GET" action="/shop">
+          <div class="mb-4">
             <label for="category" class="form-label">Category</label>
-            <select class="form-select" id="category" name="category">
+            <select class="form-select" id="category" name="category" onchange="submitFilters()">
               <option value="">All Categories</option>
               <% categories.forEach(category => { %>
-              <option value="<%= category.id %>"><%= category.name %></option>
+              <option value="<%= category.name %>" <%= category.name === selectedCategory ? 'selected' : '' %>><%= category.name %></option>
               <% }) %>
             </select>
           </div>
-          <div class="mb-3">
-            <label for="priceRange" class="form-label">Price Range</label>
-            <input
-              type="range"
-              class="form-range"
-              id="priceRange"
-              name="priceRange"
-              min="0"
-              max="1000"
-              step="10"
-            />
+          <div class="mb-4">
+            <label for="brand" class="form-label">Brand</label>
+            <select class="form-select" id="brand" name="brand" onchange="submitFilters()">
+              <option value="">All Brands</option>
+              <% brands.forEach(brand => { %>
+              <option value="<%= brand.brandName %>" <%= brand.brandName === selectedBrand ? 'selected' : '' %>><%= brand.brandName %></option>
+              <% }) %>
+            </select>
           </div>
-          <button type="submit" class="btn btn-primary">Apply Filters</button>
+          <div class="mb-4">
+            <label for="priceRange" class="form-label">Price Range</label>
+            <select class="form-select" id="priceRange" name="priceRange" onchange="submitFilters()">
+              <option value="">Any Price Range</option>
+              <option value="10000" <%= selectedPriceRange == 10000 ? 'selected' : '' %>>Up to ₹10000</option>
+              <option value="20000" <%= selectedPriceRange == 20000 ? 'selected' : '' %>>Up to ₹20000</option>
+              <option value="50000" <%= selectedPriceRange == 50000 ? 'selected' : '' %>>Up to ₹50000</option>
+              <option value="100000" <%= selectedPriceRange == 100000 ? 'selected' : '' %>>Up to ₹100000</option>
+            </select>
+          </div>
+          <div class="mb-4">
+            <label for="ram" class="form-label">RAM</label>
+            <select class="form-select" id="ram" name="ram" onchange="submitFilters()">
+              <option value="">Any RAM</option>
+              <% rams.forEach(ram => { %>
+              <option value="<%= ram %>" <%= selectedRam == ram ? 'selected' : '' %>><%= ram %>GB</option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="mb-4">
+            <label for="storage" class="form-label">Storage</label>
+            <select class="form-select" id="storage" name="storage" onchange="submitFilters()">
+              <option value="">Any Storage</option>
+              <% storages.forEach(storage => { %>
+              <option value="<%= storage %>" <%= selectedStorage == storage ? 'selected' : '' %>><%= storage %>GB</option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="mb-4">
+            <label for="color" class="form-label">Color</label>
+            <select class="form-select" id="color" name="color" onchange="submitFilters()">
+              <option value="">Any Color</option>
+              <% colors.forEach(color => { %>
+              <option value="<%= color %>" <%= selectedColor === color ? 'selected' : '' %>><%= color %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="mb-4">
+            <label class="form-label">Sort By</label>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="priceLowToHigh" name="sort" value="priceLowToHigh" onchange="submitFilters()" <%= selectedSort === 'priceLowToHigh' ? 'checked' : '' %>>
+              <label class="form-check-label" for="priceLowToHigh">Price Low to High</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="priceHighToLow" name="sort" value="priceHighToLow" onchange="submitFilters()" <%= selectedSort === 'priceHighToLow' ? 'checked' : '' %>>
+              <label class="form-check-label" for="priceHighToLow">Price High to Low</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="alphabeticalAZ" name="sort" value="alphabeticalAZ" onchange="submitFilters()" <%= selectedSort === 'alphabeticalAZ' ? 'checked' : '' %>>
+              <label class="form-check-label" for="alphabeticalAZ">Alphabetical A-Z</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="alphabeticalZA" name="sort" value="alphabeticalZA" onchange="submitFilters()" <%= selectedSort === 'alphabeticalZA' ? 'checked' : '' %>>
+              <label class="form-check-label" for="alphabeticalZA">Alphabetical Z-A</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="newArrivals" name="sort" value="newArrivals" onchange="submitFilters()" <%= selectedSort === 'newArrivals' ? 'checked' : '' %>>
+              <label class="form-check-label" for="newArrivals">New Arrivals</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="oldArrivals" name="sort" value="oldArrivals" onchange="submitFilters()" <%= selectedSort === 'oldArrivals' ? 'checked' : '' %>>
+              <label class="form-check-label" for="oldArrivals">Old Arrivals</label>
+            </div>
+          </div>
         </form>
       </div>
     </div>
     <!-- Products Section -->
     <div class="col-md-9">
       <div class="product__filter-wrapper">
-        <div class="product__filter row">
-          <% for (let i = 0; i < products.length; i++) { %>
-          <div class="col-lg-3 col-md-3 col-sm-6 col-12 mix new-arrivals mb-4">
+        <div class="product__filter row" id="productContainer">
+          <% if (products.length === 0) { %>
+          <div class="col-12 text-center no-products">
+            <p>No Products Available</p>
+          </div>
+          <% } else { %>
+          <% for (let i = 0; i < Math.min(products.length, 6); i++) { %>
+          <div class="col-lg-3 col-md-4 col-sm-6 col-12 mix new-arrivals mb-4">
             <div class="product__item compact">
               <a href="/product/<%= products[i]._id %>">
                 <div
@@ -64,6 +161,7 @@
                     class="hover-image"
                     alt="Second Image"
                   />
+                  <span class="product-category <%= products[i].category === 'New Phone' ? 'new-phone' : 'refurbished' %>"><%= products[i].category %></span>
                 </div>
               </a>
               <div class="product__item__text">
@@ -109,7 +207,13 @@
             </div>
           </div>
           <% } %>
+          <% } %>
         </div>
+        <% if (products.length > 6) { %>
+        <div class="text-center mt-4">
+          <button class="btn btn-primary" id="showMoreBtn" onclick="showMore()">Show More</button>
+        </div>
+        <% } %>
       </div>
     </div>
   </div>
@@ -118,6 +222,63 @@
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  let currentProductCount = 6;
+
+  function submitFilters() {
+    document.getElementById('filtersForm').submit();
+  }
+
+  function clearFilters() {
+    document.getElementById('category').value = "";
+    document.getElementById('brand').value = "";
+    document.getElementById('priceRange').value = "";
+    document.getElementById('ram').value = "";
+    document.getElementById('storage').value = "";
+    document.getElementById('color').value = "";
+    document.querySelectorAll('input[name="sort"]').forEach(input => input.checked = false);
+    document.getElementById('filtersForm').submit();
+  }
+
+  function showMore() {
+    const productContainer = document.getElementById('productContainer');
+    const products = <%- JSON.stringify(products) %>;
+    const newProducts = products.slice(currentProductCount, currentProductCount + 6);
+    newProducts.forEach(product => {
+      const productElement = document.createElement('div');
+      productElement.className = 'col-lg-3 col-md-4 col-sm-6 col-12 mix new-arrivals mb-4';
+      productElement.innerHTML = `
+        <div class="product__item compact">
+          <a href="/product/${product._id}">
+            <div class="product__item__pic" style="background-image: url('${product.productImage[0]}');">
+              <img src="${product.productImage[1]}" class="hover-image" alt="Second Image" />
+              <span class="product-category ${product.category === 'New Phone' ? 'new-phone' : 'refurbished'}">${product.category}</span>
+            </div>
+          </a>
+          <div class="product__item__text">
+            <h6 class="product-name">${product.productName}</h6>
+            <h5 class="product-price">
+              ₹${product.combos[0].salePrice.toLocaleString()}
+              <span class="text-muted">
+                <del>₹${product.combos[0].regularPrice.toLocaleString()}</del>
+              </span>
+              ${product.combos[0].regularPrice > product.combos[0].salePrice ? `<span class="product-discount">-${Math.round(((product.combos[0].regularPrice - product.combos[0].salePrice) / product.combos[0].regularPrice) * 100)}%</span>` : ''}
+            </h5>
+            <div class="action-buttons">
+              ${product.combos[0].quantity !== 0 ? `<a href="/addToCart?id=${product._id}" class="add-cart" data-id="${product._id}">Add To Cart</a>` : `<span class="add-cart" style="background-color: red">Out of Stock</span>`}
+              <a href="/addToWishlist?id=${product._id}" class="wishlist-btn"><i class="fa fa-heart"></i></a>
+            </div>
+          </div>
+        </div>
+      `;
+      productContainer.appendChild(productElement);
+    });
+    currentProductCount += 6;
+    if (currentProductCount >= products.length) {
+      document.getElementById('showMoreBtn').style.display = 'none';
+    }
+  }
+</script>
 <!-- <script src="/scripts/user/shop.js"></script> -->
 
 <%- include('../../views/layout/footer.ejs') %>

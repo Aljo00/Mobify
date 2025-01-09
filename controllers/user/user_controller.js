@@ -23,12 +23,12 @@ const load_homePage = async (req, res) => {
     const refurbishedPhones = await Product.find({
       isBlocked: false,
       category: "Refurbished Phones",
-    });
+    }).limit(6);
 
     const newPhones = await Product.find({
       isBlocked: false,
       category: "New Phone",
-    });
+    }).limit(6);
 
     const newArrivals = await Product.find({
       isBlocked: false,
@@ -64,7 +64,6 @@ const load_homePage = async (req, res) => {
           .slice(0, 2) // Take the first two characters
           .toUpperCase(); // Convert to uppercase
       }
-
     } else {
       console.log("User not logged in or session not set.");
     }
@@ -86,8 +85,8 @@ const load_homePage = async (req, res) => {
 const load_loginpage = async (req, res) => {
   try {
     const brand = await Brand.find({});
-    res.render("user/login",{
-      brand: brand
+    res.render("user/login", {
+      brand: brand,
     });
   } catch (error) {
     console.log("Error found: ", error.message);
@@ -211,7 +210,7 @@ const verifyOtp = async (req, res) => {
 
       res.json({ success: true, redirectUrl: "/login" });
     } else {
-      res 
+      res
         .status(400)
         .json({ success: false, message: "Invalid OTP! Please try again." });
     }

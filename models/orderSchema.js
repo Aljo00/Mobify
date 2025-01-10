@@ -3,58 +3,99 @@ const {Schema} = mongoose;
 
 const {v4:uuidv4} = require("uuid")
 
-const orderSchema = new Schema({
+const orderSchema = new Schema(
+  {
     orderId: {
-        type:String,
-        default: ()=> uuidv4(),
-        required: true
+      type: String,
+      default: () => uuidv4(),
+      required: true,
     },
-    orderedItems: [{
+    orderedItems: [
+      {
         product: {
-            type: Schema.Types.ObjectId,
-            ref: "Product",
-            required: true
+          type: Schema.Types.ObjectId,
+          ref: "Product",
+          required: true,
         },
         quantity: {
-            type: Number,
-            required: true
+          type: Number,
+          required: true,
         },
         price: {
-            type:Number,
-            default: 0
-        }
-    }],
+          type: Number,
+          required: true,
+        },
+        RAM: {
+          type: String,
+          required: true,
+        },
+        Storage: {
+          type: String,
+          required: true,
+        },
+        color: {
+          type: String,
+          required: true,
+        },
+        totalPrice: {
+          type: Number,
+          required: true,
+        },
+        status: {
+          type: String,
+          required: true,
+          enum: [
+            "Pending",
+            "Processing",
+            "Shipped",
+            "Delivered",
+            "Cancelled",
+            "Return Request",
+            "Returned",
+          ],
+        },
+      },
+    ],
     totalPrice: {
-        type: Number,
-        required: true
+      type: Number,
+      required: true,
     },
     discount: {
-        type: Number,
-        default: 0
+      type: Number,
+      default: 0,
     },
     FinalAmount: {
-        type: Number,
-        required: true
+      type: Number,
+      required: true,
     },
     address: {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-        required: true
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
     invoiceDate: {
-        type: Date
+      type: Date,
     },
-    status:{
-        type: String,
-        required: true,
-        enum: ['Pending', 'Processing','Shipped','Delivered','Cancelled','Return Request','Returned']
+    status: {
+      type: String,
+      required: true,
+      enum: [
+        "Pending",
+        "Processing",
+        "Shipped",
+        "Delivered",
+        "Cancelled",
+        "Return Request",
+        "Returned",
+      ],
     },
     couponApplied: {
-        type: Boolean,
-        default: false
-    }
-
-}, {timestamps: true});
+      type: Boolean,
+      default: false,
+    },
+  },
+  { timestamps: true }
+);
 
 const Order = mongoose.model("Order", orderSchema);
 

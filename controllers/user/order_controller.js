@@ -83,6 +83,8 @@ const placeOrder = async (req, res) => {
       color: item.color,
     }));
 
+    console.log(orderItems)
+
     const totalAmount = cart.items.reduce(
       (acc, item) => acc + item.totalPrice,
       0
@@ -93,7 +95,7 @@ const placeOrder = async (req, res) => {
       userId,
       address: selectedAddress,
       paymentMethod,
-      orderItems: orderItems,
+      orderedItems: orderItems,
       totalPrice: totalAmount,
       FinalAmount: totalAmount,
       status: "Pending",

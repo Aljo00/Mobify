@@ -18,7 +18,7 @@ const processCheckout = async (req, res) => {
     const cart = await Cart.findOne({ userId }).populate("items.ProductId");
 
     // Calculate the cart item count
-    const cartItemCount = cart ? cart.items.length : 0; 
+    const cartItemCount = cart ? cart.items.length : 0;
 
     const totalPrice = cart.items.reduce(
       (sum, item) => sum + item.totalPrice,
@@ -48,7 +48,7 @@ const processCheckout = async (req, res) => {
       cartItemCount,
       cartSummary,
       user: userData,
-      totalPrice: totalPrice
+      totalPrice: totalPrice,
     });
   } catch (error) {
     console.error("Error processing checkout:", error);
@@ -81,9 +81,10 @@ const placeOrder = async (req, res) => {
       RAM: item.RAM,
       Storage: item.Storage,
       color: item.color,
+      status: "Pending",
     }));
 
-    console.log(orderItems)
+    console.log(orderItems);
 
     const totalAmount = cart.items.reduce(
       (acc, item) => acc + item.totalPrice,

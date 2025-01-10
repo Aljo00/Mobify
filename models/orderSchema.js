@@ -10,6 +10,11 @@ const orderSchema = new Schema(
       default: () => uuidv4(),
       required: true,
     },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     orderedItems: [
       {
         product: {

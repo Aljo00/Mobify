@@ -157,6 +157,10 @@ user_router.get("/reset-password/:token",accountController.loadResetPassword);
 
 user_router.post("/reset-password/:token",accountController.resetPassword);
 
+user_router.get("/orders", userAuth.protect, accountController.loadOrdersPage);
+
+user_router.get("/orders/:id", userAuth.protect, accountController.loadOrdersDetailPage)
+
 //Shop Management
 user_router.get("/shop",userAuth.notProtect,shopController.loadShopPage)
 

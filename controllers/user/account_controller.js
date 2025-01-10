@@ -8,7 +8,8 @@ const User = require("../../models/userSchema");
 const Brand = require("../../models/brandSchema");
 const Address = require("../../models/addressSchema");
 const cloudinary = require("../../config/cloudinary");
-const { profile } = require("console");
+// const { profile } = require("console");
+const Order = require("../../models/orderSchema");
 
 const load_page404 = async (req, res) => {
   try {
@@ -20,7 +21,7 @@ const load_page404 = async (req, res) => {
 
 const loadAccountPage = async (req, res) => {
   try {
-    const brand = await Brand.find({});
+    const brand = await Brand.find({ isBlocked: false });
     const user = req.user.id;
     const userData = user ? await User.findById(user).lean() : null;
     // Generate initials if no profile picture exists
@@ -84,44 +85,44 @@ const loadEditAccountPage = async (req, res) => {
 
 const editAccount = async (req, res) => {
   try {
-   const { name, dob, email, altEmail, phone, altPhone } = req.body;
-   const user = req.user.id;
+    const { name, dob, email, altEmail, phone, altPhone } = req.body;
+    const user = req.user.id;
 
-   // Handle file upload to Cloudinary
-   let profileImageUrl = null;
-   console.log(req.file)
-   if (req.file) {
-     // Upload image to Cloudinary
-     const result = await cloudinary.uploader.upload(req.file.path, {
-       folder: "profile_images", // specify the folder in Cloudinary
-     });
+    // Handle file upload to Cloudinary
+    let profileImageUrl = null;
+    console.log(req.file);
+    if (req.file) {
+      // Upload image to Cloudinary
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "profile_images", // specify the folder in Cloudinary
+      });
 
-     // Get the URL of the uploaded image
-     profileImageUrl = result.secure_url;
-   }
+      // Get the URL of the uploaded image
+      profileImageUrl = result.secure_url;
+    }
 
-   console.log(profileImageUrl)
+    console.log(profileImageUrl);
 
-   const updateFields = {
-     name,
-     dob,
-     email,
-     altEmail,
-     phone,
-     altPhone,
-   };
+    const updateFields = {
+      name,
+      dob,
+      email,
+      altEmail,
+      phone,
+      altPhone,
+    };
 
-   if (profileImageUrl) {
-     updateFields.profileImage = profileImageUrl;
-   }
+    if (profileImageUrl) {
+      updateFields.profileImage = profileImageUrl;
+    }
 
-   const a = await User.updateOne({ _id: user }, { $set: updateFields });
+    const a = await User.updateOne({ _id: user }, { $set: updateFields });
 
-   console.log(a)
+    console.log(a);
 
-   res
-     .status(200)
-     .json({ success: true, message: "Account updated successfully" });
+    res
+      .status(200)
+      .json({ success: true, message: "Account updated successfully" });
   } catch (error) {
     console.error("Error editing account page:", error);
     res.redirect("/page404");
@@ -492,6 +493,101 @@ const resetPassword = async (req, res) => {
   }
 };
 
+// const orderedItems = async (req,res) => {
+
+//   try {
+
+//   } catch (error) {
+//     console.error("Error resetting password:", error);
+//     res.status(500).send("Server error.");
+//   }
+
+// }
+
+const loadOrdersPage = async (req, res) => {
+  try {
+    const brand = await Brand.find({ isBlocked: false });
+    const user = req.user.id;
+    const userData = user ? await User.findById(user).lean() : null;
+    // Generate initials if no profile picture exists
+    if (!userData.profileImage) {
+      const name = userData.name || "";
+      userData.initials = name
+        .replace(/\s+/g, "") // Remove all spaces in the name
+        .slice(0, 2) // Take the first two characters
+        .toUpperCase(); // Convert to uppercase
+    }
+
+    const usercart = await cart.findOne({ userId: user });
+    const cartItemCount = usercart.items.length;
+
+    const orders = await Order.find({ userId: user })
+      .populate("orderedItems.product")
+      .lean();
+
+    res.render("user/orders", {
+      orders,
+      cartItemCount,
+      brand,
+      user: userData,
+    });
+  } catch (error) {
+    console.error("Error loading orders page:", error);
+    res.redirect("/page404");
+  }
+};
+
+const loadOrdersDetailPage = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { productId } = req.query;
+
+    const brand = await Brand.find({ isBlocked: false });
+    const user = req.user.id;
+    const userData = user ? await User.findById(user).lean() : null;
+
+    if (userData && !userData.profileImage) {
+      const name = userData.name || "";
+      userData.initials = name.replace(/\s+/g, "").slice(0, 2).toUpperCase();
+    }
+
+    const usercart = await cart.findOne({ userId: user });
+    const cartItemCount = usercart ? usercart.items.length : 0;
+
+    const order = await Order.findOne({ orderId }).populate(
+      "orderedItems.product"
+    );
+    if (!order) {
+      return res.status(404).send("Order not found");
+    }
+
+    // Find the specific product in the ordered items
+    const clickedProduct = order.orderedItems.find(
+      (item) => item._id.toString() === productId
+    );
+    if (!clickedProduct) {
+      return res.status(404).send("Product not found in this order");
+    }
+
+    res.render("user/orderDetails", {
+      order,
+      cartItemCount,
+      brand,
+      user: userData,
+      clickedProduct, // Send the clicked product to the view
+    });
+  } catch (error) {
+    console.error("Error loading orders page:", error);
+    res.redirect("/page404");
+  }
+};
+
+try {
+} catch (error) {
+  console.error(error);
+  res.status(500).send("Server error");
+}
+
 module.exports = {
   load_page404,
   loadAccountPage,
@@ -507,4 +603,6 @@ module.exports = {
   updateAddress,
   loadEditAccountPage,
   editAccount,
+  loadOrdersPage,
+  loadOrdersDetailPage,
 };

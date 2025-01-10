@@ -15,6 +15,8 @@ const brandController = require("../controllers/admin/brandController");
 
 const productController = require("../controllers/admin/productController");
 
+const orderController = require("../controllers/admin/orderController");
+
 const multer = require("multer");
 
 const storage = require("../helpers/multer");
@@ -125,5 +127,11 @@ admin_route.post(
 );
 
 admin_route.post("/deleteimage", productController.deleteSingleImage);
+
+//order Management
+
+admin_route.get("/orders",adminAuth.protectAdmin,orderController.getOrdersPage);
+
+admin_route.post("/orders/update-status",adminAuth.protectAdmin,orderController.updateStatus)
 
 module.exports = admin_route;

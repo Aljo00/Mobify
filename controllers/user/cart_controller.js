@@ -9,7 +9,7 @@ const env = require("dotenv").config();
 
 const loadCartPage = async (req, res) => {
   try {
-    const brandData = await Brand.find({}).lean();
+    const brandData = await Brand.find({isBlocked:false}).lean();
     const userId = req.user.id;
     const userCart = await cart
       .findOne({ userId })
@@ -20,68 +20,7 @@ const loadCartPage = async (req, res) => {
       .lean();
 
     const userData = userId ? await User.findById(userId) : null;
-
-    if (userCart && userCart.items.length > 0) {
-      for (let item of userCart.items) {
-        const product = item.ProductId;
-
-        if (product && Array.isArray(product.combos)) {
-          // Find the matching combo in the Product schema
-          const matchingCombo = product.combos.find(
-            (combo) =>
-              combo.ram === item.RAM &&
-              combo.storage === item.Storage &&
-              combo.color.includes(item.color)
-          );
-
-          if (matchingCombo) {
-            console.log(
-              `Cart Quantity: ${item.quantity}, Available Stock: ${matchingCombo.quantity}`
-            );
-
-            // If the stock is zero, mark as out of stock and update DB
-            if (matchingCombo.quantity === 0) {
-              console.log(`Item ${item._id} is out of stock`);
-
-              // Update the cart item quantity to 0 in the database
-              await cart.updateOne(
-                { userId, "items._id": item._id },
-                { $set: { "items.$.quantity": 0 } }
-              );
-
-              // Mark the item as out of stock for rendering
-              item.quantity = 0;
-              item.outOfStock = true;
-            } else {
-              // Update the local object for rendering if stock is available
-              item.outOfStock = false;
-            }
-          } else {
-            console.log("No matching combo found for this item.");
-
-            // If no matching combo is found, mark as out of stock
-            await cart.updateOne(
-              { userId, "items._id": item._id },
-              { $set: { "items.$.quantity": 0 } }
-            );
-
-            item.quantity = 0; // Update quantity to 0
-            item.outOfStock = true; // Mark as out of stock
-          }
-        } else {
-          console.log("No combos found for product or product is undefined.");
-
-          // Handle case where no combos are available
-          await cart.updateOne(
-            { userId, "items._id": item._id },
-            { $set: { "items.$.quantity": 0 } }
-          );
-
-          item.quantity = 0; // Update quantity to 0
-          item.outOfStock = true; // Mark as out of stock
-        }
-      }
-    }
+    
 
     const cartItemCount = userCart.items.length;
 
@@ -97,6 +36,48 @@ const loadCartPage = async (req, res) => {
     res.status(500).send("Internal server error");
   }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const addtoCart = async (req, res) => {
   try {

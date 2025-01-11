@@ -64,7 +64,6 @@ const user_IsBlocked = async (req, res, next) => {
         res.clearCookie("userAuth", {
           httpOnly: true, // Ensure the cookie is not accessible via JavaScript
           secure: process.env.NODE_ENV === "production", // Use HTTPS in production
-          sameSite: "strict", // Ensure the cookie is sent only with same-site requests
         });
         return res.render("user/login", {
           message: "User is blocked by the admin",

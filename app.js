@@ -10,7 +10,9 @@ const session = require('express-session')
 //requiring the user_routes file
 const user_route = require("./routes/user_routes");
 
-const admin_route = require("./routes/admin_routes")
+const admin_route = require("./routes/admin_routes");
+
+const userAuth = require("./middleware/JWTUserAuth")
 
 const passport = require("./config/passport");
 
@@ -65,7 +67,7 @@ app.set("views", './views');
 
 app.use(express.static('public'));
 
-app.use('/',user_route);
+app.use('/',userAuth.user_IsBlocked,user_route);
 app.use('/admin',admin_route);
 
 //Starting the server

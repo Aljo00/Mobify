@@ -15,6 +15,15 @@
 
 <main>
   <div class="container-fluid">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item"><a href="/shop?category=<%= product.category %>"><%= product.category %></a></li>
+        <li class="breadcrumb-item"><a href="/shop?brand=<%= product.brand %>"><%= product.brand %></a></li>
+        <li class="breadcrumb-item active" aria-current="page"><%= product.productName %></li>
+      </ol>
+    </nav>
     <div class="row">
       <!-- Product Image Carousel -->
       <div class="col-lg-6 col-md-12">

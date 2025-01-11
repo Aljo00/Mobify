@@ -19,6 +19,13 @@
 <link rel="stylesheet" href="/styles/user/cart.css" />
 
 <div class="cart-container">
+  <!-- Breadcrumbs -->
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Cart</li>
+    </ol>
+  </nav>
   <h1>Shopping Cart</h1>
   <div class="cart-content">
     <div class="cart-items">
@@ -56,6 +63,15 @@
   <p>Color: <%= item.color %></p>
   <% if (item.outOfStock) { %>
   <p class="text-danger">Out of stock</p>
+  <% } else if (insufficientQuantityItems && insufficientQuantityItems.some(i => i.productName === item.ProductId.productName)) { %>
+<p class="text-danger">Insufficient quantity available</p>
+<p>Quantity: 
+    <select name="quantity" class="form-select d-inline w-auto ms-2" onchange="updateCartItem(this, '<%= item.ProductId._id.toString() %>')">
+      <% for (let i = 1; i <= 5; i++) { %>
+        <option value="<%= i %>" <%= item.quantity === i ? 'selected' : '' %>><%= i %></option>
+      <% } %>
+    </select>
+  </p>
 <% } else { %>
   <p>Quantity: 
     <select name="quantity" class="form-select d-inline w-auto ms-2" onchange="updateCartItem(this, '<%= item.ProductId._id.toString() %>')">
@@ -78,7 +94,7 @@
     <div class="cart-summary">
       <h2>Cart Summary</h2>
       <p>
-        Total Items: <%= cart.items.length%>
+        Total Items: <%=  cart.items.filter(item => !item.outOfStock).length;%>
       </p>
       <p>
         Total Price: ₹<%= cart.items.reduce((acc, item) => acc +
@@ -127,7 +143,11 @@
           title: 'Oops...',
           text: data.message || 'Failed to update cart',
         }).then(() => {
-          window.location.reload();
+          // Update cart summary
+          document.querySelector('.cart-summary p:nth-child(2)').innerText = `Total Items: ${data.totalItems}`;
+          document.querySelector('.cart-summary p:nth-child(3)').innerText = `Total Price: ₹${data.totalPrice}`;
+          // Show insufficient quantity message
+          itemElement.querySelector('.item-details').insertAdjacentHTML('beforeend', '<p class="text-danger">Insufficient quantity</p>');
         });
       }
     })

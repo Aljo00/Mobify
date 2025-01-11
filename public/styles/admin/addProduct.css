@@ -123,7 +123,7 @@
   color: red;
   font-size: 12px;
   margin-top: 5px;
-  display: none; /* Hide by default */
+  display: block; /* Ensure error messages are displayed */
   animation: shake 0.5s ease-in-out;
 }
 

@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="/styles/admin/orders.css" />
 
 <div class="d-flex">
-  <div class="sidebar">
+  <div class="sidebar fixed-top">
     <h2 class="text-white">Admin Dashboard</h2>
     <a href="/admin/dashboard">Dashboard</a>
     <a href="/admin/users">Users</a>
@@ -37,52 +37,80 @@
     <a href="/admin/logout">Logout</a>
   </div>
   <div class="main-content">
-  <h1>Orders</h1>
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Order ID</th>
-        <th>Customer Name</th>
-        <th>Product Name</th>
-        <th>Quantity</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% orders.forEach(order => { %>
+    <div class="text-center">
+      <h1 class="my-4">Order Management</h1>
+    </div>
+    <div class="breadcrumb-container">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="/admin/dashboard">Dashboard</a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">
+            Order Management
+          </li>
+        </ol>
+      </nav>
+    </div>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer Name</th>
+          <th>Product Name</th>
+          <th>Quantity</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% orders.forEach(order => { %>
         <tr>
           <td>#<%= order.orderId %></td>
           <td><%= order.customerName %></td>
           <td><%= order.productName %></td>
           <td><%= order.quantity %></td>
           <td>
-            <span class="badge <%= order.itemStatus === 'Delivered' ? 'bg-success' :  order.itemStatus === 'Returned'? 'bg-danger' : order.itemStatus === 'Cancelled'? 'bg-danger' : 'bg-warning' %>">
+            <span
+              class="badge <%= order.itemStatus === 'Delivered' ? 'bg-success' : order.itemStatus === 'Returned'? 'bg-danger' : order.itemStatus === 'Cancelled'? 'bg-danger' : 'bg-warning' %>"
+            >
               <%= order.itemStatus %>
             </span>
           </td>
           <td>
             <!-- Form for updating the status -->
             <form action="/admin/orders/update-status" method="POST">
-  <input type="hidden" name="orderId" value="<%= order.orderId %>">
-  <input type="hidden" name="productId" value="<%= order.productId %>">
-  <select name="status" class="form-select">
-    <option value="Pending" <%= order.status === 'Pending' ? 'selected' : '' %>>Pending</option>
-    <option value="Processing" <%= order.status === 'Processing' ? 'selected' : '' %>>Processing</option>
-    <option value="Shipped" <%= order.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
-    <option value="Delivered" <%= order.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
-    <option value="Cancelled" <%= order.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
-    <option value="Returned" <%= order.status === 'Returned' ? 'selected' : '' %>>Returned</option>
-  </select>
-  <button type="submit" class="btn btn-primary btn-sm mt-2">Update</button>
-</form>
+              <input
+                type="hidden"
+                name="orderId"
+                value="<%= order.orderId %>"
+              />
+              <input
+                type="hidden"
+                name="productId"
+                value="<%= order.productId %>"
+              />
+              <select name="status" class="form-select">
+                <option value="Pending" <%= order.status === 'Pending' ?
+                'selected' : '' %>>Pending <option value="Processing" <%=
+                order.status === 'Processing' ? 'selected' : '' %>>Processing
+                <option value="Shipped" <%= order.status === 'Shipped' ?
+                'selected' : '' %>>Shipped <option value="Delivered" <%=
+                order.status === 'Delivered' ? 'selected' : '' %>>Delivered
+                <option value="Cancelled" <%= order.status === 'Cancelled' ?
+                'selected' : '' %>>Cancelled <option value="Returned" <%=
+                order.status === 'Returned' ? 'selected' : '' %>>Returned
+              </select>
+              <button type="submit" class="btn btn-primary btn-sm mt-2">
+                Update
+              </button>
+            </form>
           </td>
         </tr>
-      <% }) %>
-    </tbody>
-  </table>
-</div>
-
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <!-- Bootstrap JS -->

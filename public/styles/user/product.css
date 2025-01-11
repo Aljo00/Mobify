@@ -313,3 +313,33 @@ footer {
   background-color: #fff;
   color: #333;
 }
+
+/* Breadcrumbs */
+.breadcrumb {
+  background-color: #efcaca; 
+  padding: 10px 20px; /* Increased padding */
+  border-radius: 10px; /* Rounded corners */
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+  content: ">";
+  color: #007bff; /* Blue separator */
+  padding: 0 10px; /* Spacing around separator */
+}
+
+.breadcrumb-item a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500; /* Slightly bolder text */
+}
+
+.breadcrumb-item a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb-item.active {
+  color: #6c757d; /* Grey color for active item */
+  font-weight: 700; /* Bold text for active item */
+}

@@ -17,15 +17,20 @@ const processCheckout = async (req, res) => {
     const addresses = await Address.find({ userId });
     const cart = await Cart.findOne({ userId }).populate("items.ProductId");
 
-    // Calculate the cart item count
-    const cartItemCount = cart ? cart.items.length : 0;
+    // Filter out items with zero quantity
+    const validCartItems = cart.items.filter(item => item.quantity > 0);
 
-    const totalPrice = cart.items.reduce(
+    // Calculate the cart item count
+    const cartItemCount = validCartItems.filter(
+      (item) => !item.outOfStock
+    ).length;
+
+    const totalPrice = validCartItems.reduce(
       (sum, item) => sum + item.totalPrice,
       0
     );
 
-    for (const item of cart.items) {
+    for (const item of validCartItems) {
       if (item.ProductId.stock < item.quantity) {
         return res.status(400).render("user/cart", {
           message: `The product ${item.ProductId.name} is out of stock or has insufficient quantity.`,
@@ -35,15 +40,15 @@ const processCheckout = async (req, res) => {
     // Calculate the cart summary
     const cartSummary = {
       totalItems: cartItemCount,
-      totalPrice: cart
-        ? cart.items.reduce((acc, item) => acc + item.totalPrice, 0)
-        : 0,
+      totalPrice: validCartItems.reduce((acc, item) => acc + item.totalPrice, 0),
     };
+
+    console.log("Valid Cart Items:", validCartItems);
 
     // Pass data to the view
     res.render("user/checkOut", {
       addresses,
-      cart,
+      cart: { items: validCartItems },
       brand,
       cartItemCount,
       cartSummary,
@@ -73,8 +78,16 @@ const placeOrder = async (req, res) => {
       return res.status(400).json({ success: false, message: "Cart is empty" });
     }
 
-    const orderItems = cart.items.map((item) => ({
+    // Filter out items with zero quantity for the order
+    const validCartItems = cart.items.filter(item => item.quantity > 0);
+
+    if (validCartItems.length === 0) {
+      return res.status(400).json({ success: false, message: "No valid items in cart" });
+    }
+
+    const orderItems = validCartItems.map((item) => ({
       product: item.ProductId._id,
+      productName: item.ProductId.productName, // Add product name
       quantity: item.quantity,
       price: item.price,
       totalPrice: item.totalPrice,
@@ -86,7 +99,7 @@ const placeOrder = async (req, res) => {
 
     console.log(orderItems);
 
-    const totalAmount = cart.items.reduce(
+    const totalAmount = validCartItems.reduce(
       (acc, item) => acc + item.totalPrice,
       0
     );
@@ -105,7 +118,7 @@ const placeOrder = async (req, res) => {
     await newOrder.save();
 
     // Update the product quantities in the Product collection
-    for (const item of cart.items) {
+    for (const item of validCartItems) {
       const product = await Product.findById(item.ProductId._id);
 
       if (product) {
@@ -150,12 +163,12 @@ const placeOrder = async (req, res) => {
       }
     }
 
-    // Clear the cart after placing the order
-    await Cart.findOneAndUpdate({ userId }, { items: [] });
+    // Remove only the valid items from the cart after placing the order
+    cart.items = cart.items.filter(item => item.quantity === 0);
+    await cart.save();
 
-    res
-      .status(200)
-      .json({ success: true, message: "Order placed successfully" });
+    // Render the order successful page with order details
+    res.render("user/orderSuccesful", { order: newOrder });
   } catch (error) {
     console.error("Error placing order:", error);
     res.status(500).json({ success: false, message: "Internal server error" });

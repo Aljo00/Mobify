@@ -20,9 +20,38 @@ const loadCartPage = async (req, res) => {
       .lean();
 
     const userData = userId ? await User.findById(userId) : null;
-    
 
-    const cartItemCount = userCart.items.length;
+    // Validate cart quantities against product quantities in the database
+    let insufficientQuantityItems = [];
+    for (const item of userCart.items) {
+      const product = await Product.findById(item.ProductId);
+      const selectedCombo = product.combos.find(
+        (combo) =>
+          combo.ram === item.RAM &&
+          combo.storage === item.Storage &&
+          combo.color.includes(item.color)
+      );
+
+      if (selectedCombo.quantity === 0) {
+        item.outOfStock = true;
+        item.totalPrice = selectedCombo.quantity * selectedCombo.salePrice;
+        item.quantity = selectedCombo.quantity;
+      } else if (item.quantity > selectedCombo.quantity) {
+        insufficientQuantityItems.push({
+          productName: product.productName,
+          availableQuantity: selectedCombo.quantity,
+        });
+        // Update the quantity in the cart
+        item.quantity = selectedCombo.quantity;
+        item.totalPrice = selectedCombo.quantity * selectedCombo.salePrice;
+      }
+    }
+
+    // Save the updated cart
+    await cart.updateOne({ userId }, { items: userCart.items });
+
+    // Calculate cart item count excluding out-of-stock items
+    const cartItemCount = userCart.items.filter(item => !item.outOfStock).length;
 
     console.log("Cart page rendered of the user:", userData.name);
     res.render("user/cart", {
@@ -30,6 +59,7 @@ const loadCartPage = async (req, res) => {
       brand: brandData,
       user: userData,
       cartItemCount,
+      insufficientQuantityItems,
     });
   } catch (error) {
     console.error("Error loading cart page:", error);
@@ -326,7 +356,7 @@ const addToCartFromHome = async (req, res) => {
 const updateCart = async (req, res) => {
   try {
     const userId = req.user.id;
-    console.log(req.body);
+    
     let { id, quantity, ram, storage, color, price } = req.body;
 
     price = parseFloat(price.replace("₹", "").trim());

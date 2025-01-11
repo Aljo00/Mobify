@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Successful</title>
+  <link rel="stylesheet" href="/styles/user/orderSuccessfull.css">;
+</head>
+<body>
+  <div class="order-success-container">
+    <h1>Order Successfully Placed!</h1>
+    <p>Thank you for your purchase. Your order has been successfully placed.</p>
+
+    <div class="order-details">
+      <h2>Order Details</h2>
+      <p><strong>Order ID:</strong> <%= order._id %></p>
+      <p><strong>Total Amount:</strong> $<%= order.totalPrice %></p>
+      
+      <h3>Ordered Items</h3>
+      <ul>
+        <% order.orderedItems.forEach(item => { %>
+          <li>
+            <p><strong>Product:</strong> <%= item.productName %></p>
+            <p><strong>Quantity:</strong> <%= item.quantity %></p>
+            <p><strong>Price:</strong> $<%= item.price %></p>
+            <p><strong>Total Price:</strong> $<%= item.totalPrice %></p>
+          </li>
+        <% }) %>
+      </ul>
+    </div>
+
+    <div class="order-actions">
+      <a href="/shop" class="btn">Continue Shopping</a>
+      <a href="/orders/<%= order._id %>" class="btn">View Order</a>
+    </div>
+  </div>
+</body>
+</html>

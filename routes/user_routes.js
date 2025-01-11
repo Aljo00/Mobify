@@ -13,6 +13,8 @@ const multer = require("multer");
 
 const storage = require("../helpers/multer");
 
+// user_router.use(userAuth.user_IsBlocked);
+
 const uploads = multer({ storage: storage });
 const { generateToken } = require("../config/JWT");
 
@@ -23,7 +25,6 @@ const User = require("../models/userSchema");
 user_router.get(
   "/",
   userAuth.notProtect,
-  userAuth.user_IsBlocked,
   user_controller.load_homePage
 );
 
@@ -123,7 +124,7 @@ user_router.post("/cart/delete/:id", userAuth.protect, cartController.deleteFrom
 //Order Management
 user_router.get("/checkout", userAuth.protect, orderController.processCheckout);
 
-user_router.post("/place-order", userAuth.protect, orderController.placeOrder);
+user_router.post("/place-order",uploads.none(), userAuth.protect, orderController.placeOrder);
 
 //User Profile Management
 user_router.get("/account",userAuth.protect, accountController.loadAccountPage);

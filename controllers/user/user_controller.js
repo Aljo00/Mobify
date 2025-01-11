@@ -197,7 +197,6 @@ const verifyOtp = async (req, res) => {
 
       // Generate JWT using the `generateToken` helper function
       const token = generateToken(user);
-      console.log("Generated Token:", token);
 
       // Send the token to the client in a secure HTTP-only cookie
       res.cookie("userAuth", token, {

@@ -542,6 +542,8 @@ const loadOrdersDetailPage = async (req, res) => {
     const { orderId } = req.params;
     const { productId } = req.query;
 
+    console.log(orderId, productId)
+
     const brand = await Brand.find({ isBlocked: false });
     const user = req.user.id;
     const userData = user ? await User.findById(user).lean() : null;
@@ -582,6 +584,29 @@ const loadOrdersDetailPage = async (req, res) => {
   }
 };
 
+const cancelOrder = async (req, res) => {
+  try {
+    console.log(req.body)
+    const { orderId, productId } = req.body;
+
+    // Find the order and update the status of the specific product
+    const order = await Order.findOneAndUpdate(
+      { _id: orderId, "orderedItems._id": productId },
+      { $set: { "orderedItems.$.status": "Cancelled" } },
+      { new: true }
+    );
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
+    res.status(200).json({ success: true, message: "Order cancelled successfully" });
+  } catch (error) {
+    console.error("Error cancelling order:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
 try {
 } catch (error) {
   console.error(error);
@@ -605,4 +630,5 @@ module.exports = {
   editAccount,
   loadOrdersPage,
   loadOrdersDetailPage,
+  cancelOrder,
 };

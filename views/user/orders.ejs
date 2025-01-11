@@ -55,6 +55,7 @@
             <th>Quantity</th>
             <th>Total Price</th>
             <th>Status</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -62,7 +63,7 @@
           { %>
           <tr>
             <td>
-              <a href="/orders/<%= order.orderId %>?productId=<%= item._id %>">
+              <a href="/orders/<%= item.orderId %>?productId=<%= item._id %>">
                 <%= item.product.productName %>
               </a>
             </td>
@@ -77,6 +78,17 @@
             <td><%= item.quantity %></td>
             <td>$<%= item.totalPrice %></td>
             <td><%= item.status %></td>
+            <td>
+              <button 
+                class="btn btn-danger" 
+                <% if (item.status === 'Shipped') { %> 
+                  disabled 
+                <% } %>
+                onclick="cancelOrder('<%= item.orderId %>', '<%= item._id %>')"
+              >
+                Cancel Order
+              </button>
+            </td>
           </tr>
           <% }) %> <% }) %>
         </tbody>
@@ -84,3 +96,28 @@
     </div>
   </div>
 </div>
+
+<script>
+  function cancelOrder(orderId, productId) {
+    fetch('/cancel-order', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ orderId, productId })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Order cancelled successfully');
+        location.reload(); // Reload the page to reflect the changes
+      } else {
+        alert('Failed to cancel order');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('An error occurred while cancelling the order');
+    });
+  }
+</script>

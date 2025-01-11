@@ -162,6 +162,8 @@ user_router.get("/orders", userAuth.protect, accountController.loadOrdersPage);
 
 user_router.get("/orders/:id", userAuth.protect, accountController.loadOrdersDetailPage)
 
+user_router.post("'/cancel-order",userAuth.protect,accountController.cancelOrder)
+
 //Shop Management
 user_router.get("/shop",userAuth.notProtect,shopController.loadShopPage)
 

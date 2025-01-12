@@ -76,6 +76,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let isValid = true;
 
+    // Email syntax validation
+    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailPattern.test(altEmail)) {
+      isValid = false;
+      document.getElementById("altEmail").classList.add("is-invalid");
+      document.getElementById("altEmail").nextElementSibling.textContent =
+        "Please enter a valid email address.";
+    }
+
     if (email === altEmail) {
       isValid = false;
       document.getElementById("altEmail").classList.add("is-invalid");

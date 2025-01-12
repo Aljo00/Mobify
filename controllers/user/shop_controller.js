@@ -17,6 +17,7 @@ const loadShopPage = async (req, res) => {
     const selectedStorage = req.query.storage || "";
     const selectedColor = req.query.color || "";
     const selectedSort = req.query.sort || "";
+    const searchQuery = req.query.search || "";
 
     const productQuery = {};
     if (selectedCategory) {
@@ -36,6 +37,9 @@ const loadShopPage = async (req, res) => {
     }
     if (selectedColor) {
       productQuery["combos.color"] = { $in: [selectedColor] };
+    }
+    if (searchQuery) {
+      productQuery.productName = { $regex: searchQuery, $options: "i" };
     }
 
     let product = await Product.find(productQuery);
@@ -101,6 +105,7 @@ const loadShopPage = async (req, res) => {
       selectedStorage,
       selectedColor,
       selectedSort,
+      searchQuery,
       colors,
       rams,
       storages,

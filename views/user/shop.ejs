@@ -53,6 +53,13 @@
         </div>
         <form id="filtersForm" method="GET" action="/shop">
           <div class="mb-4">
+            <label for="search" class="form-label">Search</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="search" name="search" placeholder="Search products..." value="<%= searchQuery %>">
+              <button class="btn btn-primary" type="button" onclick="submitFilters()">Search</button>
+            </div>
+          </div>
+          <div class="mb-4">
             <label for="category" class="form-label">Category</label>
             <select class="form-select" id="category" name="category" onchange="submitFilters()">
               <option value="">All Categories</option>
@@ -233,6 +240,7 @@
   }
 
   function clearFilters() {
+    document.getElementById('search').value = "";
     document.getElementById('category').value = "";
     document.getElementById('brand').value = "";
     document.getElementById('priceRange').value = "";

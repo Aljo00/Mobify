@@ -19,18 +19,29 @@ const load_page404 = async (req, res) => {
   }
 };
 
+
+// Overall Summary:
+// This section handles the account-related actions for the user. It consists of three controllers: 
+// 1. loadAccountPage - Loads the user's account section.
+// 2. loadEditAccountPage - Loads the edit account page for modifying user details.
+// 3. editAccount - Saves the updated user details to the database after editing.
+
+
+
+// Controller: loadAccountPage
+// Description: This controller is responsible for loading the user's account section. It retrieves and displays 
+// the user's profile details, settings, and other relevant information in the account dashboard.
 const loadAccountPage = async (req, res) => {
   try {
     const brand = await Brand.find({ isBlocked: false });
     const user = req.user.id;
     const userData = user ? await User.findById(user).lean() : null;
-    // Generate initials if no profile picture exists
     if (!userData.profileImage) {
       const name = userData.name || "";
       userData.initials = name
-        .replace(/\s+/g, "") // Remove all spaces in the name
-        .slice(0, 2) // Take the first two characters
-        .toUpperCase(); // Convert to uppercase
+        .replace(/\s+/g, "") 
+        .slice(0, 2) 
+        .toUpperCase();
     }
 
     if (userData) {
@@ -38,7 +49,6 @@ const loadAccountPage = async (req, res) => {
       userData.address = userAddress ? userAddress.address : [];
     }
 
-    // const cartItemCount = userData.items.length;
     const usercart = await cart.findOne({ userId: user });
     const cartItemCount = usercart.items.length;
 
@@ -53,22 +63,26 @@ const loadAccountPage = async (req, res) => {
   }
 };
 
+
+// Controller: loadEditAccountPage
+// Description: This controller loads the edit account page where the user can modify their personal information, 
+// such as name, email, password, etc. It provides the user with a form pre-filled with their current account details.
+
 const loadEditAccountPage = async (req, res) => {
   try {
     const brand = await Brand.find({});
     const user = req.user.id;
 
     const userData = user ? await User.findById(user).lean() : null;
-    // Generate initials if no profile picture exists
     if (!userData.profileImage) {
       const name = userData.name || "";
       userData.initials = name
-        .replace(/\s+/g, "") // Remove all spaces in the name
-        .slice(0, 2) // Take the first two characters
-        .toUpperCase(); // Convert to uppercase
+        .replace(/\s+/g, "") 
+        .slice(0, 2) 
+        .toUpperCase(); 
     }
 
-    // const cartItemCount = userData.items.length;
+    
     const usercart = await cart.findOne({ userId: user });
     const cartItemCount = usercart.items.length;
 
@@ -83,21 +97,26 @@ const loadEditAccountPage = async (req, res) => {
   }
 };
 
+
+// Controller: editAccount
+// Description: This controller handles the process of saving the updated account details to the database. 
+// It takes the edited data from the user and updates the corresponding fields in the user's account record.
+
 const editAccount = async (req, res) => {
   try {
     const { name, dob, email, altEmail, phone, altPhone } = req.body;
     const user = req.user.id;
 
-    // Handle file upload to Cloudinary
+    
     let profileImageUrl = null;
     console.log(req.file);
     if (req.file) {
-      // Upload image to Cloudinary
+      
       const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: "profile_images", // specify the folder in Cloudinary
+        folder: "profile_images", 
       });
 
-      // Get the URL of the uploaded image
+      
       profileImageUrl = result.secure_url;
     }
 
@@ -116,9 +135,7 @@ const editAccount = async (req, res) => {
       updateFields.profileImage = profileImageUrl;
     }
 
-    const a = await User.updateOne({ _id: user }, { $set: updateFields });
-
-    console.log(a);
+    await User.updateOne({ _id: user }, { $set: updateFields });
 
     res
       .status(200)

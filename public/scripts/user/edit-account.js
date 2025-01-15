@@ -56,7 +56,7 @@ document
       const formData = new FormData();
       formData.append("profileImage", croppedImageURL);
       fetch("/upload-profile-image", {
-        method: "POST",
+        method: "PATCH",
         body: formData,
       });
     }
@@ -113,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const formData = new FormData(form);
         const response = await fetch(form.action, {
-          method: "POST",
+          method: "PATCH",
           body: formData,
         });
 

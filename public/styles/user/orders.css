@@ -264,3 +264,109 @@ footer {
   background-color: #0056b3; /* Darker blue background on hover */
   transform: translateX(5px); /* Slight move to the right on hover */
 }
+
+/* Card Styles */
+.card {
+  border: 1px solid #ddd; /* Light grey border */
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Light shadow */
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px); /* Slight move up on hover */
+}
+
+.card-img-top {
+  width: 100%;
+  height: 200px; /* Fixed height for images */
+  object-fit: cover; /* Ensure image covers the area */
+}
+
+.card-body {
+  padding: 15px;
+}
+
+.card-title a {
+  color: #007bff; /* Blue text */
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.card-title a:hover {
+  color: #0056b3; /* Darker blue on hover */
+}
+
+.card-text {
+  margin-bottom: 10px;
+}
+
+/* Full-width Card Layout */
+.order-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.order-card {
+  display: flex;
+  flex-direction: row;
+  border: 1px solid #ddd; /* Light grey border */
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Light shadow */
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  background-color: #fff; /* White background */
+  height: auto; /* Adjust height to fit content */
+  position: relative; /* Ensure status is positioned correctly */
+}
+
+.order-card:hover {
+  transform: translateY(-5px); /* Slight move up on hover */
+}
+
+.order-card img {
+  width: 100%;
+  height: auto; /* Ensure image covers the area */
+  object-fit: cover; /* Ensure image covers the area */
+}
+
+.order-card .card-body {
+  padding: 10px; /* Reduced padding */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Center content vertically */
+}
+
+.order-card .card-title {
+  font-size: 16px; /* Adjust font size */
+  margin-bottom: 5px; /* Reduced margin */
+}
+
+.order-card .card-title a {
+  color: #007bff; /* Blue text */
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.order-card .card-title a:hover {
+  color: #0056b3; /* Darker blue on hover */
+}
+
+.order-card .card-text {
+  font-size: 14px; /* Adjust font size */
+  margin-bottom: 5px; /* Reduced margin */
+}
+
+.order-status {
+  position: absolute;
+  top: 10px;
+  right: 30px; /* Changed to top right corner */
+  background-color: #ffcc00; /* Different color for status */
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: bold;
+}

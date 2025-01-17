@@ -3,6 +3,7 @@ const Brand = require("../../models/brandSchema");
 const Category = require("../../models/categorySchema");
 const Product = require("../../models/productSchema");
 const cart = require("../../models/cartSchema");
+const Wishlist = require("../../models/wishlistSchema");
 const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
@@ -23,18 +24,18 @@ const load_homePage = async (req, res) => {
     const refurbishedPhones = await Product.find({
       isBlocked: false,
       category: "Refurbished Phones",
-    }).limit(6);
+    }).limit(8);
 
     const newPhones = await Product.find({
       isBlocked: false,
       category: "New Phone",
-    }).limit(6);
+    }).limit(8);
 
     const newArrivals = await Product.find({
       isBlocked: false,
     })
       .sort({ createdAt: -1 })
-      .limit(6);
+      .limit(8);
 
     const user = req.user;
 
@@ -44,8 +45,18 @@ const load_homePage = async (req, res) => {
     let cartItemCount = 0;
     let userData = null;
 
+    let wishlistItems = [];
     if (user) {
       const userId = user.id;
+
+      if (userId) {
+        const userWishlist = await Wishlist.findOne({ userId }).lean();
+        if (userWishlist) {
+          wishlistItems = userWishlist.items.map((item) =>
+            item.ProductId.toString()
+          );
+        }
+      }
 
       const userCart = await cart.findOne({
         userId: new mongoose.Types.ObjectId(userId),
@@ -75,6 +86,7 @@ const load_homePage = async (req, res) => {
       newPhones,
       newArrivals,
       cartItemCount,
+      wishlistItems,
     });
   } catch (error) {
     console.log("Error found: ", error.message);

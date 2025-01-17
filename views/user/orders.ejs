@@ -46,53 +46,37 @@
     </div>
     <div class="col-md-9">
       <h2>My Orders</h2>
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>Product Name</th>
-            <th>Product Photo</th>
-            <th>Unit price</th>
-            <th>Quantity</th>
-            <th>Total Price</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% orders.forEach(order => { %> <% order.orderedItems.forEach(item =>
-          { %>
-          <tr>
-            <td>
-              <a href="/orders/<%= item.orderId %>?productId=<%= item._id %>">
-                <%= item.product.productName %>
-              </a>
-            </td>
-            <td>
-              <img
-                src="<%= item.product.productImage[0] %>"
-                alt="Product Image"
-                width="50"
-              />
-            </td>
-            <td><%= item.price %></td>
-            <td><%= item.quantity %></td>
-            <td>$<%= item.totalPrice %></td>
-            <td><%= item.status %></td>
-            <td>
-              <button 
-                class="btn btn-danger" 
-                <% if (item.status === 'Shipped') { %> 
-                  disabled 
-                <% } %>
-                onclick="cancelOrder('<%= item.orderId %>', '<%= item._id %>')"
-              >
-                Cancel Order
-              </button>
-            </td>
-          </tr>
-          <% }) %> <% }) %>
-        </tbody>
-      </table>
+      <div class="order-cards">
+        <% orders.forEach(order => { %> 
+          <% order.orderedItems.forEach(item => { %>
+            <div class="order-card mb-4 position-relative">
+              <div class="row g-0">
+                <div class="col-md-3"> <!-- Reduced column width -->
+                  <img src="<%= item.product.productImage[0] %>" class="img-fluid rounded-start" alt="Product Image">
+                </div>
+                <div class="col-md-9">
+                  <div class="card-body">
+                    <h5 class="card-title"><a href="/orders/<%= item.orderId %>?productId=<%= item._id %>"><%= item.product.productName %></a></h5>
+                    <p class="card-text">Unit Price: <%= item.price %></p>
+                    <p class="card-text">Quantity: <%= item.quantity %></p>
+                    <p class="card-text">Total Price: $<%= item.totalPrice %></p>
+                    <button 
+                      class="btn btn-danger" 
+                      <% if (item.status === 'Shipped') { %> 
+                        disabled 
+                      <% } %>
+                      onclick="cancelOrder('<%= item.orderId %>', '<%= item._id %>')"
+                    >
+                      Cancel Order
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <span class="order-status"><%= item.status %></span>
+            </div>
+          <% }) %> 
+        <% }) %>
+      </div>
     </div>
   </div>
 </div>
@@ -121,3 +105,5 @@
     });
   }
 </script>
+
+<%- include('../../views/layout/footer.ejs') %>

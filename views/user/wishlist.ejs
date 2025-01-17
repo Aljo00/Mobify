@@ -1,0 +1,62 @@
+<%- include('../../views/layout/header.ejs') %>
+
+<!-- Bootstrap CSS -->
+<link
+  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+  rel="stylesheet"
+/>
+<!-- Font Awesome -->
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+/>
+<!-- Custom CSS -->
+<link rel="stylesheet" href="/styles/user/wishlist.css" />
+
+<div class="container mt-5">
+  <h2>Your Wishlist</h2>
+  <div class="row" id="wishlist-container">
+    <% if (wishlist && wishlist.items.length > 0) { %> <%
+    wishlist.items.forEach(item => { %>
+    <div class="col-md-6">
+      <div class="card mb-4">
+        <div class="row g-0">
+          <div class="col-md-4">
+            <img
+              src="<%= item.image %>"
+              class="card-img-top"
+              alt="<%= item.name %>"
+            />
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <h5 class="card-title"><%= item.name %></h5>
+              <p class="card-text">RAM: <%= item.RAM %></p>
+              <p class="card-text">Storage: <%= item.Storage %></p>
+              <p class="card-text">Color: <%= item.color %></p>
+              <p class="card-text">Price: $<%= item.price %></p>
+              <button
+                class="btn btn-danger remove-from-wishlist"
+                data-id="<%= item.ProductId %>"
+              >
+                <i class="fas fa-trash-alt"></i> Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% }) %> <% } else { %>
+    <p>Your wishlist is empty.</p>
+    <% } %>
+  </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Include jQuery before your script -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="/scripts/user/wishlist.js"></script>
+
+<%- include('../../views/layout/footer.ejs') %>

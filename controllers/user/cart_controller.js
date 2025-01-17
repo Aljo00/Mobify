@@ -68,47 +68,6 @@ const loadCartPage = async (req, res) => {
 };
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 const addtoCart = async (req, res) => {
   try {
     const userId = req.user ? req.user.id : null;

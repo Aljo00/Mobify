@@ -75,9 +75,9 @@
     </div>
   </div>
   <div class="product__filter-wrapper">
-    <div class="product__filter d-flex overflow-auto">
+    <div class="product__filter d-flex flex-wrap">
       <% for (let i = 0; i < newArrivals.length; i++) { %>
-      <div class="col-lg-2 col-md-3 col-sm-4 col-6 mix new-arrivals">
+      <div class="col-lg-3 col-md-4 col-sm-6 col-12 mix new-arrivals mb-4"> <!-- Added mb-4 for spacing -->
         <div class="product__item compact">
           <a href="/product/<%= newArrivals[i]._id %>">
             <div
@@ -153,9 +153,9 @@
     </div>
   </div>
   <div class="product__filter-wrapper">
-    <div class="product__filter d-flex overflow-auto">
+    <div class="product__filter d-flex flex-wrap">
       <% for (let i = 0; i < newPhones.length; i++) { %>
-      <div class="col-lg-2 col-md-3 col-sm-4 col-6 mix new-arrivals">
+      <div class="col-lg-3 col-md-4 col-sm-6 col-12 mix new-arrivals mb-4"> <!-- Added mb-4 for spacing -->
         <div class="product__item compact">
           <a href="/product/<%= newPhones[i]._id %>">
             <div
@@ -224,9 +224,9 @@
     </div>
   </div>
   <div class="product__filter-wrapper">
-    <div class="product__filter d-flex overflow-auto">
+    <div class="product__filter d-flex flex-wrap">
       <% for (let i = 0; i < refurbishedPhones.length; i++) { %>
-      <div class="col-lg-2 col-md-3 col-sm-4 col-6 mix new-arrivals">
+      <div class="col-lg-3 col-md-4 col-sm-6 col-12 mix new-arrivals mb-4"> <!-- Added mb-4 for spacing -->
         <div class="product__item compact">
           <a href="/product/<%= refurbishedPhones[i]._id %>">
             <div
@@ -276,7 +276,7 @@
               <span class="add-cart" style="background-color: red;">Out of Stock</span>
               <% } %>
               <a
-                href="/addToWishlist?id=<%= refurbishedPhones[i]._id %>"
+                href="/addToWishlist?id="<%= refurbishedPhones[i]._id %>"
                 class="wishlist-btn"
               >
                 <i class="fa fa-heart"></i>

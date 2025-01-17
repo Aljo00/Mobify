@@ -7,6 +7,7 @@ const cartController = require("../controllers/user/cart_controller");
 const accountController = require("../controllers/user/account_controller");
 const orderController = require("../controllers/user/order_controller");
 const shopController = require("../controllers/user/shop_controller");
+const wishlistController = require("../controllers/user/wishlist_controller");
 const passport = require("passport");
 const userAuth = require("../middleware/JWTUserAuth");
 const multer = require("multer");
@@ -178,7 +179,12 @@ user_router.get("/orders/:id", userAuth.protect, accountController.loadOrdersDet
 user_router.post("'/cancel-order",userAuth.protect,accountController.cancelOrder)
 
 //Shop Management
-user_router.get("/shop",userAuth.notProtect,shopController.loadShopPage)
+user_router.get("/shop",userAuth.notProtect,shopController.loadShopPage);
+
+//wishlist Mangement
+user_router.post("/addToWishlist",userAuth.notProtect ,wishlistController.addToWishlist);
+
+user_router.get("/wishlist",userAuth.notProtect,wishlistController.load_wishlist)
 
 user_router.get("/logout", user_controller.logout);
 

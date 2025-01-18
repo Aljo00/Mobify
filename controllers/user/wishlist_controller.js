@@ -55,8 +55,6 @@ const load_wishlist = async (req, res) => {
       });
     }
 
-    console.log(userWishlist.items);
-
     res.render("user/wishlist", {
       wishlist: userWishlist,
       user: userData,
@@ -147,7 +145,64 @@ const addToWishlist = async (req, res) => {
   }
 };
 
+const deleteFromWishlist = async (req, res) => {
+  try {
+    const userId = req.user ? req.user.id : null;
+
+    if (!userId) {
+      return res
+        .status(401)
+        .json({ success: false, message: "User not logged in" });
+    }
+
+    // Get productId directly from query string
+    const productId = req.query.id;
+    console.log(`This is the productId:-- ${productId}`);
+
+    if (!productId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Product ID is required" });
+    }
+
+    let userWishlist = await Wishlist.findOne({ userId });
+
+    if (!userWishlist) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Wishlist not found" });
+    }
+
+    // Find the product in the wishlist
+    const itemIndex = userWishlist.items.findIndex(
+      (item) => item.ProductId.toString() === productId
+    );
+
+    if (itemIndex === -1) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found in wishlist" });
+    }
+
+    // Remove the item from the wishlist
+    userWishlist.items.splice(itemIndex, 1);
+    await userWishlist.save();
+
+    res.json({
+      success: true,
+      message: "Product successfully removed from wishlist",
+    });
+  } catch (error) {
+    console.error("Error removing from wishlist:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while removing from wishlist",
+    });
+  }
+};  
+
 module.exports = {
   load_wishlist,
   addToWishlist,
+  deleteFromWishlist,
 };

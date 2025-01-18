@@ -37,7 +37,7 @@
               <p class="card-text">Price: $<%= item.price %></p>
               <button
                 class="btn btn-danger remove-from-wishlist"
-                data-id="<%= item.ProductId %>"
+                data-id="<%= item.ProductId._id.toString() %>"
               >
                 <i class="fas fa-trash-alt"></i> Remove
               </button>

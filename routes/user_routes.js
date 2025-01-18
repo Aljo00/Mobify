@@ -184,7 +184,9 @@ user_router.get("/shop",userAuth.notProtect,shopController.loadShopPage);
 //wishlist Mangement
 user_router.post("/addToWishlist",userAuth.notProtect ,wishlistController.addToWishlist);
 
-user_router.get("/wishlist",userAuth.notProtect,wishlistController.load_wishlist)
+user_router.get("/wishlist",userAuth.notProtect,wishlistController.load_wishlist);
+
+user_router.delete("/wishlist/remove",userAuth.protect,wishlistController.deleteFromWishlist);
 
 user_router.get("/logout", user_controller.logout);
 

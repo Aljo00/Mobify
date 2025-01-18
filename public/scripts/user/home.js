@@ -77,36 +77,41 @@ document.addEventListener("DOMContentLoaded", () => {
       event.preventDefault();
 
       const productId = button.closest("a").getAttribute("href").split("=")[1];
-      const url = `/addToWishlist?id=${productId}`;
+      const isAdding = !button.classList.contains("clicked");
+      const url = isAdding ? `/addToWishlist?id=${productId}` : `/wishlist/remove?id=${productId}`;
 
       try {
-        const response = await fetch(url, { method: "POST" });
+        const response = await fetch(url, { method: isAdding ? "POST" : "DELETE" });
         const data = await response.json();
 
         if (data.success) {
           Swal.fire({
             icon: "success",
-            title: "Added to Wishlist",
+            title: isAdding ? "Added to Wishlist" : "Removed from Wishlist",
             text: data.message,
             toast: true,
             position: "top-end",
             showConfirmButton: false,
-            timer: 2000,
+            timer: 1000,
             timerProgressBar: true,
-            background: "#d4edda",
-            color: "#155724",
+            background: isAdding ? "#d4edda" : "#f8d7da",
+            color: isAdding ? "#155724" : "#721c24",
             showClass: {
               popup: "animate__animated animate__fadeInDown",
             },
             hideClass: {
               popup: "animate__animated animate__fadeOutUp",
             },
+          }).then(() => {
+            // Refresh the page after success
+            window.location.href = window.location.href;
           });
+          button.classList.toggle("clicked");
         } else {
           Swal.fire({
             icon: "error",
             title: "Error",
-            text: data.message || "An error occurred while adding to wishlist.",
+            text: data.message || `An error occurred while ${isAdding ? "adding to" : "removing from"} wishlist.`,
             toast: true,
             position: "top-end",
             showConfirmButton: false,
@@ -126,7 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "An error occurred while adding to wishlist.",
+          text: `An error occurred while ${isAdding ? "adding to" : "removing from"} wishlist.`,
           toast: true,
           position: "top-end",
           showConfirmButton: false,

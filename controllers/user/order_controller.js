@@ -5,6 +5,7 @@ const Product = require("../../models/productSchema");
 const Cart = require("../../models/cartSchema");
 const Order = require("../../models/orderSchema");
 const Address = require("../../models/addressSchema");
+const { razarpay } = require("../../config/razarPay");
 const env = require("dotenv").config();
 
 const processCheckout = async (req, res) => {
@@ -18,7 +19,7 @@ const processCheckout = async (req, res) => {
     const cart = await Cart.findOne({ userId }).populate("items.ProductId");
 
     // Filter out items with zero quantity
-    const validCartItems = cart.items.filter(item => item.quantity > 0);
+    const validCartItems = cart.items.filter((item) => item.quantity > 0);
 
     // Calculate the cart item count
     const cartItemCount = validCartItems.filter(
@@ -40,7 +41,10 @@ const processCheckout = async (req, res) => {
     // Calculate the cart summary
     const cartSummary = {
       totalItems: cartItemCount,
-      totalPrice: validCartItems.reduce((acc, item) => acc + item.totalPrice, 0),
+      totalPrice: validCartItems.reduce(
+        (acc, item) => acc + item.totalPrice,
+        0
+      ),
     };
 
     console.log("Valid Cart Items:", validCartItems);
@@ -79,10 +83,12 @@ const placeOrder = async (req, res) => {
     }
 
     // Filter out items with zero quantity for the order
-    const validCartItems = cart.items.filter(item => item.quantity > 0);
+    const validCartItems = cart.items.filter((item) => item.quantity > 0);
 
     if (validCartItems.length === 0) {
-      return res.status(400).json({ success: false, message: "No valid items in cart" });
+      return res
+        .status(400)
+        .json({ success: false, message: "No valid items in cart" });
     }
 
     const orderItems = validCartItems.map((item) => ({
@@ -164,7 +170,7 @@ const placeOrder = async (req, res) => {
     }
 
     // Remove only the valid items from the cart after placing the order
-    cart.items = cart.items.filter(item => item.quantity === 0);
+    cart.items = cart.items.filter((item) => item.quantity === 0);
     await cart.save();
 
     // Render the order successful page with order details
@@ -175,7 +181,27 @@ const placeOrder = async (req, res) => {
   }
 };
 
+const razarPay = async (re, res) => {
+  try {
+    const { amount, currency = "INR" } = req.body;
+
+    const options = {
+      amount: amount * 100,
+      currency: currency,
+    };
+
+    const order = await razarpay.orders.create(options);
+    res.status(200).json({ success: true, message: "Razarpay completed", order });
+  } catch (error) {
+    console.error("Error placing order:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+};
+
 module.exports = {
   processCheckout,
   placeOrder,
+  razarPay,
 };

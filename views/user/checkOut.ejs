@@ -128,7 +128,69 @@
   </div>
 </div>
 
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
 <script>
+
+  $(document).ready(function() {
+    // Assuming you already have a button for payment
+    $('.pay-now').click(async function() {
+      // Get the amount you want to pass from the frontend
+      const amount = 1000; // For example, 1000 paise = ₹10
+      
+      try {
+        // Fetch order details from your backend
+        const response = await fetch("/create-order", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ amount: amount })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Initialize Razorpay checkout with order details
+          const options = {
+            key: 'YOUR_RAZORPAY_API_KEY', // Replace with your actual Razorpay API key
+            amount: data.order.amount, // Order amount from backend (in paise)
+            currency: data.order.currency, // Currency from backend
+            name: 'Your Company Name',
+            description: 'Payment for Order',
+            order_id: data.order.id, // Order ID from Razorpay response
+            handler: function (response) {
+              // Handle the payment success here
+              console.log(response);
+              alert("Payment successful!");
+            },
+            prefill: {
+              name: "Customer Name",
+              email: "customer@example.com",
+              contact: "1234567890"
+            },
+            notes: {
+              address: "Customer Address"
+            },
+            theme: {
+              color: "#F37254" // Change the theme color
+            }
+          };
+
+          const rzp = new Razorpay(options);
+          rzp.open(); // Open Razorpay checkout window
+        } else {
+          alert('Failed to create order. Please try again!');
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred. Please try again.");
+      }
+    });
+  });
+
+
   function toggleAddressActions(radio) {
     document.querySelectorAll('.address-actions').forEach(action => {
       action.style.display = 'none';

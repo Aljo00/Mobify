@@ -127,6 +127,8 @@ user_router.get("/checkout", userAuth.protect, orderController.processCheckout);
 
 user_router.post("/place-order",uploads.none(), userAuth.protect, orderController.placeOrder);
 
+user_router.post("/create-order",userAuth.protect,orderController.razarPay)
+
 //User Profile Management
 
 // Route: GET /account

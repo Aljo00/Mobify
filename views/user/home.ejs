@@ -132,7 +132,7 @@
               <% } %>
               <a
                 href="/addToWishlist?id=<%= newArrivals[i]._id %>"
-                class="wishlist-btn"
+                class="wishlist-btn <%= wishlistItems.includes(newArrivals[i]._id.toString()) ? 'clicked' : '' %>"
               >
                 <i class="fa fa-heart"></i>
               </a>
@@ -203,7 +203,7 @@
               <% } %>
               <a
                 href="/addToWishlist?id=<%= newPhones[i]._id %>"
-                class="wishlist-btn"
+                class="wishlist-btn <%= wishlistItems.includes(newPhones[i]._id.toString()) ? 'clicked' : '' %>"
               >
                 <i class="fa fa-heart"></i>
               </a>
@@ -277,7 +277,7 @@
               <% } %>
               <a
                 href="/addToWishlist?id="<%= refurbishedPhones[i]._id %>"
-                class="wishlist-btn"
+                class="wishlist-btn <%= wishlistItems.includes(refurbishedPhones[i]._id.toString()) ? 'clicked' : '' %>"
               >
                 <i class="fa fa-heart"></i>
               </a>

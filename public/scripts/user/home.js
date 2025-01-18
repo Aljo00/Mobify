@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-
   // Store the scroll position when the page is about to reload
   window.onbeforeunload = () => {
     sessionStorage.setItem("scrollPosition", window.scrollY);
@@ -92,13 +91,16 @@ document.addEventListener("DOMContentLoaded", () => {
             toast: true,
             position: "top-end",
             showConfirmButton: false,
-            timer: 1000,
+            timer: 2000,
             timerProgressBar: true,
             background: "#d4edda",
             color: "#155724",
-          }).then(() => {
-            // Refresh the page after success
-            window.location.href = window.location.href;
+            showClass: {
+              popup: "animate__animated animate__fadeInDown",
+            },
+            hideClass: {
+              popup: "animate__animated animate__fadeOutUp",
+            },
           });
         } else {
           Swal.fire({
@@ -108,13 +110,16 @@ document.addEventListener("DOMContentLoaded", () => {
             toast: true,
             position: "top-end",
             showConfirmButton: false,
-            timer: 1500,
+            timer: 2500,
             timerProgressBar: true,
             background: "#f8d7da",
             color: "#721c24",
-          }).then(() => {
-            // Refresh the page after error
-            window.location.href = window.location.href;
+            showClass: {
+              popup: "animate__animated animate__fadeInDown",
+            },
+            hideClass: {
+              popup: "animate__animated animate__fadeOutUp",
+            },
           });
         }
       } catch (error) {
@@ -125,13 +130,16 @@ document.addEventListener("DOMContentLoaded", () => {
           toast: true,
           position: "top-end",
           showConfirmButton: false,
-          timer: 1500,
+          timer: 2500,
           timerProgressBar: true,
           background: "#f8d7da",
           color: "#721c24",
-        }).then(() => {
-          // Refresh the page after error
-          window.location.href = window.location.href;
+          showClass: {
+            popup: "animate__animated animate__fadeInDown",
+          },
+          hideClass: {
+            popup: "animate__animated animate__fadeOutUp",
+          },
         });
         console.error(error);
       }

@@ -132,21 +132,14 @@ user_router.post("/create-order",userAuth.protect,orderController.razarPay)
 //User Profile Management
 
 // Route: GET /account
-// Description: This route loads the user's account page. It is protected by authentication middleware 
-// (userAuth.protect) to ensure only authenticated users can access their account details.
 user_router.get("/account", userAuth.protect, accountController.loadAccountPage);
 
 
 // Route: GET /update-account
-// Description: This route loads the edit account page, allowing the user to modify their account details.
-// It is protected by authentication middleware (userAuth.protect) to ensure only authenticated users can access the edit page.
 user_router.get("/update-account", userAuth.protect, accountController.loadEditAccountPage);
 
 
 // Route: Patch /update-account
-// Description: This route handles updating the user's account details. It allows the user to upload a profile image 
-// and save other edited information. It is protected by authentication middleware (userAuth.protect) and uses 
-// the 'uploads.single("profileImage")' middleware for handling file uploads before saving the changes to the database.
 user_router.patch(
   "/update-account",
   userAuth.protect,

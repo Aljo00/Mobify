@@ -59,6 +59,7 @@
           <th>Customer Name</th>
           <th>Product Name</th>
           <th>Quantity</th>
+          <th>Total Price</th>
           <th>Status</th>
           <th>Actions</th>
         </tr>
@@ -70,6 +71,7 @@
           <td><%= order.customerName %></td>
           <td><%= order.productName %></td>
           <td><%= order.quantity %></td>
+          <td><%= order.totalPrice %></td>
           <td>
             <span
               class="badge <%= order.itemStatus === 'Delivered' ? 'bg-success' : order.itemStatus === 'Returned'? 'bg-danger' : order.itemStatus === 'Cancelled'? 'bg-danger' : 'bg-warning' %>"

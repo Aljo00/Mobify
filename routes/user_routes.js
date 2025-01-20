@@ -8,6 +8,7 @@ const accountController = require("../controllers/user/account_controller");
 const orderController = require("../controllers/user/order_controller");
 const shopController = require("../controllers/user/shop_controller");
 const wishlistController = require("../controllers/user/wishlist_controller");
+const walletController = require("../controllers/user/walletController");
 const passport = require("passport");
 const userAuth = require("../middleware/JWTUserAuth");
 const multer = require("multer");
@@ -23,11 +24,7 @@ const User = require("../models/userSchema");
 
 // const userAuth = require("../middleware/userAuth");
 
-user_router.get(
-  "/",
-  userAuth.notProtect,
-  user_controller.load_homePage
-);
+user_router.get("/", userAuth.notProtect, user_controller.load_homePage);
 
 user_router.get("/page404", user_controller.load_page404);
 
@@ -112,32 +109,55 @@ user_router.get(
 );
 
 //Cart Management
-user_router.get("/add-to-cart/:id", userAuth.notProtect, cartController.addtoCart);
+user_router.get(
+  "/add-to-cart/:id",
+  userAuth.notProtect,
+  cartController.addtoCart
+);
 
-user_router.get("/addToCart",userAuth.notProtect, cartController.addToCartFromHome);
+user_router.get(
+  "/addToCart",
+  userAuth.notProtect,
+  cartController.addToCartFromHome
+);
 
-user_router.post("/cart/update",userAuth.protect, cartController.updateCart);
+user_router.post("/cart/update", userAuth.protect, cartController.updateCart);
 
 user_router.get("/cart", userAuth.protect, cartController.loadCartPage);
 
-user_router.post("/cart/delete/:id", userAuth.protect, cartController.deleteFromCart);
+user_router.post(
+  "/cart/delete/:id",
+  userAuth.protect,
+  cartController.deleteFromCart
+);
 
 //Order Management
 user_router.get("/checkout", userAuth.protect, orderController.processCheckout);
 
-user_router.post("/place-order",uploads.none(), userAuth.protect, orderController.placeOrder);
+user_router.post(
+  "/place-order",
+  uploads.none(),
+  userAuth.protect,
+  orderController.placeOrder
+);
 
-user_router.post("/create-order",userAuth.protect,orderController.razarPay)
+user_router.post("/create-order", userAuth.protect, orderController.razarPay);
 
 //User Profile Management
 
 // Route: GET /account
-user_router.get("/account", userAuth.protect, accountController.loadAccountPage);
-
+user_router.get(
+  "/account",
+  userAuth.protect,
+  accountController.loadAccountPage
+);
 
 // Route: GET /update-account
-user_router.get("/update-account", userAuth.protect, accountController.loadEditAccountPage);
-
+user_router.get(
+  "/update-account",
+  userAuth.protect,
+  accountController.loadEditAccountPage
+);
 
 // Route: Patch /update-account
 user_router.patch(
@@ -147,41 +167,88 @@ user_router.patch(
   accountController.editAccount
 );
 
-user_router.get("/addresses", userAuth.protect, accountController.loadAddressPage);
+user_router.get(
+  "/addresses",
+  userAuth.protect,
+  accountController.loadAddressPage
+);
 
-user_router.get("/add-address", userAuth.protect, accountController.loadAddAddressPage);
+user_router.get(
+  "/add-address",
+  userAuth.protect,
+  accountController.loadAddAddressPage
+);
 
-user_router.post("/add-address", userAuth.protect, accountController.addNewAddress);
+user_router.post(
+  "/add-address",
+  userAuth.protect,
+  accountController.addNewAddress
+);
 
-user_router.get("/edit-address/:id",userAuth.protect,accountController.loadEditAddressPage)
+user_router.get(
+  "/edit-address/:id",
+  userAuth.protect,
+  accountController.loadEditAddressPage
+);
 
-user_router.post("/edit-address/:id",userAuth.protect,accountController.updateAddress);
+user_router.post(
+  "/edit-address/:id",
+  userAuth.protect,
+  accountController.updateAddress
+);
 
-user_router.delete("/delete-address/:id",userAuth.protect,accountController.deleteAddress)
+user_router.delete(
+  "/delete-address/:id",
+  userAuth.protect,
+  accountController.deleteAddress
+);
 
-user_router.get("/forgot-password",accountController.loadForgotPasswordPage);
+user_router.get("/forgot-password", accountController.loadForgotPasswordPage);
 
-user_router.post("/forgot-password",accountController.verifyEmail);
+user_router.post("/forgot-password", accountController.verifyEmail);
 
-user_router.get("/reset-password/:token",accountController.loadResetPassword);
+user_router.get("/reset-password/:token", accountController.loadResetPassword);
 
-user_router.post("/reset-password/:token",accountController.resetPassword);
+user_router.post("/reset-password/:token", accountController.resetPassword);
 
 user_router.get("/orders", userAuth.protect, accountController.loadOrdersPage);
 
-user_router.get("/orders/:id", userAuth.protect, accountController.loadOrdersDetailPage)
+user_router.get(
+  "/orders/:id",
+  userAuth.protect,
+  accountController.loadOrdersDetailPage
+);
 
-user_router.post("'/cancel-order",userAuth.protect,accountController.cancelOrder)
+user_router.post(
+  "'/cancel-order",
+  userAuth.protect,
+  accountController.cancelOrder
+);
 
 //Shop Management
-user_router.get("/shop",userAuth.notProtect,shopController.loadShopPage);
+user_router.get("/shop", userAuth.notProtect, shopController.loadShopPage);
 
 //wishlist Mangement
-user_router.post("/addToWishlist",userAuth.notProtect ,wishlistController.addToWishlist);
+user_router.post(
+  "/addToWishlist",
+  userAuth.notProtect,
+  wishlistController.addToWishlist
+);
 
-user_router.get("/wishlist",userAuth.notProtect,wishlistController.load_wishlist);
+user_router.get(
+  "/wishlist",
+  userAuth.notProtect,
+  wishlistController.load_wishlist
+);
 
-user_router.delete("/wishlist/remove",userAuth.protect,wishlistController.deleteFromWishlist);
+user_router.delete(
+  "/wishlist/remove",
+  userAuth.protect,
+  wishlistController.deleteFromWishlist
+);
+
+//wallet Management
+user_router.get("/wallet", userAuth.protect, walletController.load_wallet);
 
 user_router.get("/logout", user_controller.logout);
 

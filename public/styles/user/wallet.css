@@ -1,0 +1,268 @@
+/* General Styles */
+body,
+html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  background-color: #dbdcdd; /* Offwhite background */
+  color: #000; /* Black text */
+}
+
+.container {
+  width: 100%;
+  padding: 0 15px; /* Adjust padding as needed */
+  margin: 0 auto;
+  max-width: 1400px; /* Ensure the container spans the full width */
+}
+
+/* Dropdown Container */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown Trigger Link */
+.sign-in-link {
+  font-size: 16px;
+  color: #fff; /* White text */
+  background-color: #007bff; /* Blue background */
+  padding: 10px 15px;
+  border-radius: 5px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.sign-in-link:hover {
+  background-color: #0056b3; /* Darker blue background on hover */
+}
+
+/* Dropdown Content */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background-color: #fff; /* White background */
+  color: #000; /* Black text */
+  min-width: 150px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.dropdown-content a {
+  display: block;
+  color: #000; /* Black text */
+  padding: 10px 15px;
+  text-decoration: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f1f1; /* Light grey background on hover */
+  color: #007bff; /* Blue text on hover */
+}
+
+/* Show Dropdown Content on Hover */
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* Navbar Styles */
+.navbar {
+  background-color: #ffffff; /* White background */
+}
+
+.navbar-nav .nav-link {
+  color: #000 !important; /* Black text */
+  position: relative;
+}
+
+.navbar-nav .nav-link::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  display: block;
+  margin-top: 5px;
+  right: 0;
+  background: #007bff; /* Blue line */
+  transition: width 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover::after {
+  width: 100%; /* Full width on hover */
+  left: 0;
+  background: #007bff; /* Blue line */
+}
+
+.navbar-nav .nav-link:hover {
+  color: #007bff !important; /* Blue text on hover */
+}
+
+.navbar-toggler {
+  border-color: #007bff; /* Blue border */
+}
+
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(0, 123, 255, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+/* Dropdown Styles */
+.nav-item.dropdown:hover .dropdown-menu {
+  display: block;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.nav-item.dropdown .dropdown-menu {
+  display: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  min-width: 250px; /* Larger dropdown box */
+  padding: 10px 20px; /* Add padding */
+  border: 1px solid #ddd; /* Light grey border */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Light shadow */
+}
+
+.dropdown-menu .dropdown-item {
+  padding: 10px 15px; /* Add padding */
+  color: #000; /* Black text */
+  text-decoration: none;
+  display: block;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dropdown-menu .dropdown-item:hover {
+  background-color: #f1f1f1; /* Light grey background on hover */
+  color: #007bff; /* Blue text on hover */
+}
+
+/* Icons Group */
+.icons-group a {
+  color: #000 !important; /* Black text */
+}
+
+.icons-group a:hover {
+  color: #333 !important; /* Darker grey text on hover */
+}
+
+/* Footer */
+footer {
+  background-color: #000; /* Black background */
+  color: #fff; /* White text */
+  text-align: center;
+  padding: 10px 0;
+}
+
+/* Wallet Details */
+.wallet-details {
+  background-color: #fff; /* White background */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Light shadow */
+}
+
+.wallet-details h3 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.wallet-details .balance-container {
+  background-color: #007bff; /* Blue background */
+  color: #fff; /* White text */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Light shadow */
+}
+
+.wallet-details .balance-amount {
+  font-size: 36px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.wallet-details button {
+  font-size: 16px;
+  padding: 10px 20px;
+  background-color: #ff9800; /* Orange background */
+  border: none;
+  border-radius: 5px;
+  color: #fff; /* White text */
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.wallet-details button:hover {
+  background-color: #e68900; /* Darker orange background on hover */
+  transform: scale(1.05); /* Slightly enlarge the button on hover */
+}
+
+.wallet-details h4 {
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 40px;
+}
+
+.wallet-details table {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.wallet-details table th,
+.wallet-details table td {
+  padding: 10px;
+  text-align: left;
+}
+
+.wallet-details table th {
+  background-color: #f8f9fa; /* Light grey background */
+}
+
+.wallet-details table tbody tr:nth-child(odd) {
+  background-color: #f1f1f1; /* Light grey background for odd rows */
+}
+
+.transaction-history {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-radius: 10px;
+  background-color: #f8f9fa; /* Light grey background */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Light shadow */
+}
+
+.transaction-item .transaction-date,
+.transaction-item .transaction-description,
+.transaction-item .transaction-type,
+.transaction-item .transaction-amount {
+  flex: 1;
+  text-align: center;
+}
+
+.transaction-item .transaction-type.credit {
+  color: green;
+}
+
+.transaction-item .transaction-type.debit {
+  color: red;
+}
+
+.transaction-item.no-transactions {
+  justify-content: center;
+  color: #6c757d; /* Grey text */
+}

@@ -126,12 +126,27 @@ admin_route.post(
   productController.editProduct
 );
 
+// Route to get product combos
+admin_route.get(
+  "/getProductCombos/:productId",
+  adminAuth.protectAdmin,
+  productController.loadComboDetails
+);
+
 admin_route.post("/deleteimage", productController.deleteSingleImage);
 
 //order Management
 
-admin_route.get("/orders",adminAuth.protectAdmin,orderController.getOrdersPage);
+admin_route.get(
+  "/orders",
+  adminAuth.protectAdmin,
+  orderController.getOrdersPage
+);
 
-admin_route.post("/orders/update-status",adminAuth.protectAdmin,orderController.updateStatus)
+admin_route.post(
+  "/orders/update-status",
+  adminAuth.protectAdmin,
+  orderController.updateStatus
+);
 
 module.exports = admin_route;

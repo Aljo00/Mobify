@@ -1,131 +1,235 @@
 <%- include('../../views/layout/admin/header.ejs')%>
 
-
 <head>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/styles/admin/product.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
-    <link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
-/>
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css"
+  />
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="/styles/admin/product.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+  />
 </head>
 
 <div class="sidebar">
-    <h2 class="text-white">Admin Dashboard</h2>
-    <a href="/admin/dashboard">Dashboard</a>
-    <a href="/admin/users">Users</a>
-    <a href="/admin/category">Categories</a>
-    <a href="/admin/brands">Brands</a>
-    <a href="/admin/addProducts">Add Products</a>
-    <a id="live-dashboard-button" href="/admin/products" style="background-color: #007bff; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none;">Products</a>
-    <a href="/admin/orders">Orders</a>
-    <a href="#">Settings</a>
-    <a href="/admin/logout">Logout</a>
+  <h2 class="text-white">Admin Dashboard</h2>
+  <a href="/admin/dashboard">Dashboard</a>
+  <a href="/admin/users">Users</a>
+  <a href="/admin/category">Categories</a>
+  <a href="/admin/brands">Brands</a>
+  <a href="/admin/addProducts">Add Products</a>
+  <a
+    id="live-dashboard-button"
+    href="/admin/products"
+    style="
+      background-color: #007bff;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      text-decoration: none;
+    "
+    >Products</a
+  >
+  <a href="/admin/orders">Orders</a>
+  <a href="#">Settings</a>
+  <a href="/admin/logout">Logout</a>
 </div>
 
 <div class="content-header">
-    <div>
-        <h2 class="content-title card-title">Products</h2>
-    </div>
+  <div>
+    <h2 class="content-title card-title">Products</h2>
+  </div>
 </div>
 
 <div class="breadcrumb-container">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Products</li>
-        </ol>
-    </nav>
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Products</li>
+    </ol>
+  </nav>
 </div>
 
 <header class="card-header text-center mb-20">
-    <form action="" method="get" class="d-inline">
-        <div class="input-group input-group-sm border border-1 border-grey">
-            <input type="text" class="form-control border-0" placeholder="Search products or brands" name="search">
-            <button class="btn  border-0" type="submit">Search</button>
-        </div>
-    </form>
+  <form action="" method="get" class="d-inline">
+    <div class="input-group input-group-sm border border-1 border-grey">
+      <input
+        type="text"
+        class="form-control border-0"
+        placeholder="Search products or brands"
+        name="search"
+      />
+      <button class="btn border-0" type="submit">Search</button>
+    </div>
+  </form>
 </header>
 <div class="right mt-5">
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th scope="col"><b>Product name</b></th>
-                <th scope="col"><b>Brand</b></th>
-                <th scope="col"><b>Category</b></th>
-                <th scope="col"><b>Offer</b></th>
-                <th scope="col"><b>combos</b></th>
-                <th scope="col"><b>Action</b></th>
-                <th scope="col"><b>Edit</b></th>
-            </tr>
-        </thead>
-        <tbody>
-            <% for(let i = data.length-1; i >= 0; i--) {%>
-            <tr>
-                <td><%=data[i].productName%></td>
-                <td><%=data[i].brand%></td>
-                <td><%=data[i].category%></td>
-                <td>
-                
-                    <button class="btn btn-info" onclick="" style="width: 100px;">
-                        <a href="#" class="text-white">Add Offer</a>
-                    </button>
-        
-                    <button class="btn btn-info" onclick="" style="width: 100px;">
-                        <a href="#" class="text-white">Remove</a>
-                    </button>
-                
-                </td>
-                <td><%=data[i].comboCount%></td>
-                <td>
-                    <button class="btn btn-danger" style="width: 80px;" onclick="softDeleteProduct('<%= data[i]._id %>')">
-  Delete
-</button>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col"><b>Product name</b></th>
+        <th scope="col"><b>Brand</b></th>
+        <th scope="col"><b>Category</b></th>
+        <th scope="col"><b>Offer</b></th>
+        <th scope="col"><b>combos</b></th>
+        <th scope="col"><b>Action</b></th>
+        <th scope="col"><b>Edit</b></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% for(let i = data.length-1; i >= 0; i--) {%>
+      <tr>
+        <td><%=data[i].productName%></td>
+        <td><%=data[i].brand%></td>
+        <td><%=data[i].category%></td>
+        <td>
+          <button class="btn btn-info" onclick="" style="width: 100px">
+            <a href="#" class="text-white">Add Offer</a>
+          </button>
 
-                </td>
-                <td>
-                    <button class="btn btn-info" style="width: 80px;">
-                        <a href="/admin/editProduct?id=<%=data[i]._id%>" class="text-white" style="text-decoration: none;">Edit</a>
-                    </button>
-                </td>
-            </tr>
-            <%}%>
-        </tbody>
-
-    </table>
+          <button class="btn btn-info" onclick="" style="width: 100px">
+            <a href="#" class="text-white">Remove</a>
+          </button>
+        </td>
+        <td>
+          <button
+            class="btn btn-info"
+            onclick="showCombos('<%= data[i]._id %>')"
+            style="width: 100px"
+          >
+            Show Combos
+          </button>
+        </td>
+        <td>
+          <button
+            class="btn btn-danger"
+            style="width: 80px"
+            onclick="softDeleteProduct('<%= data[i]._id %>')"
+          >
+            Delete
+          </button>
+        </td>
+        <td>
+          <button class="btn btn-info" style="width: 80px">
+            <a
+              href="/admin/editProduct?id=<%=data[i]._id%>"
+              class="text-white"
+              style="text-decoration: none"
+              >Edit</a
+            >
+          </button>
+        </td>
+      </tr>
+      <%}%>
+    </tbody>
+  </table>
 </div>
+
 <nav aria-label="Page navigation">
-    <ul class="pagination justify-content-center">
-        <% if (currentPage > 1) { %>
-            <li class="page-item">
-                <a class="page-link" href="?page=<%= currentPage - 1 %>">Previous</a>
-            </li>
-        <% } %>
-        <% for (let i = 1; i <= totalPages; i++) { %>
-            <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
-                <a class="page-link" href="?page=<%= i %>"><%= i %></a>
-            </li>
-        <% } %>
-        <% if (currentPage < totalPages) { %>
-            <li class="page-item">
-                <a class="page-link" href="?page=<%= currentPage + 1 %>">Next</a>
-            </li>
-        <% } %>
-    </ul>
-</nav>  
-</div>
+  <ul class="pagination justify-content-center">
+    <% if (currentPage > 1) { %>
+    <li class="page-item">
+      <a class="page-link" href="?page=<%= currentPage - 1 %>">Previous</a>
+    </li>
+    <% } %> <% for (let i = 1; i <= totalPages; i++) { %>
+    <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
+      <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+    </li>
+    <% } %> <% if (currentPage < totalPages) { %>
+    <li class="page-item">
+      <a class="page-link" href="?page=<%= currentPage + 1 %>">Next</a>
+    </li>
+    <% } %>
+  </ul>
+</nav>
+
+<!-- Modal for displaying combos -->
+<div
+  class="modal fade"
+  id="combosModal"
+  tabindex="-1"
+  aria-labelledby="combosModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" style="background-color: #f0f2f5; border-radius: 10px;">
+      <div class="modal-header" style="background-color: #007bff; color: white; border-top-left-radius: 10px; border-top-right-radius: 10px;">
+        <h5 class="modal-title" id="combosModalLabel">Product Combos</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+          style="background-color: white;"
+        ></button>
+      </div>
+      <div class="modal-body" style="padding: 20px;">
+        <div id="combosContent" style="display: flex; flex-wrap: wrap; gap: 10px;">
+          <!-- Combos will be dynamically inserted here -->
+        </div>
+      </div>
+      <div class="modal-footer" style="background-color: #e9ecef; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="container mt-3">
-</div>
+<div class="container mt-3"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/scripts/admin/product.js"></script>
 <!-- SweetAlert2 CDN -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
+<script>
+  function showCombos(productId) {
+    $.ajax({
+      url: `/admin/getProductCombos/${productId}`,
+      method: "GET",
+      success: function (data) {
+        let combosHtml = "";
+        data.combos.forEach((combo) => {
+          combosHtml += `
+            <div class="combo-item" style="border: 1px solid #ddd; padding: 10px; border-radius: 5px; width: 48%; background-color: #ffffff; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); transition: transform 0.2s;">
+              <div style="margin-bottom: 5px; color: #007bff;"><strong>RAM:</strong> ${combo.ram}</div>
+              <div style="margin-bottom: 5px; color: #28a745;"><strong>Storage:</strong> ${combo.storage}</div>
+              <div style="margin-bottom: 5px; color: #dc3545;"><strong>Quantity:</strong> ${combo.quantity}</div>
+              <div style="margin-bottom: 5px; color: #ffc107;"><strong>Color:</strong> ${combo.color}</div>
+              <div style="margin-bottom: 5px; color: #17a2b8;"><strong>Regular Price:</strong> ${combo.regularPrice}</div>
+              <div style="margin-bottom: 5px; color: #6f42c1;"><strong>Sale Price:</strong> ${combo.salePrice}</div>
+            </div>
+          `;
+        });
+        $("#combosContent").html(combosHtml);
+        $("#combosModal").modal("show");
+      },
+      error: function (err) {
+        console.error("Error fetching combos:", err);
+      },
+    });
+  }
 
+  // Add hover effect to combo items
+  $(document).on('mouseenter', '.combo-item', function() {
+    $(this).css('transform', 'scale(1.05)');
+  });
+
+  $(document).on('mouseleave', '.combo-item', function() {
+    $(this).css('transform', 'scale(1)');
+  });
+</script>
 
 <%- include('../../views/layout/admin/footer.ejs')%>

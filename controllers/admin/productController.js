@@ -29,9 +29,8 @@ const addProducts = async (req, res) => {
     const imagePaths = [];
     if (req.files && req.files.length > 0) {
       for (let i = 0; i < req.files.length; i++) {
-
         const result = await cloudinary.uploader.upload(req.files[i].path, {
-          quailty: "100"
+          quailty: "100",
         });
 
         imagePaths.push(result.secure_url);
@@ -278,13 +277,25 @@ const deleteSingleImage = async (req, res) => {
     res.send({ status: true, message: "Image deleted successfully" });
   } catch (error) {
     console.error("Error in deleteSingleImage:", error.message);
-    res
-      .status(500)
-      .send({
-        status: false,
-        message: "Internal Server Error",
-        error: error.message,
-      });
+    res.status(500).send({
+      status: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
+const loadComboDetails = async (req, res) => {
+  try {
+    const productId = req.params.productId;
+    const product = await Product.findById(productId).select("combos");
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+    res.json({ combos: product.combos });
+  } catch (error) {
+    console.error("Error fetching product combos:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -296,4 +307,5 @@ module.exports = {
   getEditProduct,
   editProduct,
   deleteSingleImage,
+  loadComboDetails
 };

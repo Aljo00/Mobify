@@ -510,16 +510,6 @@ const resetPassword = async (req, res) => {
   }
 };
 
-// const orderedItems = async (req,res) => {
-
-//   try {
-
-//   } catch (error) {
-//     console.error("Error resetting password:", error);
-//     res.status(500).send("Server error.");
-//   }
-
-// }
 
 const loadOrdersPage = async (req, res) => {
   try {
@@ -541,6 +531,12 @@ const loadOrdersPage = async (req, res) => {
     const orders = await Order.find({ userId: user })
       .populate("orderedItems.product")
       .lean();
+
+    // Fetch the address for each order
+    for (let order of orders) {
+      const userAddress = await Address.findOne({ userId: user }).lean();
+      order.address = userAddress ? userAddress.address.find(addr => addr._id.toString() === order.address.toString()) : "No address found";
+    }
 
     res.render("user/orders", {
       orders,

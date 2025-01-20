@@ -5,7 +5,7 @@ html {
   padding: 0;
   width: 100%;
   overflow-x: hidden; /* Prevent horizontal scrolling */
-  background-color: #dbdcdd; /* Offwhite background */
+  background-color: #f8f9fa; /* Light grey background */
   color: #000; /* Black text */
 }
 
@@ -320,6 +320,7 @@ footer {
   background-color: #fff; /* White background */
   height: auto; /* Adjust height to fit content */
   position: relative; /* Ensure status is positioned correctly */
+  padding: 20px; /* Add padding */
 }
 
 .order-card:hover {
@@ -369,4 +370,84 @@ footer {
   border-radius: 3px;
   font-size: 12px;
   font-weight: bold;
+}
+
+.order-header {
+  border-bottom: 1px solid #ddd; /* Light grey border */
+  padding-bottom: 10px; /* Add padding */
+  margin-bottom: 10px; /* Add margin */
+}
+
+.order-id {
+  font-size: 16px; /* Adjust font size */
+  font-weight: bold; /* Bold text */
+}
+
+.order-address {
+  font-size: 14px; /* Adjust font size */
+  color: #6c757d; /* Grey text */
+  background-color: #fff; /* White background */
+  padding: 15px; /* Add padding */
+  border-radius: 5px; /* Rounded corners */
+  border: 1px solid #ddd; /* Light grey border */
+}
+
+.order-status {
+  font-size: 14px; /* Adjust font size */
+  padding: 5px 10px; /* Add padding */
+  border-radius: 3px; /* Rounded corners */
+}
+
+.order-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px; /* Add margin */
+}
+
+.order-item-image img {
+  width: 100px; /* Fixed width */
+  height: 100px; /* Fixed height */
+  object-fit: cover; /* Ensure image covers the area */
+  border-radius: 5px; /* Rounded corners */
+}
+
+.order-item-details {
+  flex-grow: 1;
+}
+
+.order-item-details .card-title {
+  font-size: 16px; /* Adjust font size */
+  margin-bottom: 5px; /* Add margin */
+}
+
+.order-item-details .card-title a {
+  color: #007bff; /* Blue text */
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.order-item-details .card-title a:hover {
+  color: #0056b3; /* Darker blue on hover */
+}
+
+.order-item-details .card-text {
+  font-size: 14px; /* Adjust font size */
+  margin-bottom: 5px; /* Add margin */
+}
+
+.order-item-details .btn {
+  font-size: 14px; /* Adjust font size */
+  padding: 5px 10px; /* Add padding */
+}
+
+.order-products {
+  background-color: #f1f1f1; /* Light grey background */
+  padding: 15px; /* Add padding */
+  border-radius: 5px; /* Rounded corners */
+}
+
+.order-status-cancel {
+  background-color: #f1f1f1; /* Light grey background */
+  padding: 15px; /* Add padding */
+  border-radius: 5px; /* Rounded corners */
 }

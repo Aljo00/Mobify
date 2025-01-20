@@ -51,33 +51,42 @@
       <h2>My Orders</h2>
       <div class="order-cards">
         <% orders.forEach(order => { %> 
-          <% order.orderedItems.forEach(item => { %>
-            <div class="order-card mb-4 position-relative">
-              <div class="row g-0">
-                <div class="col-md-3"> <!-- Reduced column width -->
-                  <img src="<%= item.product.productImage[0] %>" class="img-fluid rounded-start" alt="Product Image">
-                </div>
-                <div class="col-md-9">
-                  <div class="card-body">
+          <div class="order-card mb-4 position-relative p-3 shadow-sm rounded">
+            <div class="order-products bg-light p-3 rounded mb-3">
+              <% order.orderedItems.forEach(item => { %>
+                <div class="order-item d-flex mb-3">
+                  <div class="order-item-image me-3">
+                    <img src="<%= item.product.productImage[0] %>" class="img-fluid rounded" alt="Product Image">
+                  </div>
+                  <div class="order-item-details flex-grow-1">
                     <h5 class="card-title"><a href="/orders/<%= item.orderId %>?productId=<%= item._id %>"><%= item.product.productName %></a></h5>
-                    <p class="card-text">Unit Price: <%= item.price %></p>
+                    <p class="card-text">Unit Price: ₹<%= item.price %></p>
                     <p class="card-text">Quantity: <%= item.quantity %></p>
-                    <p class="card-text">Total Price: $<%= item.totalPrice %></p>
-                    <button 
-                      class="btn btn-danger" 
-                      <% if (item.status === 'Shipped') { %> 
-                        disabled 
-                      <% } %>
-                      onclick="cancelOrder('<%= item.orderId %>', '<%= item._id %>')"
-                    >
-                      Cancel Order
-                    </button>
+                    <p class="card-text">Total Price: ₹<%= item.totalPrice %></p>
                   </div>
                 </div>
-              </div>
-              <span class="order-status"><%= item.status %></span>
+              <% }) %> 
             </div>
-          <% }) %> 
+            <div class="order-address bg-white p-3 rounded mb-3">
+              <i class="fas fa-map-marker-alt"></i> 
+              <%= order.address.houseName %>, 
+              <%= order.address.city %>, 
+              <%= order.address.state %> - 
+              <%= order.address.pincode %>
+            </div>
+            <div class="order-status-cancel d-flex justify-content-between align-items-center bg-light p-3 rounded">
+              <span class="order-status badge bg-warning text-dark"><%= order.status %></span>
+              <button 
+                class="btn btn-danger btn-sm" 
+                <% if (order.status === 'Shipped') { %> 
+                  disabled 
+                <% } %>
+                onclick="cancelOrder('<%= order._id %>')"
+              >
+                Cancel Order
+              </button>
+            </div>
+          </div>
         <% }) %>
       </div>
     </div>
@@ -85,13 +94,13 @@
 </div>
 
 <script>
-  function cancelOrder(orderId, productId) {
+  function cancelOrder(orderId) {
     fetch('/cancel-order', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ orderId, productId })
+      body: JSON.stringify({ orderId })
     })
     .then(response => response.json())
     .then(data => {

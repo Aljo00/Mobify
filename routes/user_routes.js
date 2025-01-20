@@ -250,6 +250,19 @@ user_router.delete(
 //wallet Management
 user_router.get("/wallet", userAuth.protect, walletController.load_wallet);
 
+user_router.get("/get-user-details", userAuth.protect, (req, res) => {
+  const { email } = req.user;
+  if (email) {
+    res.json({ success: true,email });
+  } else {
+    res.json({ success: false, message: "User details not found." });
+  }
+});
+
+user_router.post("/add-money", userAuth.protect,walletController.addMoneyToWallet)
+
+user_router.post("/verify-payment",userAuth.protect,walletController.verifyPayment);
+
 user_router.get("/logout", user_controller.logout);
 
 module.exports = user_router;

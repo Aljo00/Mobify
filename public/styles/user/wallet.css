@@ -266,3 +266,44 @@ footer {
   justify-content: center;
   color: #6c757d; /* Grey text */
 }
+
+/* Error Message */
+#errorMessage {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+#errorMessage.show {
+  opacity: 1;
+}
+
+#addMoneySection {
+  opacity: 1;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  transform: translateY(-20px);
+}
+
+#addMoneySection.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Error Message */
+.error-message {
+  display: none;
+  background-color: #fff; /* White background */
+  color: #dc3545; /* Red text */
+  padding: 10px;
+  border: 1px solid #dc3545; /* Red border */
+  border-radius: 5px;
+  margin-bottom: 10px;
+  text-align: center;
+  width: 50%; /* Reduce width */
+  margin: 0 auto; /* Center align */
+}
+
+/* Input and Error Message Styles */
+.input-small {
+  width: 50%; /* Reduce width */
+  margin: 0 auto; /* Center align */
+}

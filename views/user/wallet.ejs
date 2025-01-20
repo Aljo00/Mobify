@@ -58,33 +58,46 @@
             ₹<%= locals.wallet.balance.toLocaleString('en-IN', {
             minimumFractionDigits: 2 }) %>
           </div>
-          <button
-            class="btn btn-primary mt-3"
-            onclick="location.href='/add-money'"
-          >
-            Add Money
-          </button>
+          <div id="addMoneySection">
+            <button class="btn btn-primary mt-3" id="addMoneyButton">
+              Add Money
+            </button>
+          </div>
         </div>
         <h4 class="mt-5">Transaction History</h4>
         <% if (locals.wallet.transactions.length > 0) { %>
         <div class="transaction-history mt-3">
-          <% locals.wallet.transactions.forEach(transaction => { %>
-          <div class="transaction-item">
-            <div class="transaction-date">
-              <%= transaction.date.toDateString() %>
-            </div>
-            <div class="transaction-description">
-              <%= transaction.description %>
-            </div>
-            <div class="transaction-type <%= transaction.type %>">
-              <%= transaction.type %>
-            </div>
-            <div class="transaction-amount">
-              ₹<%= transaction.amount.toLocaleString('en-IN', {
-              minimumFractionDigits: 2 }) %>
-            </div>
-          </div>
-          <% }) %>
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Description</th>
+                <th>Type</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% locals.wallet.transactions.forEach(transaction => { %>
+              <tr>
+                <td><%= transaction.date.toLocaleDateString() %></td>
+                <td><%= transaction.date.toLocaleTimeString() %></td>
+                <td><%= transaction.description %></td>
+                <td>
+                  <span class="transaction-type-label <%= transaction.type %>">
+                    <%= transaction.type %>
+                  </span>
+                </td>
+                <td
+                  class="<%= transaction.type === 'credit' ? 'text-success' : 'text-danger' %>"
+                >
+                  ₹<%= transaction.amount.toLocaleString('en-IN', {
+                  minimumFractionDigits: 2 }) %>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
         </div>
         <% } else { %>
         <div class="transaction-item no-transactions">
@@ -97,3 +110,187 @@
 </div>
 
 <%- include('../../views/layout/footer.ejs') %>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  document
+    .getElementById("addMoneyButton")
+    .addEventListener("click", function () {
+      const addMoneySection = document.getElementById("addMoneySection");
+      addMoneySection.innerHTML = `
+    <form id="addMoneyForm" method="POST" onsubmit="return validateAndSubmit(event)">
+      <input type="number" id="moneyAmount" name="amount" class="form-control mb-3 input-small" placeholder="Enter amount" />
+      <div id="errorMessage" class="error-message" style="display: none;">Please enter a valid amount.</div>
+      <button type="submit" class="btn btn-success">Continue</button>
+    </form>
+  `;
+      addMoneySection.classList.add("show");
+
+      document
+        .getElementById("moneyAmount")
+        .addEventListener("input", validateAmount);
+    });
+
+  function validateAmount() {
+    const amount = document.getElementById("moneyAmount").value;
+    const errorMessage = document.getElementById("errorMessage");
+    if (amount && amount > 0) {
+      errorMessage.style.display = "none";
+    } else {
+      errorMessage.style.display = "block";
+    }
+  }
+
+  async function validateAndSubmit(event) {
+    event.preventDefault(); // Prevent form from actually submitting
+
+    const amount = document.getElementById("moneyAmount").value;
+    const errorMessage = document.getElementById("errorMessage");
+
+    // Validate the amount
+    if (!amount || isNaN(amount) || amount <= 0) {
+      errorMessage.textContent = "Please enter a valid amount.";
+      errorMessage.style.display = "block";
+      return;
+    }
+
+    if (amount > 50000) {
+      errorMessage.textContent = "Max limit 50,000/-";
+      errorMessage.style.display = "block";
+      return;
+    }
+
+    // Fetch the current wallet balance
+    const walletBalance = <%= locals.wallet.balance %>;
+
+    // Check if the total balance exceeds 1 lakh
+    if (walletBalance + parseInt(amount) > 100000) {
+      errorMessage.textContent = "Total wallet balance cannot exceed 1 lakh.";
+      errorMessage.style.display = "block";
+      return;
+    }
+
+    errorMessage.style.display = "none";
+
+    try {
+      // Create Razorpay order by calling the `/add-money` route
+      const response = await fetch("/add-money", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ amount: parseInt(amount) }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Fetch user details (name and email) dynamically
+        const userDetailsResponse = await fetch("/get-user-details", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        const userDetails = await userDetailsResponse.json();
+        if (!userDetails.success) {
+          alert("Failed to fetch user details.");
+          return;
+        }
+
+        const { name, email } = userDetails;
+
+        // Razorpay order created successfully, open the Razorpay popup
+        const options = {
+          key: "rzp_test_3KXfU77UMiNAQf", // Replace with your Razorpay API key
+          amount: result.order.amount, // Amount in paise
+          currency: "INR",
+          name: "Mobify",
+          description: "Add Money to Wallet",
+          order_id: result.order.id, // Razorpay Order ID
+          handler: async function (response) {
+            // On successful payment, send verification data to the backend
+            const verificationResponse = await fetch("/verify-payment", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature,
+                amount: parseInt(amount),
+              }),
+            });
+
+            const verificationResult = await verificationResponse.json();
+            if (verificationResult.success) {
+              window.location.href = "/wallet";
+            } else {
+              alert("Payment verification failed.");
+            }
+          },
+          prefill: {
+            name: name || "Guest", // User's name
+            email: email || "guest@example.com", // User's email
+          },
+          theme: {
+            color: "#3399cc",
+          },
+        };
+
+        const razorpay = new Razorpay(options);
+        razorpay.open();
+      } else {
+        alert("Failed to create Razorpay order. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error creating Razorpay order:", error);
+      alert("An error occurred. Please try again.");
+    }
+  }
+</script>
+
+<style>
+  .error-message {
+    background-color: white;
+    padding: 10px;
+    border: 1px solid red;
+    border-radius: 5px;
+    width: 300px;
+    margin-bottom: 10px;
+  }
+  .input-small {
+    width: 400px;
+  }
+  .transaction-history table {
+    width: 100%;
+    margin-top: 20px;
+  }
+  .transaction-history th,
+  .transaction-history td {
+    text-align: center;
+  }
+  .transaction-type-label {
+    padding: 5px 10px;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    text-transform: capitalize;
+  }
+  .transaction-type-label.credit {
+    background-color: #28a745;
+  }
+  .transaction-type-label.debit {
+    background-color: #dc3545;
+  }
+  .transaction-amount {
+    font-weight: bold;
+  }
+  .bg-success {
+    background-color: #28a745 !important;
+  }
+  .bg-danger {
+    background-color: #dc3545 !important;
+  }
+</style>

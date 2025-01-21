@@ -80,6 +80,10 @@ admin_route.post("/editCategory/:id", categoryController.editCategory);
 
 admin_route.post("/deleteCategory/:id", categoryController.softDeleteCategory);
 
+admin_route.put("/category/add-offer", adminAuth.protectAdmin , categoryController.addOffer);
+
+admin_route.put("/category/remove-offer", adminAuth.protectAdmin , categoryController.removeOffer); 
+
 //Admin Brand Management Routes
 admin_route.get(
   "/brands",

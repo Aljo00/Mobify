@@ -1,87 +1,226 @@
 <%- include('../../views/layout/admin/header.ejs')%>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link
+  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+  rel="stylesheet"
+/>
 
-<link rel="stylesheet" href="/styles/admin/category.css">
+<link rel="stylesheet" href="/styles/admin/category.css" />
+<link
+  rel="stylesheet"
+  href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"
+/>
 
 <div class="d-flex">
-    <div class="sidebar">
-        <h2 class="text-white">Admin Dashboard</h2>
-        <a href="/admin/dashboard">Dashboard</a>
-        <a href="/admin/users">Users</a>
-        <a id="live-dashboard-button" href="/admin/category" style="background-color: #007bff; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none;">Categories</a>
-        <a href="/admin/brands">Brands</a>
-        <a href="/admin/addProducts">Add Products</a>
-        <a href="/admin/products">Products</a>
-        <a href="/admin/orders">Orders</a>
-        <a href="#">Settings</a>
-        <a href="/admin/logout">Logout</a>
-    </div>
-    <div class="main-content flex-grow-1">
-        <div class="container">
-            <div class="category-management">
-                <div class="text-center">
-                    <h1 class="my-4">Category Management</h1>
-                </div>
-                <div class="breadcrumb-container">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Category Management</li>
-                        </ol>
-                    </nav>
-                </div>                
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Name</th>
-                                <th>Description</th>
-                                <th>Actions</th>
-                                <th>Add Offer</th>
-                                <th>Remove Offer</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% cat.reverse().forEach((category,index)=> { %>
-                                <tr>
-                                    <td><%= category.name %></td>
-                                    <td><%= category.description %></td>
-                                    <td>
-                                        <div class="btn-group">
-                                            <a href="/admin/editCategory?id=<%= category._id %>" class="btn btn-warning btn-sm">Edit</a>
-                                            <button class="btn btn-danger btn-sm" onclick="softDeleteCategory('<%= category._id %>')">Delete</button>
-                                        </div>
-                                    </td>
-                                    <td><button class="btn btn-info btn-sm">Add Offer</button></td>
-                                    <td><button class="btn btn-danger btn-sm">Remove Offer</button></td>
-                                </tr>
-                            <% }); %>
-                        </tbody>
-                    </table>
-                </div>
-
-                <h2 class="my-4 text-center">Add New Category</h2>
-                <div class="d-flex justify-content-center">
-                    <form class="w-50" method="post" onsubmit="return handleFormSumbit(event)">
-                        <div class="mb-3">
-                            <label for="categoryName" class="form-label">Name:</label>
-                            <input type="text" class="form-control" id="name" name="name">
-                            <div id="name-error" class="error-message text-danger"></div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="categoryDescription" class="form-label">Description:</label>
-                            <input type="text" class="form-control" id="description" name="description">
-                            <div id="description-error" class="error-message text-danger"></div>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Add</button>
-                    </form>
-                </div>
-            </div>
+  <div class="sidebar">
+    <h2 class="text-white">Admin Dashboard</h2>
+    <a href="/admin/dashboard">Dashboard</a>
+    <a href="/admin/users">Users</a>
+    <a
+      id="live-dashboard-button"
+      href="/admin/category"
+      style="
+        background-color: #007bff;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+      "
+      >Categories</a
+    >
+    <a href="/admin/brands">Brands</a>
+    <a href="/admin/addProducts">Add Products</a>
+    <a href="/admin/products">Products</a>
+    <a href="/admin/orders">Orders</a>
+    <a href="#">Settings</a>
+    <a href="/admin/logout">Logout</a>
+  </div>
+  <div class="main-content flex-grow-1">
+    <div class="container">
+      <div class="category-management">
+        <div class="text-center">
+          <h1 class="my-4">Category Management</h1>
         </div>
+        <div class="breadcrumb-container">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item">
+                <a href="/admin/dashboard">Dashboard</a>
+              </li>
+              <li class="breadcrumb-item active" aria-current="page">
+                Category Management
+              </li>
+            </ol>
+          </nav>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Actions</th>
+                <th>Offer Percentage</th>
+                <th>Offer Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% cat.reverse().forEach((category,index)=> { %>
+              <tr>
+                <td><%= category.name %></td>
+                <td><%= category.description %></td>
+                <td>
+                  <div class="btn-group">
+                    <a
+                      href="/admin/editCategory?id=<%= category._id %>"
+                      class="btn btn-warning btn-sm"
+                      >Edit</a
+                    >
+                    <button
+                      class="btn btn-danger btn-sm"
+                      onclick="softDeleteCategory('<%= category._id %>')"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+                <td>
+                  <%= category. categoryOffer ? category. categoryOffer + '%' :
+                  '0%' %>
+                </td>
+                <td>
+                  <% if (category. categoryOffer) { %>
+                  <button
+                    class="btn btn-danger btn-sm"
+                    onclick="confirmRemoveOffer('<%= category._id %>')"
+                  >
+                    Remove Offer
+                  </button>
+                  <% } else { %>
+                  <button
+                    class="btn btn-info btn-sm"
+                    onclick="showOfferModal('<%= category._id %>')"
+                  >
+                    Add Offer
+                  </button>
+                  <% } %>
+                </td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 class="my-4 text-center">Add New Category</h2>
+        <div class="d-flex justify-content-center">
+          <form
+            class="w-50"
+            method="post"
+            onsubmit="return handleFormSumbit(event)"
+          >
+            <div class="mb-3">
+              <label for="categoryName" class="form-label">Name:</label>
+              <input type="text" class="form-control" id="name" name="name" />
+              <div id="name-error" class="error-message text-danger"></div>
+            </div>
+            <div class="mb-3">
+              <label for="categoryDescription" class="form-label"
+                >Description:</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="description"
+                name="description"
+              />
+              <div
+                id="description-error"
+                class="error-message text-danger"
+              ></div>
+            </div>
+            <button type="submit" class="btn btn-primary">Add</button>
+          </form>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
 
+<!-- Offer Modal -->
+<div
+  class="modal fade"
+  id="offerModal"
+  tabindex="-1"
+  aria-labelledby="offerModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="offerModalLabel">Add Offer</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form id="offerForm">
+          <div class="mb-3">
+            <label for="offerPercentage" class="form-label"
+              >Offer Percentage:</label
+            >
+            <input
+              type="number"
+              class="form-control"
+              id="offerPercentage"
+              name="offerPercentage"
+              required
+            />
+            <div
+              id="offerPercentage-error"
+              class="error-message text-danger"
+            ></div>
+          </div>
+          <div class="mb-3">
+            <label for="startDate" class="form-label">Start Date:</label>
+            <input
+              type="text"
+              class="form-control datepicker"
+              id="startDate"
+              name="offerStartDate"
+              required
+            />
+            <div id="startDate-error" class="error-message text-danger"></div>
+          </div>
+          <div class="mb-3">
+            <label for="endDate" class="form-label">End Date:</label>
+            <input
+              type="text"
+              class="form-control datepicker"
+              id="endDate"
+              name="offerEndDate"
+              required
+            />
+            <div id="endDate-error" class="error-message text-danger"></div>
+          </div>
+          <input type="hidden" id="categoryId" name="categoryId" />
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button type="submit" class="btn btn-primary">Save Offer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -90,8 +229,113 @@
 
 <!-- Include jQuery before your script -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
 <script src="/scripts/admin/addCategory.js"></script>
+<script>
+  function showOfferModal(categoryId) {
+    const today = new Date();
+    $(".datepicker").datepicker({
+      dateFormat: "yy-mm-dd",
+      minDate: today,
+      onSelect: function (selectedDate) {
+        if (this.id === "startDate") {
+          const startDate = new Date(selectedDate);
+          startDate.setDate(startDate.getDate() + 1);
+          $("#endDate").datepicker("option", "minDate", startDate);
+        }
+      },
+    });
+    $("#categoryId").val(categoryId);
+    $("#offerModal").modal("show");
+  }
 
+  $("#offerForm").on("submit", function (event) {
+    event.preventDefault();
+    const offerPercentage = $("#offerPercentage").val();
+    const startDate = $("#startDate").val();
+    const endDate = $("#endDate").val();
+    let isValid = true;
+
+    if (offerPercentage <= 0 || offerPercentage > 100) {
+      $("#offerPercentage-error").text(
+        "Offer percentage must be between 1 and 100."
+      );
+      isValid = false;
+    } else {
+      $("#offerPercentage-error").text("");
+    }
+
+    if (new Date(endDate) <= new Date(startDate)) {
+      $("#endDate-error").text("End date must be after the start date.");
+      isValid = false;
+    } else {
+      $("#endDate-error").text("");
+    }
+
+    if (isValid) {
+      const offerData = {
+        categoryId: $("#categoryId").val(),
+        offerPercentage: offerPercentage,
+        offerStartDate: startDate,
+        offerEndDate: endDate,
+      };
+
+      $.ajax({
+        url: "/admin/category/add-offer",
+        type: "PUT",
+        data: offerData,
+        success: function (response) {
+          Swal.fire({
+            title: "Success!",
+            text: "The offer has been added.",
+            icon: "success",
+            showConfirmButton: false,
+            timer: 1000,
+          }).then(() => {
+            location.reload();
+          });
+        },
+        error: function (error) {
+          console.error("Error:", error);
+        },
+      });
+    }
+  });
+
+  function confirmRemoveOffer(categoryId) {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to remove the offer?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, remove it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $.ajax({
+          url: "/admin/category/remove-offer",
+          type: "PUT",
+          data: { categoryId: categoryId },
+          success: function (response) {
+            Swal.fire({
+              title: "Removed!",
+              text: "The offer has been removed.",
+              icon: "success",
+              showConfirmButton: false,
+              timer: 1000,
+            }).then(() => {
+              location.reload();
+            });
+          },
+          error: function (error) {
+            console.error("Error:", error);
+          },
+        });
+      }
+    });
+  }
+</script>
 
 <%- include('../../views/layout/admin/footer.ejs')%>

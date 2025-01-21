@@ -1,102 +1,96 @@
 const Category = require("../../models/categorySchema");
+const Product = require("../../models/productSchema");
 
+const categoryInfo = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 4;
+    const skip = (page - 1) * limit;
 
-const categoryInfo = async (req,res) => {
+    const categoryData = await Category.find({ isListed: true })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
-    try {
+    const totalCategories = await Category.countDocuments({ isListed: true });
+    const totalPages = Math.ceil(totalCategories / limit);
 
-        const page = parseInt(req.query.page) || 1;
-        const limit = 4;
-        const skip = (page - 1)* limit;
-
-        const categoryData = await Category.find({isListed: true})
-        .sort({createdAt:-1})
-        .skip(skip)
-        .limit(limit)
-
-        const totalCategories = await Category.countDocuments({ isListed: true })
-        const totalPages = Math.ceil(totalCategories / limit);  
-
-        res.render("admin/category",{
-            cat: categoryData,
-            currentPage: page,
-            totalPages: totalPages,
-            totalCategories: totalCategories
-        });
-        
-    } catch (error) {
-        console.log("Error found in categoryManagement side: ", error.message);
-        res.redirect("/admin/error");
-    }
-    
-}
+    res.render("admin/category", {
+      cat: categoryData,
+      currentPage: page,
+      totalPages: totalPages,
+      totalCategories: totalCategories,
+    });
+  } catch (error) {
+    console.log("Error found in categoryManagement side: ", error.message);
+    res.redirect("/admin/error");
+  }
+};
 
 const addCategory = async (req, res) => {
-    let { name, description } = req.body;
+  let { name, description } = req.body;
 
-    try {
-        // Trim spaces from the category name
-        name = name.trim();
+  try {
+    // Trim spaces from the category name
+    name = name.trim();
 
-        // Check if the category already exists (case-insensitive)
-        const existingCategory = await Category.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i') } });
-        if (existingCategory) {
-            return res.status(400).json({ error: "Category already exists.." });
-        }
-
-        // Create a new category
-        const newCategory = new Category({
-            name,
-            description,
-        });
-        await newCategory.save();
-
-        return res.status(200).json({ message: "Category added successfully" });
-    } catch (error) {
-        console.log("Error found in Adding category side: ", error.message);
-        return res.status(500).json({ error: "Internal server error" });
+    // Check if the category already exists (case-insensitive)
+    const existingCategory = await Category.findOne({
+      name: { $regex: new RegExp(`^${name}$`, "i") },
+    });
+    if (existingCategory) {
+      return res.status(400).json({ error: "Category already exists.." });
     }
-}
 
-const getEditCategory = async (req,res) => {
+    // Create a new category
+    const newCategory = new Category({
+      name,
+      description,
+    });
+    await newCategory.save();
 
-    try {
+    return res.status(200).json({ message: "Category added successfully" });
+  } catch (error) {
+    console.log("Error found in Adding category side: ", error.message);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
 
-        const id = req.query.id;
-        const category = await Category.findOne({_id: id});
-        res.render('admin/editCategory',{category:category})
-        
-    } catch (error) {
-        console.log("Error found in categoryManagement side: ", error.message);
-        res.redirect("/admin/error");
+const getEditCategory = async (req, res) => {
+  try {
+    const id = req.query.id;
+    const category = await Category.findOne({ _id: id });
+    res.render("admin/editCategory", { category: category });
+  } catch (error) {
+    console.log("Error found in categoryManagement side: ", error.message);
+    res.redirect("/admin/error");
+  }
+};
+
+const editCategory = async (req, res) => {
+  try {
+    id = req.params.id;
+    const { name, description } = req.body;
+
+    const updateCategory = await Category.findByIdAndUpdate(
+      id,
+      {
+        name: name,
+        description: description,
+      },
+      { new: true }
+    );
+
+    if (updateCategory) {
+      res.redirect("/admin/category");
+    } else {
+      res.status(400).json({ error: "Category Not found" });
     }
-    
-}
-
-const editCategory = async (req,res) => {
-
-    try {
-
-        id = req.params.id;
-        const {name,description} = req.body;
-
-        const updateCategory = await Category.findByIdAndUpdate(id,{
-            name:name,
-            description: description
-        },{new: true})
-
-        if(updateCategory){
-            res.redirect('/admin/category')
-        }else{
-            res.status(400).json({error:"Category Not found"})
-        }
-        
-    } catch (error) {
-        console.log("Error found in categoryManagement side: ", error.message);
-        res.redirect("/admin/error");
-    }
-    
-}
+  } catch (error) {
+    console.log("Error found in categoryManagement side: ", error.message);
+    res.redirect("/admin/error");
+  }
+};
 
 const softDeleteCategory = async (req, res) => {
   try {
@@ -110,21 +104,102 @@ const softDeleteCategory = async (req, res) => {
     );
 
     if (updateCategory) {
-      res.status(200).json({ message: 'Category soft deleted successfully.' });
+      res.status(200).json({ message: "Category soft deleted successfully." });
     } else {
-      res.status(400).json({ error: 'Category not found.' });
+      res.status(400).json({ error: "Category not found." });
     }
   } catch (error) {
-    console.log('Error in soft deleting category: ', error.message);
-    res.status(500).json({ error: 'Internal server error.' });
+    console.log("Error in soft deleting category: ", error.message);
+    res.status(500).json({ error: "Internal server error." });
   }
 };
 
+const addOffer = async (req, res) => {
+  try {
+    console.log(req.body);
+    const { categoryId, offerPercentage, offerStartDate, offerEndDate } =
+      req.body;
+
+    const startDate = new Date(offerStartDate);
+    const endDate = new Date(offerEndDate);
+    if (!startDate || !endDate || startDate >= endDate) {
+      return res.status(400).json({ message: "Invalid start or end date" });
+    }
+
+    const category = await Category.findById(categoryId);
+    if (!category) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+
+    category.categoryOffer = offerPercentage;
+    category.offerStartDate = startDate;
+    category.offerEndDate = endDate;
+    await category.save();
+
+    const products = await Product.find({ category: category.name });
+    products.forEach(async (product) => {
+      product.combos.forEach((combo) => {
+        combo.salePrice = Math.round(
+          combo.salePrice - combo.salePrice * (offerPercentage / 100)
+        );
+      });
+      await product.save();
+    });
+
+    res
+      .status(200)
+      .json({ message: "Category offer added successfully", category });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+const removeOffer = async (req, res) => {
+  try {
+    const { categoryId } = req.body;
+
+    // Find the category
+    const category = await Category.findById(categoryId);
+    if (!category) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+
+    const currentOffer = category.categoryOffer;
+    if (currentOffer === 0) {
+      return res.status(400).json({ message: "No active offer to remove" });
+    }
+
+    // Reset category offer
+    category.categoryOffer = 0;
+    category.offerStartDate = null;
+    category.offerEndDate = null;
+    await category.save();
+
+    // Reset sale prices for all products under the category
+    const products = await Product.find({ category: category.name });
+    products.forEach(async (product) => {
+      product.combos.forEach((combo) => {
+        combo.salePrice = Math.round(
+          combo.salePrice / (1 - currentOffer / 100)
+        );
+      });
+      await product.save();
+    });
+
+    res
+      .status(200)
+      .json({ message: "Category offer removed successfully", category });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
 
 module.exports = {
-    categoryInfo,
-    addCategory,
-    getEditCategory,
-    editCategory,
-    softDeleteCategory
-}
+  categoryInfo,
+  addCategory,
+  getEditCategory,
+  editCategory,
+  softDeleteCategory,
+  addOffer,
+  removeOffer,
+};

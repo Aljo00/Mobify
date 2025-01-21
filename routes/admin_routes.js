@@ -112,6 +112,10 @@ admin_route.get(
   productController.getAllProducts
 );
 
+admin_route.put("/products/add-offer",adminAuth.protectAdmin,productController.addOffer);
+
+admin_route.put("/products/remove-offer",adminAuth.protectAdmin,productController.removeOffer);
+
 admin_route.post("/deleteProduct/:id", productController.softDeleteProduct);
 
 admin_route.get(

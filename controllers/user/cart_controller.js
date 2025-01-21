@@ -45,8 +45,8 @@ const loadCartPage = async (req, res) => {
         item.quantity = selectedCombo.quantity;
         item.totalPrice = selectedCombo.quantity * selectedCombo.salePrice;
       }
+       
     }
-
     // Save the updated cart
     await cart.updateOne({ userId }, { items: userCart.items });
 

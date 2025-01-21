@@ -93,7 +93,7 @@ const getAllProducts = async (req, res) => {
         { brand: { $regex: new RegExp(".*" + search + ".*", "i") } },
       ],
     })
-      .sort({ createdAt: -1 }) // Sort by latest added first
+      .sort({ createdAt: -1 })
       .limit(limit)
       .skip(skip)
       .populate("category")
@@ -299,6 +299,67 @@ const loadComboDetails = async (req, res) => {
   }
 };
 
+const addOffer = async (req, res) => {
+  try {
+    const { productId, offerPercentage } = req.body;
+
+    if (offerPercentage < 0 || offerPercentage > 100) {
+      return res.status(400).json({ error: "Invalid offer percentage" });
+    }
+
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    product.offer = offerPercentage;
+
+    // Update salePrice for each combo
+    product.combos.forEach((combo) => {
+      combo.salePrice =
+        Math.round(combo.salePrice - combo.salePrice * (offerPercentage / 100));
+    });
+
+    await product.save();
+    res.json({ message: "Offer added successfully" });
+  } catch (error) {
+    console.error("Error fetching product combos:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+const removeOffer = async (req, res) => {
+  try {
+    const { productId } = req.body;
+
+    const product = await Product.findById(productId);  
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    if (product.offer === 0) {
+      return res.status(400).json({ message: "No offer to remove" });
+    }
+
+    const currentOffer = product.offer;
+
+    product.combos.forEach((combo) => {
+      combo.salePrice = Math.round(combo.salePrice / (1 - currentOffer / 100));
+    });
+
+    product.offer = 0;
+
+    await product.save();
+
+    res.status(200).json({ message: "Offer removed successfully"});
+  } catch (error) {
+    console.error("Error fetching product combos:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 module.exports = {
   loadProductAddPage,
   addProducts,
@@ -307,5 +368,7 @@ module.exports = {
   getEditProduct,
   editProduct,
   deleteSingleImage,
-  loadComboDetails
+  loadComboDetails,
+  addOffer,
+  removeOffer,
 };

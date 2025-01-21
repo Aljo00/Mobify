@@ -79,8 +79,9 @@
         <th scope="col"><b>Product name</b></th>
         <th scope="col"><b>Brand</b></th>
         <th scope="col"><b>Category</b></th>
-        <th scope="col"><b>Offer</b></th>
-        <th scope="col"><b>combos</b></th>
+        <th scope="col"><b>Offer Percentage</b></th>
+        <th scope="col"><b>Offer Actions</b></th>
+        <th scope="col"><b>Combos</b></th>
         <th scope="col"><b>Action</b></th>
         <th scope="col"><b>Edit</b></th>
       </tr>
@@ -92,13 +93,30 @@
         <td><%=data[i].brand%></td>
         <td><%=data[i].category%></td>
         <td>
-          <button class="btn btn-info" onclick="" style="width: 100px">
+          <% if (data[i].offer) { %>
+          <span><%= data[i].offer %>%</span>
+          <% } else { %>
+          <span>0%</span>
+          <% } %>
+        </td>
+        <td>
+          <% if (data[i].offer) { %>
+          <button
+            class="btn btn-danger"
+            onclick="removeOffer('<%= data[i]._id %>')"
+            style="width: 100px"
+          >
+            <a href="#" class="text-white">Remove Offer</a>
+          </button>
+          <% } else { %>
+          <button
+            class="btn btn-info"
+            onclick="showOfferModal('<%= data[i]._id %>')"
+            style="width: 100px"
+          >
             <a href="#" class="text-white">Add Offer</a>
           </button>
-
-          <button class="btn btn-info" onclick="" style="width: 100px">
-            <a href="#" class="text-white">Remove</a>
-          </button>
+          <% } %>
         </td>
         <td>
           <button
@@ -161,26 +179,88 @@
   aria-hidden="true"
 >
   <div class="modal-dialog modal-lg">
-    <div class="modal-content" style="background-color: #f0f2f5; border-radius: 10px;">
-      <div class="modal-header" style="background-color: #007bff; color: white; border-top-left-radius: 10px; border-top-right-radius: 10px;">
+    <div
+      class="modal-content"
+      style="background-color: #f0f2f5; border-radius: 10px"
+    >
+      <div
+        class="modal-header"
+        style="
+          background-color: #007bff;
+          color: white;
+          border-top-left-radius: 10px;
+          border-top-right-radius: 10px;
+        "
+      >
         <h5 class="modal-title" id="combosModalLabel">Product Combos</h5>
         <button
           type="button"
           class="btn-close"
           data-bs-dismiss="modal"
           aria-label="Close"
-          style="background-color: white;"
+          style="background-color: white"
         ></button>
       </div>
-      <div class="modal-body" style="padding: 20px;">
-        <div id="combosContent" style="display: flex; flex-wrap: wrap; gap: 10px;">
+      <div class="modal-body" style="padding: 20px">
+        <div
+          id="combosContent"
+          style="display: flex; flex-wrap: wrap; gap: 10px"
+        >
           <!-- Combos will be dynamically inserted here -->
         </div>
       </div>
-      <div class="modal-footer" style="background-color: #e9ecef; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
+      <div
+        class="modal-footer"
+        style="
+          background-color: #e9ecef;
+          border-bottom-left-radius: 10px;
+          border-bottom-right-radius: 10px;
+        "
+      >
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
           Close
         </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for adding offer -->
+<div
+  class="modal fade"
+  id="offerModal"
+  tabindex="-1"
+  aria-labelledby="offerModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="offerModalLabel">Add Offer</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form id="offerForm">
+          <input type="hidden" id="offerProductId" name="productId" />
+          <div class="mb-3">
+            <label for="offerPercentage" class="form-label"
+              >Offer Percentage</label
+            >
+            <input
+              type="number"
+              class="form-control"
+              id="offerPercentage"
+              name="offerPercentage"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
       </div>
     </div>
   </div>
@@ -223,13 +303,79 @@
   }
 
   // Add hover effect to combo items
-  $(document).on('mouseenter', '.combo-item', function() {
-    $(this).css('transform', 'scale(1.05)');
+  $(document).on("mouseenter", ".combo-item", function () {
+    $(this).css("transform", "scale(1.05)");
   });
 
-  $(document).on('mouseleave', '.combo-item', function() {
-    $(this).css('transform', 'scale(1)');
+  $(document).on("mouseleave", ".combo-item", function () {
+    $(this).css("transform", "scale(1)");
   });
+
+  function showOfferModal(productId) {
+    $("#offerProductId").val(productId);
+    $("#offerModal").modal("show");
+  }
+
+  $("#offerForm").on("submit", function (event) {
+    event.preventDefault();
+    const productId = $("#offerProductId").val();
+    const offerPercentage = $("#offerPercentage").val();
+    // Add your AJAX call here to submit the offer
+    $.ajax({
+      url: "/admin/products/add-offer",
+      method: "PUT",
+      data: { productId, offerPercentage },
+      success: function (response) {
+        Swal.fire({
+          title: "Success",
+          text: "Offer added successfully!",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1000
+        }).then(() => {
+          location.reload();
+        });
+        $("#offerModal").modal("hide");
+      },
+      error: function (error) {
+        Swal.fire("Error", "Failed to add offer.", "error");
+      },
+    });
+  });
+
+  function removeOffer(productId) {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you really want to remove the offer?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, remove it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $.ajax({
+          url: "/admin/products/remove-offer",
+          method: "PUT",
+          data: { productId },
+          success: function (response) {
+            Swal.fire({
+              title: "Success",
+              text: "Offer removed successfully!",
+              icon: "success",
+              showConfirmButton: false,
+              timer: 1000
+            }).then(() => {
+              location.reload();
+            });
+          },
+          error: function (error) {
+            Swal.fire("Error", "Failed to remove offer.", "error");
+          },
+        });
+      }
+    });
+  }
 </script>
 
 <%- include('../../views/layout/admin/footer.ejs')%>

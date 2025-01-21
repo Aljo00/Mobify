@@ -65,6 +65,20 @@
                     <p class="card-text">Total Price: ₹<%= item.totalPrice %></p>
                   </div>
                 </div>
+                <div class="order-status-bar">
+                  <div class="status-step <%= item.status === 'Pending' || item.status === 'Processing' || item.status === 'Shipped' || item.status === 'Delivered' ? 'active' : '' %>">
+                    <i class="fas fa-box"></i> Pending
+                  </div>
+                  <div class="status-step <%= item.status === 'Processing' || item.status === 'Shipped' || item.status === 'Delivered' ? 'active' : '' %>">
+                    <i class="fas fa-cogs"></i> Processing
+                  </div>
+                  <div class="status-step <%= item.status === 'Shipped' || item.status === 'Delivered' ? 'active' : '' %>">
+                    <i class="fas fa-truck"></i> Shipped
+                  </div>
+                  <div class="status-step <%= item.status === 'Delivered' ? 'active' : '' %>">
+                    <i class="fas fa-check"></i> Delivered
+                  </div>
+                </div>
               <% }) %> 
             </div>
             <div class="order-address bg-white p-3 rounded mb-3">
@@ -75,10 +89,10 @@
               <%= order.address.pincode %>
             </div>
             <div class="order-status-cancel d-flex justify-content-between align-items-center bg-light p-3 rounded">
-              <span class="order-status badge bg-warning text-dark"><%= order.status %></span>
+              <span class="order-status badge bg-warning text-dark"><%= order.orderedItems[0].status %></span>
               <button 
                 class="btn btn-danger btn-sm" 
-                <% if (order.status === 'Shipped') { %> 
+                <% if (order.orderedItems[0].status === 'Shipped' || order.orderedItems[0].status === 'Delivered') { %> 
                   disabled 
                 <% } %>
                 onclick="cancelOrder('<%= order._id %>')"

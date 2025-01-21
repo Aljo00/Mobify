@@ -536,6 +536,9 @@ const loadOrdersPage = async (req, res) => {
     for (let order of orders) {
       const userAddress = await Address.findOne({ userId: user }).lean();
       order.address = userAddress ? userAddress.address.find(addr => addr._id.toString() === order.address.toString()) : "No address found";
+      order.orderedItems.forEach(item => {
+        item.status = item.status || "Pending"; // Default status if not set
+      });
     }
 
     res.render("user/orders", {

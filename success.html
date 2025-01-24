@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order Placed Successfully - Evara</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <link rel="stylesheet" href="assets/css/orderplace.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+      .order-success-container {
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 30px;
+        text-align: center;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        animation: slideIn 0.5s ease-out;
+      }
+
+      .success-icon {
+        width: 80px;
+        height: 80px;
+        background-color: #28a745;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        animation: scaleIn 0.5s ease-out 0.5s both;
+      }
+
+      .success-icon i {
+        color: white;
+        font-size: 40px;
+        animation: checkmark 0.5s ease-out 1s both;
+      }
+
+      .order-details {
+        text-align: left;
+        margin: 30px 0;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        animation: fadeIn 0.5s ease-out 1s both;
+      }
+
+      .delivery-time {
+        color: #28a745;
+        font-weight: bold;
+        margin: 20px 0;
+        animation: fadeIn 0.5s ease-out 1.2s both;
+      }
+
+      .btn-view-orders {
+        animation: fadeIn 0.5s ease-out 1.4s both;
+      }
+
+      /* Animations */
+      @keyframes slideIn {
+        from {
+          transform: translateY(-20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes scaleIn {
+        from {
+          transform: scale(0);
+        }
+        to {
+          transform: scale(1);
+        }
+      }
+
+      @keyframes checkmark {
+        0% {
+          transform: scale(0) rotate(-45deg);
+          opacity: 0;
+        }
+        100% {
+          transform: scale(1) rotate(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Responsive styles */
+      @media (max-width: 768px) {
+        .order-success-container {
+          margin: 20px;
+          padding: 20px;
+        }
+
+        .success-icon {
+          width: 60px;
+          height: 60px;
+        }
+
+        .success-icon i {
+          font-size: 30px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="order-success-container">
+        <div class="success-icon">
+          <i class="fas fa-check"></i>
+        </div>
+        <h2>Order Placed Successfully!</h2>
+        <p>Thank you for shopping with us.</p>
+
+        <div class="order-details">
+          <h4>Order Details</h4>
+          <div class="mb-3">
+            <strong>Order ID:</strong> <span>#ORD123456</span>
+          </div>
+          <div class="mb-3">
+            <strong>Order Date:</strong> <span>January 15, 2025</span>
+          </div>
+          <div class="mb-3">
+            <strong>Delivery Address:</strong>
+            <p class="mb-0">123 Sample Street</p>
+            <p class="mb-0">City, State 12345</p>
+          </div>
+        </div>
+
+        <div class="delivery-time">
+          <i class="fas fa-truck"></i>
+          Expected Delivery: Within 3-5 Business Days
+        </div>
+
+        <a href="orders.html" class="btn btn-primary btn-lg btn-view-orders">
+          View My Orders
+        </a>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

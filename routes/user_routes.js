@@ -141,6 +141,8 @@ user_router.post(
   orderController.placeOrder
 );
 
+user_router.get("/order-success", userAuth.protect, orderController.orderSuccess);
+
 user_router.post("/create-order", userAuth.protect, orderController.razarPay);
 
 //User Profile Management

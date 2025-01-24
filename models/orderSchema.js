@@ -9,6 +9,7 @@ const orderSchema = new Schema(
       type: String,
       default: () => uuidv4(),
       required: true,
+      unique: true,
     },
     userId: {
       type: Schema.Types.ObjectId,
@@ -22,8 +23,8 @@ const orderSchema = new Schema(
           ref: "Product",
           required: true,
         },
-        productName:{
-          type:String,
+        productName: {
+          type: String,
           required: false,
         },
         quantity: {
@@ -79,7 +80,7 @@ const orderSchema = new Schema(
     },
     address: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Address",
       required: true,
     },
     paymentMethod: {

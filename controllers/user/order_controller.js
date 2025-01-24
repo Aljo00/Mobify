@@ -8,10 +8,7 @@ const Address = require("../../models/addressSchema");
 const Wallet = require("../../models/walletSchema");
 const { razarpay } = require("../../config/razarPay");
 const env = require("dotenv").config();
-
-
-
-
+const { v4: uuidv4 } = require("uuid");
 
 // Process the checkout page
 const processCheckout = async (req, res) => {
@@ -71,9 +68,6 @@ const processCheckout = async (req, res) => {
   }
 };
 
-
-
-
 // Place the order
 const placeOrder = async (req, res) => {
   try {
@@ -85,8 +79,6 @@ const placeOrder = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Missing order details" });
     }
-    
-
 
     const cart = await Cart.findOne({ userId }).populate("items.ProductId");
 
@@ -123,7 +115,6 @@ const placeOrder = async (req, res) => {
     );
 
     if (paymentMethod === "wallet") {
-
       // Call walletPayment and handle the error if any
       const errorMessage = await walletPayment(totalAmount, req.user.id);
 
@@ -133,8 +124,9 @@ const placeOrder = async (req, res) => {
       }
     }
 
-    // Create the order
+    // Create the order with UUID
     const newOrder = new Order({
+      orderId: uuidv4(), // Add this line to generate UUID
       userId,
       address: selectedAddress,
       paymentMethod,
@@ -196,8 +188,13 @@ const placeOrder = async (req, res) => {
     cart.items = cart.items.filter((item) => item.quantity === 0);
     await cart.save();
 
-    // Render the order successful page with order details
-    res.render("user/orderSuccesful", { order: newOrder });
+    console.log(newOrder);
+
+    res.json({
+      success: true,
+      message: "Order placed successfully",
+      redirectUrl: `/order-success?id=${newOrder.orderId}`, // Use orderId instead of _id
+    });
   } catch (error) {
     console.error("Error placing order:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
@@ -240,24 +237,6 @@ const walletPayment = async (totalAmount, userId) => {
   }
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 const razarPay = async (re, res) => {
   try {
     const { amount, currency = "INR" } = req.body;
@@ -268,17 +247,77 @@ const razarPay = async (re, res) => {
     };
 
     const order = await razarpay.orders.create(options);
-    res.status(200).json({ success: true, message: "Razarpay completed", order });
+    res
+      .status(200)
+      .json({ success: true, message: "Razarpay completed", order });
   } catch (error) {
     console.error("Error placing order:", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Internal server error" });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+
+const orderSuccess = async (req, res) => {
+  try {
+    const user = req.user.id;
+    const orderId = req.query.id;
+    console.log("Order ID:", orderId);
+
+    const order = await Order.findOne({ orderId: orderId })
+      .populate({
+        path: 'orderedItems.product',
+        select: 'productName images price' // Select the fields you need
+      })
+      .lean();
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
+    const userAddress = await Address.findOne({ userId: user }).lean();
+    if (userAddress) {
+      const selectedAddress = userAddress.address.find(
+        (addr) => addr._id.toString() === order.address.toString()
+      );
+      
+      if (selectedAddress) {
+        order.formattedAddress = {
+          type: selectedAddress.addressType,
+          name: selectedAddress.houseName,
+          landmark: selectedAddress.landMark,
+          city: selectedAddress.city,
+          state: selectedAddress.state,
+          pincode: selectedAddress.pincode,
+          phone: selectedAddress.phone,
+          alternatePhone: selectedAddress.altPhone
+        };
+      }
+    }
+
+    // Format the ordered items for display
+    order.formattedItems = order.orderedItems.map(item => ({
+      name: item.productName,
+      quantity: item.quantity,
+      price: item.price,
+      totalPrice: item.totalPrice,
+      specifications: {
+        RAM: item.RAM,
+        Storage: item.Storage,
+        color: item.color
+      }
+    }));
+
+    console.log("Formatted order:", order);
+    res.render("user/orderSuccesful", { order });
+  } catch (error) {
+    console.error("Error rendering order success page:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 
 module.exports = {
   processCheckout,
   placeOrder,
   razarPay,
+  orderSuccess,
 };

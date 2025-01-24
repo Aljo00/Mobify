@@ -124,103 +124,58 @@
 
 <script>
 
-  $(document).ready(function() {
-    // Assuming you already have a button for payment
-    $('.pay-now').click(async function() {
-      // Get the amount you want to pass from the frontend
-      const amount = 1000; // For example, 1000 paise = ₹10
-      
-      try {
-        // Fetch order details from your backend
-        const response = await fetch("/create-order", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ amount: amount })
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-          // Initialize Razorpay checkout with order details
-          const options = {
-            key: 'YOUR_RAZORPAY_API_KEY', // Replace with your actual Razorpay API key
-            amount: data.order.amount, // Order amount from backend (in paise)
-            currency: data.order.currency, // Currency from backend
-            name: 'Your Company Name',
-            description: 'Payment for Order',
-            order_id: data.order.id, // Order ID from Razorpay response
-            handler: function (response) {
-              // Handle the payment success here
-              console.log(response);
-              alert("Payment successful!");
-            },
-            prefill: {
-              name: "Customer Name",
-              email: "customer@example.com",
-              contact: "1234567890"
-            },
-            notes: {
-              address: "Customer Address"
-            },
-            theme: {
-              color: "#F37254" // Change the theme color
-            }
-          };
-
-          const rzp = new Razorpay(options);
-          rzp.open(); // Open Razorpay checkout window
-        } else {
-          alert('Failed to create order. Please try again!');
-        }
-      } catch (error) {
-        console.error("Error:", error);
-        alert("An error occurred. Please try again.");
-      }
-    });
-  });
-
   document.getElementById('checkoutForm').addEventListener('submit', async function(event) {
-    event.preventDefault(); // Prevent the default form submission
+      event.preventDefault(); // Prevent the default form submission
 
-    const form = this;
-    const formData = new FormData(form);
+      const form = this;
+      const formData = new FormData(form);
 
-    try {
-      const response = await fetch(form.action, {
-        method: 'POST',
-        body: formData
-      });
+      try {
+          const response = await fetch(form.action, {
+              method: 'POST',
+              body: formData
+          });
 
-      const data = await response.json();
+          const data = await response.json();
+          console.log('Response from backend:', data); // Debugging log
 
-      if (data.success) {
-        Swal.fire({
-          title: 'Order Placed!',
-          text: 'Your order has been placed successfully.',
-          icon: 'success',
-          confirmButtonText: 'OK'
-        }).then(() => {
-          window.location.href = '/order-confirmation'; // Redirect to order confirmation page
-        });
-      } else {
-        Swal.fire({
-          title: 'Error!',
-          text: data.message || 'Failed to place the order. Please try again.',
-          icon: 'error',
-          confirmButtonText: 'OK'
-        });
+          if (data.success) {
+              // If successful, redirect to the order success page
+              window.location.href = data.redirectUrl || '/order-success';
+          } else {
+              // Show error toast if order was not successful
+              Swal.fire({
+                  toast: true,
+                  position: 'top-end',
+                  icon: 'error',
+                  title: 'Error!',
+                  text: data.message || 'Failed to place the order. Please try again.',
+                  showConfirmButton: false,
+                  timer: 3000,
+                  timerProgressBar: true,
+                  customClass: {
+                      popup: 'colored-toast error-toast',
+                      icon: 'error-icon'
+                  }
+              });
+          }
+      } catch (error) {
+          console.error("Error:", error);
+          Swal.fire({
+              toast: true,
+              position: 'top-end',
+              icon: 'error',
+              title: 'Error!',
+              text: 'An error occurred. Please try again.',
+              showConfirmButton: false,
+              timer: 3000,
+              timerProgressBar: true,
+              customClass: {
+                  popup: 'colored-toast error-toast',
+                  icon: 'error-icon'
+              }
+          });
       }
-    } catch (error) {
-      console.error("Error:", error);
-      Swal.fire({
-        title: 'Error!',
-        text: 'An error occurred. Please try again.',
-        icon: 'error',
-        confirmButtonText: 'OK'
-      });
-    }
   });
 
   function toggleAddressActions(radio) {
@@ -246,5 +201,16 @@
     }
   });
 </script>
+
+<style>
+  .colored-toast {
+    background-color: #28a745 !important; /* Green background for success */
+    color: white !important; /* White text color */
+  }
+  .error-toast {
+    background-color: #dc3545 !important; /* Red background for error */
+    color: white !important; /* White text color */
+  }
+</style>
 
 <%- include('../../views/layout/footer.ejs') %>

@@ -299,6 +299,11 @@ h1 {
   background-color: #e68a00;
 }
 
+.checkout-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
 .item-details table {
   width: 100%;
   margin-top: 10px;

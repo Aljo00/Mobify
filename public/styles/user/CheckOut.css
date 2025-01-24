@@ -353,64 +353,7 @@ footer {
 
 .form-check-label i {
   margin-right: 10px;
-}
-
-/* ...existing code... */
-
-.transition-hidden {
-  opacity: 0;
-  height: 0;
-  overflow: hidden;
-  transition: opacity 0.5s ease, height 0.5s ease;
-}
-
-/* ...existing code... */
-
-/* Progress Bar */
-.progress-bar-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-.progress-step {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 50px;
-  height: 50px;
-  border: 2px solid #ccc;
-  border-radius: 50%;
-  background-color: #f9f9f9;
-  position: relative;
-  color: #999;
-  font-size: 14px;
-  transition: all 0.3s ease;
-}
-
-.progress-step i {
-  font-size: 18px;
-  margin-bottom: 5px;
-}
-
-.progress-step.active {
-  border-color: #007bff;
-  background-color: #007bff;
-  color: white;
-}
-
-.progress-line {
-  flex-grow: 1;
-  height: 2px;
-  background-color: #ccc;
-  margin: 0 10px;
-}
-
-.progress-line.active {
-  background-color: #007bff;
-}
+} 
 
 /* Section Transitions */
 .section {

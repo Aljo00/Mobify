@@ -5,9 +5,15 @@ const Product = require("../../models/productSchema");
 const Cart = require("../../models/cartSchema");
 const Order = require("../../models/orderSchema");
 const Address = require("../../models/addressSchema");
+const Wallet = require("../../models/walletSchema");
 const { razarpay } = require("../../config/razarPay");
 const env = require("dotenv").config();
 
+
+
+
+
+// Process the checkout page
 const processCheckout = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -65,6 +71,10 @@ const processCheckout = async (req, res) => {
   }
 };
 
+
+
+
+// Place the order
 const placeOrder = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -75,6 +85,8 @@ const placeOrder = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Missing order details" });
     }
+    
+
 
     const cart = await Cart.findOne({ userId }).populate("items.ProductId");
 
@@ -109,6 +121,17 @@ const placeOrder = async (req, res) => {
       (acc, item) => acc + item.totalPrice,
       0
     );
+
+    if (paymentMethod === "wallet") {
+
+      // Call walletPayment and handle the error if any
+      const errorMessage = await walletPayment(totalAmount, req.user.id);
+
+      if (errorMessage) {
+        // If an error message is returned, send the response
+        return res.status(400).json({ success: false, message: errorMessage });
+      }
+    }
 
     // Create the order
     const newOrder = new Order({
@@ -180,6 +203,60 @@ const placeOrder = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+
+const walletPayment = async (totalAmount, userId) => {
+  try {
+    // Find the wallet by user ID
+    const wallet = await Wallet.findOne({ user: userId });
+    if (!wallet) {
+      return "Wallet not found";
+    }
+
+    // Check for sufficient balance
+    if (wallet.balance < totalAmount) {
+      return "Insufficient balance";
+    }
+
+    // Deduct the amount and update transactions
+    wallet.balance -= totalAmount;
+    wallet.transactions.push({
+      type: "debit",
+      amount: totalAmount,
+      date: new Date(), // Save the current date and time
+      description: "Order placed",
+    });
+
+    // Save the wallet
+    await wallet.save();
+    console.log("Wallet balance updated successfully");
+
+    // Return null to indicate success
+    return null;
+  } catch (error) {
+    console.error("Error placing order:", error);
+
+    // Return a generic error message
+    return "Internal server error";
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const razarPay = async (re, res) => {
   try {

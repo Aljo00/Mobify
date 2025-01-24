@@ -27,7 +27,14 @@ const load_wallet = async (req, res) => {
 
       cartItemCount = usercart ? usercart.items.length : 0;
       userData = await User.findById(userId);
-      walletData = await Wallet.findOne({ user: userId });
+      walletData = await Wallet.findOne({ user: userId })
+
+      if (walletData) {
+        // Sort the transactions array in descending order by date
+        walletData.transactions.sort(
+          (a, b) => new Date(b.date) - new Date(a.date)
+        );
+      }
 
       if (!userData.profileImage) {
         const name = userData.name || "";
@@ -144,5 +151,5 @@ const verifyPayment = async (req, res) => {
 module.exports = {
   load_wallet,
   addMoneyToWallet,
-  verifyPayment
+  verifyPayment,
 };

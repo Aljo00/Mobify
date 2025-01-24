@@ -82,21 +82,12 @@ const orderSchema = new Schema(
       ref: "User",
       required: true,
     },
-    invoiceDate: {
-      type: Date,
-    },
-    status: {
+    paymentMethod: {
       type: String,
       required: true,
-      enum: [
-        "Pending",
-        "Processing",
-        "Shipped",
-        "Delivered",
-        "Cancelled",
-        "Return Request",
-        "Returned",
-      ],
+    },
+    invoiceDate: {
+      type: Date,
     },
     couponApplied: {
       type: Boolean,

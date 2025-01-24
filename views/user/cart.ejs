@@ -18,6 +18,13 @@
 <!-- Custom CSS -->
 <link rel="stylesheet" href="/styles/user/cart.css" />
 
+<style>
+  .checkout-button:disabled {
+    background-color: #f17171;
+    cursor: not-allowed;
+  }
+</style>
+
 <div class="cart-container">
   <!-- Breadcrumbs -->
   <nav aria-label="breadcrumb">
@@ -101,7 +108,7 @@
         item.totalPrice, 0) %>
       </p>
       <a href="/checkout">
-        <button class="checkout-button">Proceed to Checkout</button>
+        <button class="checkout-button" <%= cart.items.filter(item => !item.outOfStock).length === 0 ? 'disabled' : '' %>>Proceed to Checkout</button>
       </a>  
     </div>
   </div>

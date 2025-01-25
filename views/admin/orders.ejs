@@ -1,118 +1,131 @@
 <%- include('../../views/layout/admin/header.ejs')%>
 
-<!-- Bootstrap CSS -->
-<link
-  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-  rel="stylesheet"
-/>
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
-/>
-
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/styles/admin/orders.css" />
 
-<div class="d-flex">
-  <div class="sidebar fixed-top">
-    <h2 class="text-white">Admin Dashboard</h2>
-    <a href="/admin/dashboard">Dashboard</a>
-    <a href="/admin/users">Users</a>
-    <a href="/admin/category">categories</a>
-    <a href="/admin/brands">Brands</a>
-    <a href="/admin/addProducts">Add Products</a>
-    <a href="/admin/products">Products</a>
-    <a
-      id="live-dashboard-button"
-      href="/admin/orders"
-      style="
-        background-color: #007bff;
-        color: white;
-        padding: 10px 15px;
-        border-radius: 5px;
-        text-decoration: none;
-      "
-      >Orders</a
-    >
-    <a href="#">Settings</a>
-    <a href="/admin/logout">Logout</a>
-  </div>
-  <div class="main-content">
-    <div class="text-center">
-      <h1 class="my-4">Order Management</h1>
+<div class="wrapper">
+    <div class="sidebar">
+        <h2><i class="fas fa-mobile-alt me-2"></i>Mobify</h2>
+        <a href="/admin/dashboard">
+            <i class="fas fa-chart-line"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="/admin/users">
+            <i class="fas fa-users"></i>
+            <span>Users</span>
+        </a>
+        <a href="/admin/category">
+            <i class="fas fa-list"></i>
+            <span>Categories</span>
+        </a>
+        <a href="/admin/brands">
+            <i class="fas fa-tags"></i>
+            <span>Brands</span>
+        </a>
+        <a href="/admin/addProducts">
+            <i class="fas fa-plus"></i>
+            <span>Add Products</span>
+        </a>
+        <a href="/admin/products">
+            <i class="fas fa-box"></i>
+            <span>Products</span>
+        </a>
+        <a href="#" class="active">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Orders</span>
+        </a>
+        <a href="#">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+        </a>
+        <a href="/admin/logout">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </a>
     </div>
-    <div class="breadcrumb-container">
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item">
-            <a href="/admin/dashboard">Dashboard</a>
-          </li>
-          <li class="breadcrumb-item active" aria-current="page">
-            Order Management
-          </li>
-        </ol>
-      </nav>
+
+    <div class="main-content">
+        <div class="container-fluid">
+            <!-- Header with date -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="mb-0">Order Management</h4>
+                <div class="date text-muted">
+                    <%= new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
+                </div>
+            </div>
+
+            <!-- Enhanced Breadcrumb -->
+            <div class="breadcrumb-container mb-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item">
+                            <a href="/admin/dashboard">
+                                <i class="fas fa-home me-1"></i>Dashboard
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            <i class="fas fa-shopping-cart me-1"></i>Orders
+                        </li>
+                    </ol>
+                </nav>
+            </div>
+
+            <!-- Orders Table Card -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer Name</th>
+                                    <th>Product Name</th>
+                                    <th>Quantity</th>
+                                    <th>Total Price</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% orders.forEach(order => { %>
+                                <tr>
+                                    <td>#<%= order.orderId %></td>
+                                    <td><%= order.customerName %></td>
+                                    <td><%= order.productName %></td>
+                                    <td><%= order.quantity %></td>
+                                    <td><%= order.totalPrice %></td>
+                                    <td>
+                                        <span class="badge <%= order.itemStatus === 'Delivered' ? 'bg-success' : order.itemStatus === 'Returned'? 'bg-danger' : order.itemStatus === 'Cancelled'? 'bg-danger' : 'bg-warning' %>">
+                                            <%= order.itemStatus %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <!-- Form for updating the status -->
+                                        <form action="/admin/orders/update-status" method="POST">
+                                            <input type="hidden" name="orderId" value="<%= order.orderId %>" />
+                                            <input type="hidden" name="productId" value="<%= order.productId %>" />
+                                            <select name="status" class="form-select">
+                                                <option value="Pending" <%= order.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                                                <option value="Processing" <%= order.status === 'Processing' ? 'selected' : '' %>>Processing</option>
+                                                <option value="Shipped" <%= order.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                                                <option value="Delivered" <%= order.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                                                <option value="Cancelled" <%= order.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                                <option value="Returned" <%= order.status === 'Returned' ? 'selected' : '' %>>Returned</option>
+                                            </select>
+                                            <button type="submit" class="btn btn-primary btn-sm mt-2">Update</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Order ID</th>
-          <th>Customer Name</th>
-          <th>Product Name</th>
-          <th>Quantity</th>
-          <th>Total Price</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% orders.forEach(order => { %>
-        <tr>
-          <td>#<%= order.orderId %></td>
-          <td><%= order.customerName %></td>
-          <td><%= order.productName %></td>
-          <td><%= order.quantity %></td>
-          <td><%= order.totalPrice %></td>
-          <td>
-            <span
-              class="badge <%= order.itemStatus === 'Delivered' ? 'bg-success' : order.itemStatus === 'Returned'? 'bg-danger' : order.itemStatus === 'Cancelled'? 'bg-danger' : 'bg-warning' %>"
-            >
-              <%= order.itemStatus %>
-            </span>
-          </td>
-          <td>
-            <!-- Form for updating the status -->
-            <form action="/admin/orders/update-status" method="POST">
-              <input
-                type="hidden"
-                name="orderId"
-                value="<%= order.orderId %>"
-              />
-              <input
-                type="hidden"
-                name="productId"
-                value="<%= order.productId %>"
-              />
-              <select name="status" class="form-select">
-                <option value="Pending" <%= order.status === 'Pending' ?
-                'selected' : '' %>>Pending <option value="Processing" <%=
-                order.status === 'Processing' ? 'selected' : '' %>>Processing
-                <option value="Shipped" <%= order.status === 'Shipped' ?
-                'selected' : '' %>>Shipped <option value="Delivered" <%=
-                order.status === 'Delivered' ? 'selected' : '' %>>Delivered
-                <option value="Cancelled" <%= order.status === 'Cancelled' ?
-                'selected' : '' %>>Cancelled <option value="Returned" <%=
-                order.status === 'Returned' ? 'selected' : '' %>>Returned
-              </select>
-              <button type="submit" class="btn btn-primary btn-sm mt-2">
-                Update
-              </button>
-            </form>
-          </td>
-        </tr>
-        <% }) %>
-      </tbody>
-    </table>
-  </div>
 </div>
 
 <!-- Bootstrap JS -->

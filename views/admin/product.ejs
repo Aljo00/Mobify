@@ -2,380 +2,426 @@
 
 <head>
   <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css"
-  />
-  <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
     rel="stylesheet"
   />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+  />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css"
+  />
   <link rel="stylesheet" href="/styles/admin/product.css" />
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css"
-  />
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
-  />
 </head>
 
-<div class="sidebar">
-  <h2 class="text-white">Admin Dashboard</h2>
-  <a href="/admin/dashboard">Dashboard</a>
-  <a href="/admin/users">Users</a>
-  <a href="/admin/category">Categories</a>
-  <a href="/admin/brands">Brands</a>
-  <a href="/admin/addProducts">Add Products</a>
-  <a
-    id="live-dashboard-button"
-    href="/admin/products"
-    style="
-      background-color: #007bff;
-      color: white;
-      padding: 10px 15px;
-      border-radius: 5px;
-      text-decoration: none;
-    "
-    >Products</a
-  >
-  <a href="/admin/orders">Orders</a>
-  <a href="#">Settings</a>
-  <a href="/admin/logout">Logout</a>
-</div>
-
-<div class="content-header">
-  <div>
-    <h2 class="content-title card-title">Products</h2>
+<div class="wrapper">
+  <div class="sidebar">
+    <h2><i class="fas fa-mobile-alt me-2"></i>Mobify</h2>
+    <a href="/admin/dashboard">
+      <i class="fas fa-chart-line"></i>
+      <span>Dashboard</span>
+    </a>
+    <a href="/admin/users">
+      <i class="fas fa-users"></i>
+      <span>Users</span>
+    </a>
+    <a href="/admin/category">
+      <i class="fas fa-list"></i>
+      <span>Categories</span>
+    </a>
+    <a href="/admin/brands">
+      <i class="fas fa-tags"></i>
+      <span>Brands</span>
+    </a>
+    <a href="/admin/addProducts">
+      <i class="fas fa-plus"></i>
+      <span>Add Products</span>
+    </a>
+    <a href="#" class="active">
+      <i class="fas fa-box"></i>
+      <span>Products</span>
+    </a>
+    <a href="/admin/orders">
+      <i class="fas fa-shopping-cart"></i>
+      <span>Orders</span>
+    </a>
+    <a href="#">
+      <i class="fas fa-cog"></i>
+      <span>Settings</span>
+    </a>
+    <a href="/admin/logout">
+      <i class="fas fa-sign-out-alt"></i>
+      <span>Logout</span>
+    </a>
   </div>
-</div>
 
-<div class="breadcrumb-container">
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
-      <li class="breadcrumb-item active" aria-current="page">Products</li>
-    </ol>
-  </nav>
-</div>
-
-<header class="card-header text-center mb-20">
-  <form action="" method="get" class="d-inline">
-    <div class="input-group input-group-sm border border-1 border-grey">
-      <input
-        type="text"
-        class="form-control border-0"
-        placeholder="Search products or brands"
-        name="search"
-      />
-      <button class="btn border-0" type="submit">Search</button>
-    </div>
-  </form>
-</header>
-<div class="right mt-5">
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th scope="col"><b>Product name</b></th>
-        <th scope="col"><b>Brand</b></th>
-        <th scope="col"><b>Category</b></th>
-        <th scope="col"><b>Offer Percentage</b></th>
-        <th scope="col"><b>Offer Actions</b></th>
-        <th scope="col"><b>Combos</b></th>
-        <th scope="col"><b>Action</b></th>
-        <th scope="col"><b>Edit</b></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% for(let i = data.length-1; i >= 0; i--) {%>
-      <tr>
-        <td><%=data[i].productName%></td>
-        <td><%=data[i].brand%></td>
-        <td><%=data[i].category%></td>
-        <td>
-          <% if (data[i].offer) { %>
-          <span><%= data[i].offer %>%</span>
-          <% } else { %>
-          <span>0%</span>
-          <% } %>
-        </td>
-        <td>
-          <% if (data[i].offer) { %>
-          <button
-            class="btn btn-danger"
-            onclick="removeOffer('<%= data[i]._id %>')"
-            style="width: 100px"
-          >
-            <a href="#" class="text-white">Remove Offer</a>
-          </button>
-          <% } else { %>
-          <button
-            class="btn btn-info"
-            onclick="showOfferModal('<%= data[i]._id %>')"
-            style="width: 100px"
-          >
-            <a href="#" class="text-white">Add Offer</a>
-          </button>
-          <% } %>
-        </td>
-        <td>
-          <button
-            class="btn btn-info"
-            onclick="showCombos('<%= data[i]._id %>')"
-            style="width: 100px"
-          >
-            Show Combos
-          </button>
-        </td>
-        <td>
-          <button
-            class="btn btn-danger"
-            style="width: 80px"
-            onclick="softDeleteProduct('<%= data[i]._id %>')"
-          >
-            Delete
-          </button>
-        </td>
-        <td>
-          <button class="btn btn-info" style="width: 80px">
-            <a
-              href="/admin/editProduct?id=<%=data[i]._id%>"
-              class="text-white"
-              style="text-decoration: none"
-              >Edit</a
-            >
-          </button>
-        </td>
-      </tr>
-      <%}%>
-    </tbody>
-  </table>
-</div>
-
-<nav aria-label="Page navigation">
-  <ul class="pagination justify-content-center">
-    <% if (currentPage > 1) { %>
-    <li class="page-item">
-      <a class="page-link" href="?page=<%= currentPage - 1 %>">Previous</a>
-    </li>
-    <% } %> <% for (let i = 1; i <= totalPages; i++) { %>
-    <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
-      <a class="page-link" href="?page=<%= i %>"><%= i %></a>
-    </li>
-    <% } %> <% if (currentPage < totalPages) { %>
-    <li class="page-item">
-      <a class="page-link" href="?page=<%= currentPage + 1 %>">Next</a>
-    </li>
-    <% } %>
-  </ul>
-</nav>
-
-<!-- Modal for displaying combos -->
-<div
-  class="modal fade"
-  id="combosModal"
-  tabindex="-1"
-  aria-labelledby="combosModalLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog modal-lg">
-    <div
-      class="modal-content"
-      style="background-color: #f0f2f5; border-radius: 10px"
-    >
-      <div
-        class="modal-header"
-        style="
-          background-color: #007bff;
-          color: white;
-          border-top-left-radius: 10px;
-          border-top-right-radius: 10px;
-        "
-      >
-        <h5 class="modal-title" id="combosModalLabel">Product Combos</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-          style="background-color: white"
-        ></button>
-      </div>
-      <div class="modal-body" style="padding: 20px">
-        <div
-          id="combosContent"
-          style="display: flex; flex-wrap: wrap; gap: 10px"
-        >
-          <!-- Combos will be dynamically inserted here -->
+  <div class="main-content">
+    <div class="container-fluid">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0">Product Management</h4>
+        <div class="date text-muted">
+          <%= new Date().toLocaleDateString('en-US', { weekday: 'long', year:
+          'numeric', month: 'long', day: 'numeric' }) %>
         </div>
       </div>
-      <div
-        class="modal-footer"
-        style="
-          background-color: #e9ecef;
-          border-bottom-left-radius: 10px;
-          border-bottom-right-radius: 10px;
-        "
-      >
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          Close
-        </button>
+
+      <!-- Breadcrumb -->
+      <div class="breadcrumb-container mb-4">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item">
+              <a href="/admin/dashboard">
+                <i class="fas fa-home me-1"></i>Dashboard
+              </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+              <i class="fas fa-box me-1"></i>Products
+            </li>
+          </ol>
+        </nav>
       </div>
-    </div>
-  </div>
-</div>
 
-<!-- Modal for adding offer -->
-<div
-  class="modal fade"
-  id="offerModal"
-  tabindex="-1"
-  aria-labelledby="offerModalLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="offerModalLabel">Add Offer</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
-      </div>
-      <div class="modal-body">
-        <form id="offerForm">
-          <input type="hidden" id="offerProductId" name="productId" />
-          <div class="mb-3">
-            <label for="offerPercentage" class="form-label"
-              >Offer Percentage</label
-            >
-            <input
-              type="number"
-              class="form-control"
-              id="offerPercentage"
-              name="offerPercentage"
-              required
-            />
-          </div>
-          <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="container mt-3"></div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="/scripts/admin/product.js"></script>
-<!-- SweetAlert2 CDN -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<script>
-  function showCombos(productId) {
-    $.ajax({
-      url: `/admin/getProductCombos/${productId}`,
-      method: "GET",
-      success: function (data) {
-        let combosHtml = "";
-        data.combos.forEach((combo) => {
-          combosHtml += `
-            <div class="combo-item" style="border: 1px solid #ddd; padding: 10px; border-radius: 5px; width: 48%; background-color: #ffffff; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); transition: transform 0.2s;">
-              <div style="margin-bottom: 5px; color: #007bff;"><strong>RAM:</strong> ${combo.ram}</div>
-              <div style="margin-bottom: 5px; color: #28a745;"><strong>Storage:</strong> ${combo.storage}</div>
-              <div style="margin-bottom: 5px; color: #dc3545;"><strong>Quantity:</strong> ${combo.quantity}</div>
-              <div style="margin-bottom: 5px; color: #ffc107;"><strong>Color:</strong> ${combo.color}</div>
-              <div style="margin-bottom: 5px; color: #17a2b8;"><strong>Regular Price:</strong> ${combo.regularPrice}</div>
-              <div style="margin-bottom: 5px; color: #6f42c1;"><strong>Sale Price:</strong> ${combo.salePrice}</div>
+      <!-- Search Section -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <form action="" method="get">
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Search products or brands"
+                name="search"
+              />
+              <button class="btn btn-primary" type="submit">
+                <i class="fas fa-search me-1"></i>Search
+              </button>
             </div>
-          `;
+          </form>
+        </div>
+      </div>
+
+      <!-- Products Table -->
+      <div class="card">
+        <div class="card-body">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th scope="col"><b>Product name</b></th>
+                <th scope="col"><b>Brand</b></th>
+                <th scope="col"><b>Category</b></th>
+                <th scope="col"><b>Offer Percentage</b></th>
+                <th scope="col"><b>Offer Actions</b></th>
+                <th scope="col"><b>Combos</b></th>
+                <th scope="col"><b>Action</b></th>
+                <th scope="col"><b>Edit</b></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% for(let i = data.length-1; i >= 0; i--) {%>
+              <tr>
+                <td><%=data[i].productName%></td>
+                <td><%=data[i].brand%></td>
+                <td><%=data[i].category%></td>
+                <td>
+                  <% if (data[i].offer) { %>
+                  <span><%= data[i].offer %>%</span>
+                  <% } else { %>
+                  <span>0%</span>
+                  <% } %>
+                </td>
+                <td>
+                  <% if (data[i].offer) { %>
+                  <button
+                    class="btn btn-danger"
+                    onclick="removeOffer('<%= data[i]._id %>')"
+                    style="width: 100px"
+                  >
+                    <a href="#" class="text-white">Remove Offer</a>
+                  </button>
+                  <% } else { %>
+                  <button
+                    class="btn btn-info"
+                    onclick="showOfferModal('<%= data[i]._id %>')"
+                    style="width: 100px"
+                  >
+                    <a href="#" class="text-white">Add Offer</a>
+                  </button>
+                  <% } %>
+                </td>
+                <td>
+                  <button
+                    class="btn btn-info"
+                    onclick="showCombos('<%= data[i]._id %>')"
+                    style="width: 100px"
+                  >
+                    Show Combos
+                  </button>
+                </td>
+                <td>
+                  <button
+                    class="btn btn-danger"
+                    style="width: 80px"
+                    onclick="softDeleteProduct('<%= data[i]._id %>')"
+                  >
+                    Delete
+                  </button>
+                </td>
+                <td>
+                  <button class="btn btn-info" style="width: 80px">
+                    <a
+                      href="/admin/editProduct?id=<%=data[i]._id%>"
+                      class="text-white"
+                      style="text-decoration: none"
+                      >Edit</a
+                    >
+                  </button>
+                </td>
+              </tr>
+              <%}%>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+          <% if (currentPage > 1) { %>
+          <li class="page-item">
+            <a class="page-link" href="?page=<%= currentPage - 1 %>"
+              >Previous</a
+            >
+          </li>
+          <% } %> <% for (let i = 1; i <= totalPages; i++) { %>
+          <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
+            <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+          </li>
+          <% } %> <% if (currentPage < totalPages) { %>
+          <li class="page-item">
+            <a class="page-link" href="?page=<%= currentPage + 1 %>">Next</a>
+          </li>
+          <% } %>
+        </ul>
+      </nav>
+
+      <!-- Modal for displaying combos -->
+      <div
+        class="modal fade"
+        id="combosModal"
+        tabindex="-1"
+        aria-labelledby="combosModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-lg">
+          <div
+            class="modal-content"
+            style="background-color: #f0f2f5; border-radius: 10px"
+          >
+            <div
+              class="modal-header"
+              style="
+                background-color: #007bff;
+                color: white;
+                border-top-left-radius: 10px;
+                border-top-right-radius: 10px;
+              "
+            >
+              <h5 class="modal-title" id="combosModalLabel">Product Combos</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+                style="background-color: white"
+              ></button>
+            </div>
+            <div class="modal-body" style="padding: 20px">
+              <div
+                id="combosContent"
+                style="display: flex; flex-wrap: wrap; gap: 10px"
+              >
+                <!-- Combos will be dynamically inserted here -->
+              </div>
+            </div>
+            <div
+              class="modal-footer"
+              style="
+                background-color: #e9ecef;
+                border-bottom-left-radius: 10px;
+                border-bottom-right-radius: 10px;
+              "
+            >
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal for adding offer -->
+      <div
+        class="modal fade"
+        id="offerModal"
+        tabindex="-1"
+        aria-labelledby="offerModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="offerModalLabel">Add Offer</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form id="offerForm">
+                <input type="hidden" id="offerProductId" name="productId" />
+                <div class="mb-3">
+                  <label for="offerPercentage" class="form-label"
+                    >Offer Percentage</label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="offerPercentage"
+                    name="offerPercentage"
+                    required
+                  />
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container mt-3"></div>
+
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+      <script src="/scripts/admin/product.js"></script>
+      <!-- SweetAlert2 CDN -->
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+      <script>
+        function showCombos(productId) {
+          $.ajax({
+            url: `/admin/getProductCombos/${productId}`,
+            method: "GET",
+            success: function (data) {
+              let combosHtml = "";
+              data.combos.forEach((combo) => {
+                combosHtml += `
+                                    <div class="combo-item" style="border: 1px solid #ddd; padding: 10px; border-radius: 5px; width: 48%; background-color: #ffffff; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); transition: transform 0.2s;">
+                                        <div style="margin-bottom: 5px; color: #007bff;"><strong>RAM:</strong> ${combo.ram}</div>
+                                        <div style="margin-bottom: 5px; color: #28a745;"><strong>Storage:</strong> ${combo.storage}</div>
+                                        <div style="margin-bottom: 5px; color: #dc3545;"><strong>Quantity:</strong> ${combo.quantity}</div>
+                                        <div style="margin-bottom: 5px; color: #ffc107;"><strong>Color:</strong> ${combo.color}</div>
+                                        <div style="margin-bottom: 5px; color: #17a2b8;"><strong>Regular Price:</strong> ${combo.regularPrice}</div>
+                                        <div style="margin-bottom: 5px; color: #6f42c1;"><strong>Sale Price:</strong> ${combo.salePrice}</div>
+                                    </div>
+                                `;
+              });
+              $("#combosContent").html(combosHtml);
+              $("#combosModal").modal("show");
+            },
+            error: function (err) {
+              console.error("Error fetching combos:", err);
+            },
+          });
+        }
+
+        // Add hover effect to combo items
+        $(document).on("mouseenter", ".combo-item", function () {
+          $(this).css("transform", "scale(1.05)");
         });
-        $("#combosContent").html(combosHtml);
-        $("#combosModal").modal("show");
-      },
-      error: function (err) {
-        console.error("Error fetching combos:", err);
-      },
-    });
-  }
 
-  // Add hover effect to combo items
-  $(document).on("mouseenter", ".combo-item", function () {
-    $(this).css("transform", "scale(1.05)");
-  });
-
-  $(document).on("mouseleave", ".combo-item", function () {
-    $(this).css("transform", "scale(1)");
-  });
-
-  function showOfferModal(productId) {
-    $("#offerProductId").val(productId);
-    $("#offerModal").modal("show");
-  }
-
-  $("#offerForm").on("submit", function (event) {
-    event.preventDefault();
-    const productId = $("#offerProductId").val();
-    const offerPercentage = $("#offerPercentage").val();
-    // Add your AJAX call here to submit the offer
-    $.ajax({
-      url: "/admin/products/add-offer",
-      method: "PUT",
-      data: { productId, offerPercentage },
-      success: function (response) {
-        Swal.fire({
-          title: "Success",
-          text: "Offer added successfully!",
-          icon: "success",
-          showConfirmButton: false,
-          timer: 1000
-        }).then(() => {
-          location.reload();
+        $(document).on("mouseleave", ".combo-item", function () {
+          $(this).css("transform", "scale(1)");
         });
-        $("#offerModal").modal("hide");
-      },
-      error: function (error) {
-        Swal.fire("Error", "Failed to add offer.", "error");
-      },
-    });
-  });
 
-  function removeOffer(productId) {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "Do you really want to remove the offer?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, remove it!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        $.ajax({
-          url: "/admin/products/remove-offer",
-          method: "PUT",
-          data: { productId },
-          success: function (response) {
-            Swal.fire({
-              title: "Success",
-              text: "Offer removed successfully!",
-              icon: "success",
-              showConfirmButton: false,
-              timer: 1000
-            }).then(() => {
-              location.reload();
-            });
-          },
-          error: function (error) {
-            Swal.fire("Error", "Failed to remove offer.", "error");
-          },
+        function showOfferModal(productId) {
+          $("#offerProductId").val(productId);
+          $("#offerModal").modal("show");
+        }
+
+        $("#offerForm").on("submit", function (event) {
+          event.preventDefault();
+          const productId = $("#offerProductId").val();
+          const offerPercentage = $("#offerPercentage").val();
+          // Add your AJAX call here to submit the offer
+          $.ajax({
+            url: "/admin/products/add-offer",
+            method: "PUT",
+            data: { productId, offerPercentage },
+            success: function (response) {
+              Swal.fire({
+                title: "Success",
+                text: "Offer added successfully!",
+                icon: "success",
+                showConfirmButton: false,
+                timer: 1000,
+              }).then(() => {
+                location.reload();
+              });
+              $("#offerModal").modal("hide");
+            },
+            error: function (error) {
+              Swal.fire("Error", "Failed to add offer.", "error");
+            },
+          });
         });
-      }
-    });
-  }
-</script>
 
-<%- include('../../views/layout/admin/footer.ejs')%>
+        function removeOffer(productId) {
+          Swal.fire({
+            title: "Are you sure?",
+            text: "Do you really want to remove the offer?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, remove it!",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              $.ajax({
+                url: "/admin/products/remove-offer",
+                method: "PUT",
+                data: { productId },
+                success: function (response) {
+                  Swal.fire({
+                    title: "Success",
+                    text: "Offer removed successfully!",
+                    icon: "success",
+                    showConfirmButton: false,
+                    timer: 1000,
+                  }).then(() => {
+                    location.reload();
+                  });
+                },
+                error: function (error) {
+                  Swal.fire("Error", "Failed to remove offer.", "error");
+                },
+              });
+            }
+          });
+        }
+      </script>
+
+      <%- include('../../views/layout/admin/footer.ejs')%>
+    </div>
+  </div>
+</div>

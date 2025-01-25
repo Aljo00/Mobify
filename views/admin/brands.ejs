@@ -1,39 +1,81 @@
 <%- include('../../views/layout/admin/header.ejs')%>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/styles/admin/category.css">
 
-<div class="d-flex">
+<div class="wrapper">
     <div class="sidebar">
-        <h2 class="text-white">Admin Dashboard</h2>
-        <a href="/admin/dashboard">Dashboard</a>
-        <a href="/admin/users">Users</a>
-        <a href="/admin/category">Categories</a>
-        <a id="live-dashboard-button" href="#" style="background-color: #007bff; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none;">Brands</a>
-        <a href="/admin/addProducts">Add Products</a>
-        <a href="/admin/products">Products</a>
-        <a href="/admin/orders">Orders</a>
-        <a href="#">Settings</a>
-        <a href="/admin/logout">Logout</a>
+        <h2><i class="fas fa-mobile-alt me-2"></i>Mobify</h2>
+        <a href="/admin/dashboard">
+            <i class="fas fa-chart-line"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="/admin/users">
+            <i class="fas fa-users"></i>
+            <span>Users</span>
+        </a>
+        <a href="/admin/category">
+            <i class="fas fa-list"></i>
+            <span>Categories</span>
+        </a>
+        <a href="#" class="active">
+            <i class="fas fa-tags"></i>
+            <span>Brands</span>
+        </a>
+        <a href="/admin/addProducts">
+            <i class="fas fa-plus"></i>
+            <span>Add Products</span>
+        </a>
+        <a href="/admin/products">
+            <i class="fas fa-box"></i>
+            <span>Products</span>
+        </a>
+        <a href="/admin/orders">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Orders</span>
+        </a>
+        <a href="#">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+        </a>
+        <a href="/admin/logout">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </a>
     </div>
-    <div class="main-content flex-grow-1">
-        <div class="container">
-            <div class="category-management">
-                <div class="brand-management">
-                    <div class="text-center">
-                        <h1 class="my-4">Brands Management</h1>
-                    </div>
-                    <div class="breadcrumb-container">
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
-                                <li class="breadcrumb-item active" aria-current="page">Brands</li>
-                            </ol>
-                        </nav>
-                    </div>
+
+    <div class="main-content">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="mb-0">Brand Management</h4>
+                <div class="date text-muted">
+                    <%= new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
+                </div>
+            </div>
+
+            <!-- Breadcrumb -->
+            <div class="breadcrumb-container mb-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item">
+                            <a href="/admin/dashboard">
+                                <i class="fas fa-home me-1"></i>Dashboard
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            <i class="fas fa-tags me-1"></i>Brands
+                        </li>
+                    </ol>
+                </nav>
+            </div>
+
+            <!-- Brands Table Card -->
+            <div class="card mb-4">
+                <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-striped table-hover">
+                        <table class="table">
                             <thead class="table-light">
                                 <tr>
                                     <th>Name</th>
@@ -78,32 +120,34 @@
                         <% } %>
                     </div>
                 </div>
+            </div>
 
-                <h2 class="my-4 text-center">Add New Brands</h2>
-                <div class="d-flex justify-content-center">
-                    <form class="w-50" method="post" action="/admin/addBrands" enctype="multipart/form-data">
-                        <div class="mb-3">
-                        <label for="categoryName" class="form-label">Name:</label>
-                            <input type="text" class="form-control" id="categoryName" name="brand" required>
+            <!-- Add Brand Card -->
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Add New Brand</h5>
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <form method="post" action="/admin/addBrands" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label for="categoryName" class="form-label">Brand Name</label>
+                                    <input type="text" class="form-control" id="categoryName" name="brand" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="brandPhoto" class="form-label">Brand Logo</label>
+                                    <input type="file" class="form-control" id="brandPhoto" name="image" accept=".jpg, .jpeg, .png" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i>Add Brand
+                                </button>
+                            </form>
                         </div>
-                        <div class="mb-3">
-                            <label for="categoryPhoto" class="form-label">Photo:</label>
-                            <input 
-                                type="file" 
-                                class="form-control" 
-                                id="brandPhoto" 
-                                name="image" 
-                                accept=".jpg, .jpeg, .png" 
-                                required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Add</button>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

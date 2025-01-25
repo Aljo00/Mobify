@@ -14,13 +14,16 @@
 <link rel="stylesheet" href="/styles/admin/dashboard.css" />
 
 <!-- Add Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
 
 <style>
   .card {
     cursor: pointer;
   }
-  
+
   /* Add these new styles for the download buttons */
   .download-btn {
     padding: 8px 16px;
@@ -57,6 +60,29 @@
 
   .download-btn i {
     font-size: 14px;
+  }
+
+  .download-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed !important;
+    pointer-events: none;
+    position: relative;
+  }
+
+  .download-btn:disabled::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    cursor: not-allowed;
+  }
+
+  /* Add hover style to show it's not clickable */
+  .download-btn:disabled:hover {
+    box-shadow: none;
+    transform: none;
   }
 </style>
 
@@ -105,7 +131,8 @@
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0">Dashboard Overview</h4>
         <div class="date text-muted">
-          <%= new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
+          <%= new Date().toLocaleDateString('en-US', { weekday: 'long', year:
+          'numeric', month: 'long', day: 'numeric' }) %>
         </div>
       </div>
 
@@ -116,7 +143,9 @@
               <i class="fas fa-rupee-sign text-primary"></i>
             </div>
             <h6 class="text-muted mb-2">Total Revenue</h6>
-            <h4 class="mb-0" id="revenueStat">₹<%= totalRevenue.toLocaleString('en-IN') %></h4>
+            <h4 class="mb-0" id="revenueStat">
+              ₹<%= totalRevenue.toLocaleString('en-IN') %>
+            </h4>
           </div>
         </div>
         <div class="col-md-3">
@@ -168,7 +197,10 @@
                     >
                       Weekly View
                     </button>
-                    <ul class="dropdown-menu" aria-labelledby="timeRangeDropdown">
+                    <ul
+                      class="dropdown-menu"
+                      aria-labelledby="timeRangeDropdown"
+                    >
                       <li>
                         <a class="dropdown-item" href="#" data-range="today"
                           >Today's View</a
@@ -192,13 +224,42 @@
                           >Weekly View</a
                         >
                       </li>
+                      <li>
+                        <a class="dropdown-item" href="#" data-range="custom"
+                          >Custom Range</a
+                        >
+                      </li>
                     </ul>
                   </div>
-                  <button class="download-btn download-btn-excel" onclick="downloadReport('excel')">
+
+                  <!-- Add this right after the dropdown -->
+                  <div id="dateRangePicker" class="d-none">
+                    <div class="input-group me-2">
+                      <input type="date" class="form-control" id="startDate" />
+                      <span class="input-group-text">to</span>
+                      <input type="date" class="form-control" id="endDate" />
+                      <button
+                        class="btn btn-primary"
+                        onclick="applyDateRange()"
+                      >
+                        Apply
+                      </button>
+                    </div>
+                  </div>
+
+                  <button
+                    class="download-btn download-btn-excel"
+                    onclick="downloadReport('excel')"
+                    id="excelBtn"
+                  >
                     <i class="fas fa-file-excel"></i>
                     Excel Report
                   </button>
-                  <button class="download-btn download-btn-pdf" onclick="downloadReport('pdf')">
+                  <button
+                    class="download-btn download-btn-pdf"
+                    onclick="downloadReport('pdf')"
+                    id="pdfBtn"
+                  >
                     <i class="fas fa-file-pdf"></i>
                     PDF Report
                   </button>
@@ -217,7 +278,9 @@
         <div class="col-12">
           <div class="card">
             <div class="card-body">
-              <div class="d-flex justify-content-between align-items-center mb-4">
+              <div
+                class="d-flex justify-content-between align-items-center mb-4"
+              >
                 <h5 class="card-title mb-0">Recent Orders</h5>
                 <a href="/admin/orders" class="btn btn-primary btn-sm">
                   View All <i class="fas fa-arrow-right ms-2"></i>
@@ -238,12 +301,14 @@
                     <% orders.slice(0, 5).forEach(order => { %>
                     <tr>
                       <td><%= order.orderId %></td>
-                      <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
+                      <td>
+                        <%= new Date(order.createdAt).toLocaleDateString() %>
+                      </td>
                       <td><%= order.userId.name %></td>
                       <td>
-                        <span class="badge bg-<%= order.orderedItems[0].status === 'Delivered' ? 'success' : 
-                                                 order.orderedItems[0].status === 'Pending' ? 'warning' :
-                                                 order.orderedItems[0].status === 'Cancelled' ? 'danger' : 'primary' %>">
+                        <span
+                          class="badge bg-<%= order.orderedItems[0].status === 'Delivered' ? 'success' : order.orderedItems[0].status === 'Pending' ? 'warning' : order.orderedItems[0].status === 'Cancelled' ? 'danger' : 'primary' %>"
+                        >
                           <%= order.orderedItems[0].status %>
                         </span>
                       </td>
@@ -269,298 +334,417 @@
 
 <!-- Initialize Charts -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    try {
-        // Add this function to group data by year
-        function groupDataByYear(labels, orders, revenue) {
-            const yearlyData = {};
-            
-            // Convert month-year labels to corresponding data by year
-            labels.forEach((label, index) => {
-                const year = label.split(' ')[1];
-                if (!yearlyData[year]) {
-                    yearlyData[year] = {
-                        orders: 0,
-                        revenue: 0
-                    };
-                }
-                yearlyData[year].orders += orders[index];
-                yearlyData[year].revenue += revenue[index];
-            });
+  document.addEventListener('DOMContentLoaded', function() {
+      try {
+          // Add this function to group data by year
+          function groupDataByYear(labels, orders, revenue) {
+              const yearlyData = {};
 
-            // Convert to arrays
-            const years = Object.keys(yearlyData).sort();
-            return {
-                labels: years,
-                orders: years.map(year => yearlyData[year].orders),
-                revenue: years.map(year => yearlyData[year].revenue)
-            };
-        }
+              // Convert month-year labels to corresponding data by year
+              labels.forEach((label, index) => {
+                  const year = label.split(' ')[1];
+                  if (!yearlyData[year]) {
+                      yearlyData[year] = {
+                          orders: 0,
+                          revenue: 0
+                      };
+                  }
+                  yearlyData[year].orders += orders[index];
+                  yearlyData[year].revenue += revenue[index];
+              });
 
-        const ctx = document.getElementById('ordersChart').getContext('2d');
-        let chart = null;
+              // Convert to arrays
+              const years = Object.keys(yearlyData).sort();
+              return {
+                  labels: years,
+                  orders: years.map(year => yearlyData[year].orders),
+                  revenue: years.map(year => yearlyData[year].revenue)
+              };
+          }
 
-        function renderChart(labels, orders, revenue) {
-            if (chart) {
-                chart.destroy();
-            }
+          const ctx = document.getElementById('ordersChart').getContext('2d');
+          let chart = null;
 
-            chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Orders',
-                        data: orders,
-                        borderColor: '#6366f1',
-                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        yAxisID: 'y',
-                        borderWidth: 2,
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                        pointBackgroundColor: '#ffffff',
-                        pointHoverBackgroundColor: '#6366f1',
-                        pointBorderColor: '#6366f1',
-                        pointBorderWidth: 2
-                    }, {
-                        label: 'Revenue',
-                        data: revenue,
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        yAxisID: 'y1',
-                        borderWidth: 2,
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                        pointBackgroundColor: '#ffffff',
-                        pointHoverBackgroundColor: '#10b981',
-                        pointBorderColor: '#10b981',
-                        pointBorderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            align: 'end',
-                            labels: {
-                                usePointStyle: true,
-                                padding: 20,
-                                font: {
-                                    family: "'Inter', sans-serif",
-                                    size: 12,
-                                    weight: '500'
-                                },
-                                boxWidth: 8
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: 'white',
-                            titleColor: '#1e293b',
-                            bodyColor: '#64748b',
-                            borderColor: '#e2e8f0',
-                            borderWidth: 1,
-                            padding: 12,
-                            bodySpacing: 6,
-                            bodyFont: {
-                                family: "'Inter', sans-serif",
-                                size: 12
-                            },
-                            titleFont: {
-                                family: "'Inter', sans-serif",
-                                size: 13,
-                                weight: '600'
-                            },
-                            boxPadding: 4,
-                            usePointStyle: true,
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.dataset.label === 'Revenue') {
-                                        label += '₹' + context.parsed.y.toLocaleString('en-IN');
-                                    } else {
-                                        label += context.parsed.y;
-                                    }
-                                    return label;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                font: {
-                                    family: "'Inter', sans-serif",
-                                    size: 12
-                                },
-                                color: '#64748b'
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            position: 'left',
-                            grid: {
-                                color: '#e2e8f0',
-                                drawBorder: false
-                            },
-                            ticks: {
-                                font: {
-                                    family: "'Inter', sans-serif",
-                                    size: 12
-                                },
-                                color: '#64748b',
-                                padding: 8
-                            }
-                        },
-                        y1: {
-                            beginAtZero: true,
-                            position: 'right',
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                font: {
-                                    family: "'Inter', sans-serif",
-                                    size: 12
-                                },
-                                color: '#64748b',
-                                padding: 8
-                            }
-                        }
-                    }
-                }
-            });
-        }
+          function renderChart(labels, orders, revenue) {
+              if (chart) {
+                  chart.destroy();
+              }
 
-        function updateOrdersTable(orders) {
-            const tbody = document.getElementById('ordersTableBody');
-            tbody.innerHTML = orders.map(order => `
-                <tr>
-                    <td>${order.orderId}</td>
-                    <td>${new Date(order.createdAt).toLocaleDateString()}</td>
-                    <td>${order.userId.name}</td>
-                    <td>
-                        <span class="badge bg-${
-                            order.orderedItems[0].status === 'Delivered' ? 'success' : 
-                            order.orderedItems[0].status === 'Pending' ? 'warning' :
-                            order.orderedItems[0].status === 'Cancelled' ? 'danger' : 'primary'
-                        }">
-                            ${order.orderedItems[0].status}
-                        </span>
-                    </td>
-                    <td>₹${order.FinalAmount.toLocaleString('en-IN')}</td>
-                </tr>
-            `).join('');
-        }
+              chart = new Chart(ctx, {
+                  type: 'line',
+                  data: {
+                      labels: labels,
+                      datasets: [{
+                          label: 'Orders',
+                          data: orders,
+                          borderColor: '#6366f1',
+                          backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                          fill: true,
+                          tension: 0.4,
+                          yAxisID: 'y',
+                          borderWidth: 2,
+                          pointRadius: 4,
+                          pointHoverRadius: 6,
+                          pointBackgroundColor: '#ffffff',
+                          pointHoverBackgroundColor: '#6366f1',
+                          pointBorderColor: '#6366f1',
+                          pointBorderWidth: 2
+                      }, {
+                          label: 'Revenue',
+                          data: revenue,
+                          borderColor: '#10b981',
+                          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                          fill: true,
+                          tension: 0.4,
+                          yAxisID: 'y1',
+                          borderWidth: 2,
+                          pointRadius: 4,
+                          pointHoverRadius: 6,
+                          pointBackgroundColor: '#ffffff',
+                          pointHoverBackgroundColor: '#10b981',
+                          pointBorderColor: '#10b981',
+                          pointBorderWidth: 2
+                      }]
+                  },
+                  options: {
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      interaction: {
+                          intersect: false,
+                          mode: 'index'
+                      },
+                      plugins: {
+                          legend: {
+                              position: 'top',
+                              align: 'end',
+                              labels: {
+                                  usePointStyle: true,
+                                  padding: 20,
+                                  font: {
+                                      family: "'Inter', sans-serif",
+                                      size: 12,
+                                      weight: '500'
+                                  },
+                                  boxWidth: 8
+                              }
+                          },
+                          tooltip: {
+                              backgroundColor: 'white',
+                              titleColor: '#1e293b',
+                              bodyColor: '#64748b',
+                              borderColor: '#e2e8f0',
+                              borderWidth: 1,
+                              padding: 12,
+                              bodySpacing: 6,
+                              bodyFont: {
+                                  family: "'Inter', sans-serif",
+                                  size: 12
+                              },
+                              titleFont: {
+                                  family: "'Inter', sans-serif",
+                                  size: 13,
+                                  weight: '600'
+                              },
+                              boxPadding: 4,
+                              usePointStyle: true,
+                              callbacks: {
+                                  label: function(context) {
+                                      let label = context.dataset.label || '';
+                                      if (label) {
+                                          label += ': ';
+                                      }
+                                      if (context.dataset.label === 'Revenue') {
+                                          label += '₹' + context.parsed.y.toLocaleString('en-IN');
+                                      } else {
+                                          label += context.parsed.y;
+                                      }
+                                      return label;
+                                  }
+                              }
+                          }
+                      },
+                      scales: {
+                          x: {
+                              grid: {
+                                  display: false
+                              },
+                              ticks: {
+                                  font: {
+                                      family: "'Inter', sans-serif",
+                                      size: 12
+                                  },
+                                  color: '#64748b'
+                              }
+                          },
+                          y: {
+                              beginAtZero: true,
+                              position: 'left',
+                              grid: {
+                                  color: '#e2e8f0',
+                                  drawBorder: false
+                              },
+                              ticks: {
+                                  font: {
+                                      family: "'Inter', sans-serif",
+                                      size: 12
+                                  },
+                                  color: '#64748b',
+                                  padding: 8
+                              }
+                          },
+                          y1: {
+                              beginAtZero: true,
+                              position: 'right',
+                              grid: {
+                                  display: false
+                              },
+                              ticks: {
+                                  font: {
+                                      family: "'Inter', sans-serif",
+                                      size: 12
+                                  },
+                                  color: '#64748b',
+                                  padding: 8
+                              }
+                          }
+                      }
+                  }
+              });
+          }
 
-        function updateStatsAndTable(revenue, orders, ordersToShow) {
-            // Update revenue stat
-            const totalRevenue = revenue.reduce((a, b) => a + Number(b), 0);
-            document.getElementById('revenueStat').textContent = `₹${totalRevenue.toLocaleString('en-IN')}`;
-            
-            // Update orders stat
-            const totalOrders = orders.reduce((a, b) => a + Number(b), 0);
-            document.getElementById('ordersStat').textContent = totalOrders;
+          function updateOrdersTable(orders) {
+              const tbody = document.getElementById('ordersTableBody');
+              tbody.innerHTML = orders.map(order => `
+                  <tr>
+                      <td>${order.orderId}</td>
+                      <td>${new Date(order.createdAt).toLocaleDateString()}</td>
+                      <td>${order.userId.name}</td>
+                      <td>
+                          <span class="badge bg-${
+                              order.orderedItems[0].status === 'Delivered' ? 'success' :
+                              order.orderedItems[0].status === 'Pending' ? 'warning' :
+                              order.orderedItems[0].status === 'Cancelled' ? 'danger' : 'primary'
+                          }">
+                              ${order.orderedItems[0].status}
+                          </span>
+                      </td>
+                      <td>₹${order.FinalAmount.toLocaleString('en-IN')}</td>
+                  </tr>
+              `).join('');
+          }
 
-            // Update orders table
-            const tbody = document.getElementById('ordersTableBody');
-            if (ordersToShow && ordersToShow.length > 0) {
-                tbody.innerHTML = ordersToShow.slice(0, 5).map(order => `
-                    <tr>
-                        <td>${order.orderId}</td>
-                        <td>${new Date(order.createdAt).toLocaleDateString()}</td>
-                        <td>${order.userId.name}</td>
-                        <td>
-                            <span class="badge bg-${
-                                order.orderedItems[0].status === 'Delivered' ? 'success' : 
-                                order.orderedItems[0].status === 'Pending' ? 'warning' :
-                                order.orderedItems[0].status === 'Cancelled' ? 'danger' : 'primary'
-                            }">
-                                ${order.orderedItems[0].status}
-                            </span>
-                        </td>
-                        <td>₹${order.FinalAmount.toLocaleString('en-IN')}</td>
-                    </tr>
-                `).join('');
-            } else {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center">No orders found</td></tr>';
-            }
-        }
+          function updateStatsAndTable(revenue, orders, ordersToShow) {
+              // Update revenue stat with null check
+              const totalRevenue = Array.isArray(revenue) ?
+                  revenue.reduce((a, b) => a + Number(b || 0), 0) : 0;
+              document.getElementById('revenueStat').textContent =
+                  `₹${totalRevenue.toLocaleString('en-IN')}`;
 
-        // Click handler for view changes
-        document.querySelectorAll('.dropdown-item').forEach(item => {
-            item.addEventListener('click', function(e) {
-                e.preventDefault();
-                const range = this.dataset.range;
-                
-                // Update button text and active state
-                document.getElementById('timeRangeDropdown').textContent = this.textContent;
-                document.querySelectorAll('.dropdown-item').forEach(el => el.classList.remove('active'));
-                this.classList.add('active');
+              // Update orders stat with null check
+              const totalOrders = Array.isArray(orders) ?
+                  orders.reduce((a, b) => a + Number(b || 0), 0) : 0;
+              document.getElementById('ordersStat').textContent = totalOrders;
 
-                // Get the appropriate data based on range
-                let labels, orders, revenue, ordersToShow;
-                switch(range) {
-                    case 'today':
-                        labels = <%- todayLabels %>;
-                        orders = <%- todayData %>;
-                        revenue = <%- todayRevenue %>;
-                        ordersToShow = <%- todaysOrders %>;
-                        break;
-                    case 'yearly':
-                        const yearlyData = groupDataByYear(<%- orderChartLabels %>, <%- orderChartData %>, <%- orderChartRevenue %>);
-                        labels = yearlyData.labels;
-                        orders = yearlyData.orders;
-                        revenue = yearlyData.revenue;
-                        ordersToShow = <%- monthlyOrdersList %>; // Use monthly for yearly view
-                        break;
-                    case 'monthly':
-                        labels = <%- orderChartLabels %>;
-                        orders = <%- orderChartData %>;
-                        revenue = <%- orderChartRevenue %>;
-                        ordersToShow = <%- monthlyOrdersList %>;
-                        break;
-                    case 'weekly':
-                        labels = <%- weeklyLabels %>;
-                        orders = <%- weeklyData %>;
-                        revenue = <%- weeklyRevenue %>;
-                        ordersToShow = <%- weeklyOrdersList %>;
-                        break;
-                }
+              // Update orders table
+              const tbody = document.getElementById('ordersTableBody');
+              if (!ordersToShow || ordersToShow.length === 0) {
+                  tbody.innerHTML = '<tr><td colspan="5" class="text-center">No orders found</td></tr>';
+                  return;
+              }
 
-                // Render the chart with selected data
-                renderChart(labels, orders, revenue);
-                updateStatsAndTable(revenue, orders, ordersToShow);
-            });
-        });
+              tbody.innerHTML = ordersToShow.slice(0, 5).map(order => `
+                  <tr>
+                      <td>${order.orderId || 'N/A'}</td>
+                      <td>${new Date(order.createdAt).toLocaleDateString()}</td>
+                      <td>${order.userId?.name || 'N/A'}</td>
+                      <td>
+                          <span class="badge bg-${
+                              order.orderedItems?.[0]?.status === 'Delivered' ? 'success' :
+                              order.orderedItems?.[0]?.status === 'Pending' ? 'warning' :
+                              order.orderedItems?.[0]?.status === 'Cancelled' ? 'danger' : 'primary'
+                          }">
+                              ${order.orderedItems?.[0]?.status || 'N/A'}
+                          </span>
+                      </td>
+                      <td>₹${(order.FinalAmount || 0).toLocaleString('en-IN')}</td>
+                  </tr>
+              `).join('');
+          }
 
-        // Initial render with weekly data
-        renderChart(<%- weeklyLabels %>, <%- weeklyData %>, <%- weeklyRevenue %>);
-        updateStatsAndTable(<%- weeklyRevenue %>, <%- weeklyData %>, <%- weeklyOrdersList %>);
-    } catch (error) {
-        console.error('Chart Error:', error);
-    }
-});
+          function updateDownloadButtons(hasData = false) {
+              document.getElementById('excelBtn').disabled = !hasData;
+              document.getElementById('pdfBtn').disabled = !hasData;
+          }
 
-function downloadReport(type) {
-    const timeRange = document.getElementById('timeRangeDropdown').textContent.trim();
-    window.location.href = `/admin/download-report?type=${type}&range=${timeRange.toLowerCase()}`;
-}
+          // Click handler for view changes
+          document.querySelectorAll('.dropdown-item').forEach(item => {
+              item.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  const range = this.dataset.range;
+                  const dateRangePicker = document.getElementById('dateRangePicker');
+                  const dropdownButton = document.getElementById('timeRangeDropdown');
+
+                  // Update active state
+                  document.querySelectorAll('.dropdown-item').forEach(item => {
+                      item.classList.remove('active');
+                  });
+                  this.classList.add('active');
+
+                  if (range === 'custom') {
+                      dateRangePicker.classList.remove('d-none');
+                      dropdownButton.textContent = 'Custom Range';
+                      updateDownloadButtons(false);
+                  } else {
+                      dateRangePicker.classList.add('d-none');
+                      // Update dropdown button text based on selection
+                      const viewText = this.textContent.trim();
+                      dropdownButton.textContent = viewText;
+                      
+                      // Rest of your existing switch case code...
+                      let labels, orders, revenue, ordersToShow;
+                      switch(range) {
+                          case 'today':
+                              labels = <%- todayLabels %>;
+                              orders = <%- todayData %>;
+                              revenue = <%- todayRevenue %>;
+                              ordersToShow = <%- todaysOrders %>;
+                              break;
+                          case 'yearly':
+                              const yearlyData = groupDataByYear(<%- orderChartLabels %>, <%- orderChartData %>, <%- orderChartRevenue %>);
+                              labels = yearlyData.labels;
+                              orders = yearlyData.orders;
+                              revenue = yearlyData.revenue;
+                              ordersToShow = <%- monthlyOrdersList %>; // Use monthly for yearly view
+                              break;
+                          case 'monthly':
+                              labels = <%- orderChartLabels %>;
+                              orders = <%- orderChartData %>;
+                              revenue = <%- orderChartRevenue %>;
+                              ordersToShow = <%- monthlyOrdersList %>;
+                              break;
+                          case 'weekly':
+                              labels = <%- weeklyLabels %>;
+                              orders = <%- weeklyData %>;
+                              revenue = <%- weeklyRevenue %>;
+                              ordersToShow = <%- weeklyOrdersList %>;
+                              break;
+                      }
+
+                      // Render the chart with selected data
+                      renderChart(labels, orders, revenue);
+                      updateStatsAndTable(revenue, orders, ordersToShow);
+                      // Enable/disable buttons based on data availability
+                      updateDownloadButtons(ordersToShow && ordersToShow.length > 0);
+                  }
+              });
+          });
+
+          async function applyDateRange() {
+              const startDate = document.getElementById('startDate').value;
+              const endDate = document.getElementById('endDate').value;
+
+              if (!startDate || !endDate) {
+                  alert('Please select both start and end dates');
+                  return;
+              }
+
+              if (new Date(endDate) < new Date(startDate)) {
+                  alert('End date must be after start date');
+                  return;
+              }
+
+              try {
+                  // Fetch data for the custom date range
+                  const response = await fetch(`/admin/custom-range-data?start=${startDate}&end=${endDate}`);
+                  const data = await response.json();
+
+                  if (response.ok && data.success) {
+                      // Update stats
+                      document.getElementById('revenueStat').textContent =
+                          `₹${data.stats.totalRevenue.toLocaleString('en-IN')}`;
+                      document.getElementById('ordersStat').textContent =
+                          data.stats.totalOrders;
+
+                      // Update chart
+                      renderChart(data.chartData.labels, data.chartData.orders, data.chartData.revenue);
+
+                      // Update orders table
+                      const tbody = document.getElementById('ordersTableBody');
+                      if (data.orders.length === 0) {
+                          tbody.innerHTML = '<tr><td colspan="5" class="text-center">No orders found for selected period</td></tr>';
+                      } else {
+                          tbody.innerHTML = data.orders.map(order => `
+                              <tr>
+                                  <td>${order.orderId}</td>
+                                  <td>${new Date(order.createdAt).toLocaleDateString()}</td>
+                                  <td>${order.userId?.name || 'N/A'}</td>
+                                  <td>
+                                      <span class="badge bg-${
+                                          order.orderedItems[0]?.status === 'Delivered' ? 'success' :
+                                          order.orderedItems[0]?.status === 'Pending' ? 'warning' :
+                                          order.orderedItems[0]?.status === 'Cancelled' ? 'danger' : 'primary'
+                                      }">
+                                          ${order.orderedItems[0]?.status || 'N/A'}
+                                      </span>
+                                  </td>
+                                  <td>₹${(order.FinalAmount || 0).toLocaleString('en-IN')}</td>
+                              </tr>
+                          `).join('');
+                      }
+
+                      // Update dropdown button text
+                      document.getElementById('timeRangeDropdown').textContent =
+                          `${new Date(startDate).toLocaleDateString()} - ${new Date(endDate).toLocaleDateString()}`;
+
+                      // Enable/disable download buttons based on data
+                      updateDownloadButtons(data.orders && data.orders.length > 0);
+                  } else {
+                      alert('Failed to fetch data for selected date range');
+                      updateDownloadButtons(false);
+                  }
+              } catch (error) {
+                  console.error('Error fetching custom range data:', error);
+                  alert('Error fetching data for selected date range');
+                  updateDownloadButtons(false);
+              }
+          }
+
+          // Make applyDateRange available globally
+          window.applyDateRange = applyDateRange;
+
+          // Make downloadReport function globally available
+          window.downloadReport = function(type) {
+              const dropdownText = document.getElementById('timeRangeDropdown').textContent;
+              try {
+                  if (dropdownText.includes(' - ')) { // Custom date range
+                      const startDate = document.getElementById('startDate').value;
+                      const endDate = document.getElementById('endDate').value;
+                      if (!startDate || !endDate) {
+                          alert('Please select both start and end dates');
+                          return;
+                      }
+                      window.location.href = `/admin/download-report?type=${type}&range=custom&start=${startDate}&end=${endDate}`;
+                  } else {
+                      // Remove 'View' from the end and send
+                      const range = dropdownText.replace(/\s+View$/, '').trim();
+                      window.location.href = `/admin/download-report?type=${type}&range=${range}`;
+                  }
+              } catch (error) {
+                  console.error('Download error:', error);
+                  alert('Error generating report. Please try again.');
+              }
+          };
+
+          // Initial render with weekly data
+          renderChart(<%- weeklyLabels %>, <%- weeklyData %>, <%- weeklyRevenue %>);
+          updateStatsAndTable(<%- weeklyRevenue %>, <%- weeklyData %>, <%- weeklyOrdersList %>);
+          // Initial state - enable/disable based on weekly data
+          updateDownloadButtons(<%- weeklyOrdersList %> && <%- weeklyOrdersList %>.length > 0);
+      } catch (error) {
+          console.error('Chart Error:', error);
+          updateDownloadButtons(false);
+      }
+  });
 </script>
 
 <!-- Custom JS -->

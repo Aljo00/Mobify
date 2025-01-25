@@ -312,97 +312,129 @@ const logout = async (req, res) => {
 
 const downloadReport = async (req, res) => {
   try {
-    const { type, range } = req.query;
+    const { type, range, start, end } = req.query;
     const today = new Date();
     let startDate, endDate;
 
+    // Normalize the range string
+    const normalizedRange = range.toLowerCase().replace(/\s+view$/, '').trim();
+
     // Set date range based on selected view
-    switch (range) {
-      case "today's view":
-        startDate = new Date(today.setHours(0, 0, 0, 0));
-        endDate = new Date(today.setHours(23, 59, 59, 999));
+    switch (normalizedRange) {
+      case 'custom':
+        if (!start || !end) {
+          throw new Error('Start and end dates are required for custom range');
+        }
+        startDate = new Date(start);
+        startDate.setHours(0, 0, 0, 0);
+        endDate = new Date(end);
+        endDate.setHours(23, 59, 59, 999);
         break;
-      case "weekly view":
-        startDate = new Date(today.setDate(today.getDate() - 7));
+      
+      case "today's":
+        startDate = new Date();
+        startDate.setHours(0, 0, 0, 0);
         endDate = new Date();
+        endDate.setHours(23, 59, 59, 999);
         break;
-      case "monthly view":
+      
+      case "weekly":
+        endDate = new Date();
+        startDate = new Date();
+        startDate.setDate(startDate.getDate() - 7);
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(23, 59, 59, 999);
+        break;
+      
+      case "monthly":
         startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+        startDate.setHours(0, 0, 0, 0);
         endDate = new Date();
+        endDate.setHours(23, 59, 59, 999);
         break;
-      case "yearly view":
+      
+      case "yearly":
         startDate = new Date(today.getFullYear(), 0, 1);
+        startDate.setHours(0, 0, 0, 0);
         endDate = new Date();
+        endDate.setHours(23, 59, 59, 999);
         break;
+      
+      default:
+        throw new Error(`Invalid date range: ${range}`);
     }
 
-    // Enhanced statistics calculation
+    // Enhanced orders query with proper population
     const orders = await Order.find({
-      createdAt: { $gte: startDate, $lte: endDate },
-    })
-      .populate("userId", "name")
-      .populate("orderedItems.product");
+      createdAt: { $gte: startDate, $lte: endDate }
+    }).populate('userId', 'name');
 
+    if (!orders || orders.length === 0) {
+      throw new Error(`No orders found for the selected period (${range})`);
+    }
+
+    // Rest of your existing code for processing orders and generating reports...
     const salesStats = {
       totalOrders: orders.length,
-      totalRevenue: orders.reduce((sum, order) => sum + order.FinalAmount, 0),
+      totalRevenue: orders.reduce(
+        (sum, order) => sum + (order.FinalAmount || 0),
+        0
+      ),
       totalProducts: orders.reduce(
         (sum, order) =>
           sum +
           order.orderedItems.reduce(
-            (itemSum, item) => itemSum + item.quantity,
+            (itemSum, item) => itemSum + (item.quantity || 0),
             0
           ),
         0
       ),
       averageOrderValue: orders.length
-        ? orders.reduce((sum, order) => sum + order.FinalAmount, 0) /
+        ? orders.reduce((sum, order) => sum + (order.FinalAmount || 0), 0) /
           orders.length
         : 0,
       deliveredOrders: orders.filter(
-        (order) => order.orderedItems[0].status === "Delivered"
+        (order) => order.orderedItems[0]?.status === "Delivered"
       ).length,
       pendingOrders: orders.filter(
-        (order) => order.orderedItems[0].status === "Pending"
+        (order) => order.orderedItems[0]?.status === "Pending"
       ).length,
       cancelledOrders: orders.filter(
-        (order) => order.orderedItems[0].status === "Cancelled"
+        (order) => order.orderedItems[0]?.status === "Cancelled"
       ).length,
-      paymentMethods: {
-        online: orders.filter((order) => order.paymentMethod === "Online")
-          .length,
-        cod: orders.filter((order) => order.paymentMethod === "COD").length,
-      },
     };
 
-    // Get top selling products
-    const productStats = {};
-    orders.forEach((order) => {
+    // Get payment statistics with case-insensitive comparison
+    const paymentStats = {
+      COD: orders.filter(
+        (order) => order.paymentMethod?.toLowerCase() === "cod"
+      ).length,
+      Online: orders.filter(
+        (order) => order.paymentMethod?.toLowerCase() === "online"
+      ).length,
+      Wallet: orders.filter(
+        (order) => order.paymentMethod?.toLowerCase() === "wallet"
+      ).length,
+    };
+
+    // Process product statistics
+    const productStats = orders.reduce((acc, order) => {
       order.orderedItems.forEach((item) => {
-        if (!productStats[item.productName]) {
-          productStats[item.productName] = {
-            quantity: 0,
-            revenue: 0,
-          };
+        if (!acc[item.productName]) {
+          acc[item.productName] = { quantity: 0, revenue: 0 };
         }
-        productStats[item.productName].quantity += item.quantity;
-        productStats[item.productName].revenue += item.totalPrice;
+        acc[item.productName].quantity += item.quantity || 0;
+        acc[item.productName].revenue += item.totalPrice || 0;
       });
-    });
+      return acc;
+    }, {});
 
     const topProducts = Object.entries(productStats)
       .sort(([, a], [, b]) => b.revenue - a.revenue)
       .slice(0, 5);
 
-    // Add payment method statistics
-    const paymentStats = {
-      COD: orders.filter((order) => order.paymentMethod === "cod").length,
-      Online: orders.filter((order) => order.paymentMethod === "online").length,
-      Wallet: orders.filter((order) => order.paymentMethod === "wallet").length,
-    };
-
     // Calculate total payments
-    const totalPayments = orders.length; // This is more accurate than summing paymentStats
+    const totalPayments = orders.length;
 
     if (type === "excel") {
       const workbook = new Excel.Workbook();
@@ -471,41 +503,41 @@ const downloadReport = async (req, res) => {
 
       // Orders Detail Sheet - Keep only this one, remove the duplicate
       const orderDetailsSheet = workbook.addWorksheet("Order Details");
-      
+
       // Set up columns with proper width
       orderDetailsSheet.columns = [
-        { header: 'Order ID', key: 'orderId', width: 15 },
-        { header: 'Order Date', key: 'date', width: 20 },
-        { header: 'Customer Name', key: 'customer', width: 25 },
-        { header: 'Product Name', key: 'product', width: 40 },
-        { header: 'Quantity', key: 'quantity', width: 10 },
-        { header: 'Price', key: 'price', width: 15 },
-        { header: 'Status', key: 'status', width: 15 },
-        { header: 'Payment', key: 'payment', width: 15 }
+        { header: "Order ID", key: "orderId", width: 15 },
+        { header: "Order Date", key: "date", width: 20 },
+        { header: "Customer Name", key: "customer", width: 25 },
+        { header: "Product Name", key: "product", width: 40 },
+        { header: "Quantity", key: "quantity", width: 10 },
+        { header: "Price", key: "price", width: 15 },
+        { header: "Status", key: "status", width: 15 },
+        { header: "Payment", key: "payment", width: 15 },
       ];
 
       // Style header row
       const headerRow = orderDetailsSheet.getRow(1);
       headerRow.font = { bold: true };
       headerRow.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'E5E7EB' }
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "E5E7EB" },
       };
 
       // Add order data with product details
       let rowIndex = 2;
-      orders.forEach(order => {
+      orders.forEach((order) => {
         order.orderedItems.forEach((item, i) => {
           const row = {
-            orderId: i === 0 ? order.orderId : '', // Show orderId only for first product
-            date: i === 0 ? new Date(order.createdAt).toLocaleString() : '',
-            customer: i === 0 ? order.userId.name : '',
+            orderId: i === 0 ? order.orderId : "", // Show orderId only for first product
+            date: i === 0 ? new Date(order.createdAt).toLocaleString() : "",
+            customer: i === 0 ? order.userId.name : "",
             product: item.productName,
             quantity: item.quantity,
-            price: `₹${item.totalPrice.toLocaleString('en-IN')}`,
+            price: `₹${item.totalPrice.toLocaleString("en-IN")}`,
             status: item.status,
-            payment: i === 0 ? order.paymentMethod : ''
+            payment: i === 0 ? order.paymentMethod : "",
           };
 
           const dataRow = orderDetailsSheet.addRow(row);
@@ -513,19 +545,19 @@ const downloadReport = async (req, res) => {
           // Add zebra striping
           if (rowIndex % 2 === 0) {
             dataRow.fill = {
-              type: 'pattern',
-              pattern: 'solid',
-              fgColor: { argb: 'F9FAFB' }
+              type: "pattern",
+              pattern: "solid",
+              fgColor: { argb: "F9FAFB" },
             };
           }
 
           // Add borders
-          dataRow.eachCell(cell => {
+          dataRow.eachCell((cell) => {
             cell.border = {
-              top: { style: 'thin', color: { argb: 'E5E7EB' } },
-              left: { style: 'thin', color: { argb: 'E5E7EB' } },
-              bottom: { style: 'thin', color: { argb: 'E5E7EB' } },
-              right: { style: 'thin', color: { argb: 'E5E7EB' } }
+              top: { style: "thin", color: { argb: "E5E7EB" } },
+              left: { style: "thin", color: { argb: "E5E7EB" } },
+              bottom: { style: "thin", color: { argb: "E5E7EB" } },
+              right: { style: "thin", color: { argb: "E5E7EB" } },
             };
           });
 
@@ -538,7 +570,7 @@ const downloadReport = async (req, res) => {
       });
 
       // Auto-fit columns
-      orderDetailsSheet.columns.forEach(column => {
+      orderDetailsSheet.columns.forEach((column) => {
         column.width = Math.max(column.width, 12);
       });
 
@@ -925,7 +957,79 @@ const downloadReport = async (req, res) => {
     }
   } catch (error) {
     console.error("Download Report Error:", error);
-    res.status(500).send("Error generating report");
+    res.status(500).send(`Error generating report: ${error.message}`);
+  }
+};
+
+// Add a new endpoint to get data for custom date range chart
+const getCustomRangeData = async (req, res) => {
+  try {
+    const { start, end } = req.query;
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+
+    const orders = await Order.find({
+      createdAt: { $gte: startDate, $lte: endDate },
+    })
+      .populate("userId", "name")
+      .sort({ createdAt: 1 });
+
+    // Calculate summary stats
+    const stats = {
+      totalOrders: orders.length,
+      totalRevenue: orders.reduce(
+        (sum, order) => sum + (order.FinalAmount || 0),
+        0
+      ),
+      totalProducts: orders.reduce(
+        (sum, order) =>
+          sum +
+          order.orderedItems.reduce(
+            (itemSum, item) => itemSum + item.quantity,
+            0
+          ),
+        0
+      ),
+    };
+
+    // Process chart data
+    const dailyData = {};
+    for (
+      let d = new Date(startDate);
+      d <= endDate;
+      d.setDate(d.getDate() + 1)
+    ) {
+      const dateStr = d.toISOString().split("T")[0];
+      dailyData[dateStr] = { count: 0, revenue: 0 };
+    }
+
+    orders.forEach((order) => {
+      const dateStr = order.createdAt.toISOString().split("T")[0];
+      if (dailyData[dateStr]) {
+        dailyData[dateStr].count++;
+        dailyData[dateStr].revenue += order.FinalAmount || 0;
+      }
+    });
+
+    const chartData = {
+      labels: Object.keys(dailyData).map((date) =>
+        new Date(date).toLocaleDateString()
+      ),
+      orders: Object.values(dailyData).map((d) => d.count),
+      revenue: Object.values(dailyData).map((d) => d.revenue),
+    };
+
+    res.json({
+      stats,
+      chartData,
+      orders: orders.slice(0, 5), // Send only latest 5 orders for table
+      success: true,
+    });
+  } catch (error) {
+    console.error("Custom Range Data Error:", error);
+    res
+      .status(500)
+      .json({ error: "Failed to fetch custom range data", success: false });
   }
 };
 
@@ -936,4 +1040,5 @@ module.exports = {
   show_error,
   logout,
   downloadReport,
+  getCustomRangeData,
 };

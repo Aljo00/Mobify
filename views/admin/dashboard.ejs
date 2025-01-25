@@ -1,69 +1,516 @@
 <%- include('../../views/layout/admin/header.ejs')%>
 
 <!-- Bootstrap CSS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link
+  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+  rel="stylesheet"
+/>
 <!-- Font Awesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+/>
 <!-- Custom CSS -->
-<link rel="stylesheet" href="/styles/admin/dashboard.css">
+<link rel="stylesheet" href="/styles/admin/dashboard.css" />
+
+<!-- Add Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-    .card {
-        cursor: pointer;
-    }
+  .card {
+    cursor: pointer;
+  }
 </style>
 
-<div class="d-flex">
-    <div class="sidebar">
-        <h2 class="text-white">Admin Dashboard</h2>
-        <a id="live-dashboard-button" href="#" style="background-color: #007bff; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none;">Dashboard</a>
-        <a href="/admin/users">Users</a>
-        <a href="/admin/category">categories</a>
-        <a href="/admin/brands">Brands</a>
-        <a href="/admin/addProducts">Add Products</a>
-        <a href="/admin/products">Products</a>
-        <a href="/admin/orders">Orders</a>
-        <a href="#">Settings</a>
-        <a href="/admin/logout">Logout</a>
-    </div>
-    <div class="main-content flex-grow-1">
-        <div class="container">
-            <h1 class="my-4">Welcome to the Admin Dashboard</h1>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="card" onclick="window.location.href='/admin/users'">
-                        <div class="card-body">
-                            <h5 class="card-title">Total Users</h5>
-                            <p class="card-text"><%= totalUsers %></p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card" onclick="window.location.href='/admin/products'">
-                        <div class="card-body">
-                            <h5 class="card-title">Total Products</h5>
-                            <p class="card-text"><%= totalProducts %></p>
-                        </div>
-                    </div>
-                </div>                
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Total Orders</h5>
-                            <p class="card-text">200</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<div class="wrapper">
+  <div class="sidebar">
+    <h2><i class="fas fa-mobile-alt me-2"></i>Mobify</h2>
+    <a href="#" class="active">
+      <i class="fas fa-chart-line"></i>
+      <span>Dashboard</span>
+    </a>
+    <a href="/admin/users">
+      <i class="fas fa-users"></i>
+      <span>Users</span>
+    </a>
+    <a href="/admin/category">
+      <i class="fas fa-list"></i>
+      <span>Categories</span>
+    </a>
+    <a href="/admin/brands">
+      <i class="fas fa-tags"></i>
+      <span>Brands</span>
+    </a>
+    <a href="/admin/addProducts">
+      <i class="fas fa-plus"></i>
+      <span>Add Products</span>
+    </a>
+    <a href="/admin/products">
+      <i class="fas fa-box"></i>
+      <span>Products</span>
+    </a>
+    <a href="/admin/orders">
+      <i class="fas fa-shopping-cart"></i>
+      <span>Orders</span>
+    </a>
+    <a href="#">
+      <i class="fas fa-cog"></i>
+      <span>Settings</span>
+    </a>
+    <a href="/admin/logout">
+      <i class="fas fa-sign-out-alt"></i>
+      <span>Logout</span>
+    </a>
+  </div>
+  <div class="main-content">
+    <div class="container-fluid">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0">Dashboard Overview</h4>
+        <div class="date text-muted">
+          <%= new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
         </div>
-    </div>
-</div>
+      </div>
 
+      <div class="row g-4">
+        <div class="col-md-3">
+          <div class="card stat-card">
+            <div class="icon bg-primary-subtle">
+              <i class="fas fa-rupee-sign text-primary"></i>
+            </div>
+            <h6 class="text-muted mb-2">Total Revenue</h6>
+            <h4 class="mb-0" id="revenueStat">₹<%= totalRevenue.toLocaleString('en-IN') %></h4>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card stat-card">
+            <div class="icon bg-primary-subtle">
+              <i class="fas fa-shopping-cart text-primary"></i>
+            </div>
+            <h6 class="text-muted mb-2">Total Orders</h6>
+            <h4 class="mb-0" id="ordersStat"><%= totalOrders %></h4>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card stat-card">
+            <div class="icon bg-primary-subtle">
+              <i class="fas fa-users text-primary"></i>
+            </div>
+            <h6 class="text-muted mb-2">Active Users</h6>
+            <h4 class="mb-0"><%= totalUsers %></h4>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card stat-card">
+            <div class="icon bg-primary-subtle">
+              <i class="fas fa-box text-primary"></i>
+            </div>
+            <h6 class="text-muted mb-2">Total Products</h6>
+            <h4 class="mb-0"><%= totalProducts %></h4>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart Section -->
+      <div class="row mt-4">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body">
+              <div
+                class="d-flex justify-content-between align-items-center mb-3"
+              >
+                <h5 class="card-title mb-0">Orders Trend</h5>
+                <div class="dropdown">
+                  <button
+                    class="btn btn-primary dropdown-toggle"
+                    type="button"
+                    id="timeRangeDropdown"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    Weekly View
+                  </button>
+                  <ul class="dropdown-menu" aria-labelledby="timeRangeDropdown">
+                    <li>
+                      <a class="dropdown-item" href="#" data-range="today"
+                        >Today's View</a
+                      >
+                    </li>
+                    <li>
+                      <a class="dropdown-item" href="#" data-range="yearly"
+                        >Yearly View</a
+                      >
+                    </li>
+                    <li>
+                      <a class="dropdown-item" href="#" data-range="monthly"
+                        >Monthly View</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        class="dropdown-item active"
+                        href="#"
+                        data-range="weekly"
+                        >Weekly View</a
+                      >
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="chart-container" style="height: 400px">
+                <canvas id="ordersChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Orders Table Section -->
+      <div class="row mt-4">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="card-title mb-0">Recent Orders</h5>
+                <a href="/admin/orders" class="btn btn-primary btn-sm">
+                  View All <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>Order ID</th>
+                      <th>Date</th>
+                      <th>Customer</th>
+                      <th>Status</th>
+                      <th>Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ordersTableBody">
+                    <% orders.slice(0, 5).forEach(order => { %>
+                    <tr>
+                      <td><%= order.orderId %></td>
+                      <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
+                      <td><%= order.userId.name %></td>
+                      <td>
+                        <span class="badge bg-<%= order.orderedItems[0].status === 'Delivered' ? 'success' : 
+                                                 order.orderedItems[0].status === 'Pending' ? 'warning' :
+                                                 order.orderedItems[0].status === 'Cancelled' ? 'danger' : 'primary' %>">
+                          <%= order.orderedItems[0].status %>
+                        </span>
+                      </td>
+                      <td>₹<%= order.FinalAmount.toLocaleString('en-IN') %></td>
+                    </tr>
+                    <% }); %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Initialize Charts -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        // Add this function to group data by year
+        function groupDataByYear(labels, orders, revenue) {
+            const yearlyData = {};
+            
+            // Convert month-year labels to corresponding data by year
+            labels.forEach((label, index) => {
+                const year = label.split(' ')[1];
+                if (!yearlyData[year]) {
+                    yearlyData[year] = {
+                        orders: 0,
+                        revenue: 0
+                    };
+                }
+                yearlyData[year].orders += orders[index];
+                yearlyData[year].revenue += revenue[index];
+            });
+
+            // Convert to arrays
+            const years = Object.keys(yearlyData).sort();
+            return {
+                labels: years,
+                orders: years.map(year => yearlyData[year].orders),
+                revenue: years.map(year => yearlyData[year].revenue)
+            };
+        }
+
+        const ctx = document.getElementById('ordersChart').getContext('2d');
+        let chart = null;
+
+        function renderChart(labels, orders, revenue) {
+            if (chart) {
+                chart.destroy();
+            }
+
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Orders',
+                        data: orders,
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        yAxisID: 'y',
+                        borderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#ffffff',
+                        pointHoverBackgroundColor: '#6366f1',
+                        pointBorderColor: '#6366f1',
+                        pointBorderWidth: 2
+                    }, {
+                        label: 'Revenue',
+                        data: revenue,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        yAxisID: 'y1',
+                        borderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#ffffff',
+                        pointHoverBackgroundColor: '#10b981',
+                        pointBorderColor: '#10b981',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'end',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                font: {
+                                    family: "'Inter', sans-serif",
+                                    size: 12,
+                                    weight: '500'
+                                },
+                                boxWidth: 8
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'white',
+                            titleColor: '#1e293b',
+                            bodyColor: '#64748b',
+                            borderColor: '#e2e8f0',
+                            borderWidth: 1,
+                            padding: 12,
+                            bodySpacing: 6,
+                            bodyFont: {
+                                family: "'Inter', sans-serif",
+                                size: 12
+                            },
+                            titleFont: {
+                                family: "'Inter', sans-serif",
+                                size: 13,
+                                weight: '600'
+                            },
+                            boxPadding: 4,
+                            usePointStyle: true,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.dataset.label === 'Revenue') {
+                                        label += '₹' + context.parsed.y.toLocaleString('en-IN');
+                                    } else {
+                                        label += context.parsed.y;
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    family: "'Inter', sans-serif",
+                                    size: 12
+                                },
+                                color: '#64748b'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            position: 'left',
+                            grid: {
+                                color: '#e2e8f0',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: {
+                                    family: "'Inter', sans-serif",
+                                    size: 12
+                                },
+                                color: '#64748b',
+                                padding: 8
+                            }
+                        },
+                        y1: {
+                            beginAtZero: true,
+                            position: 'right',
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    family: "'Inter', sans-serif",
+                                    size: 12
+                                },
+                                color: '#64748b',
+                                padding: 8
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateOrdersTable(orders) {
+            const tbody = document.getElementById('ordersTableBody');
+            tbody.innerHTML = orders.map(order => `
+                <tr>
+                    <td>${order.orderId}</td>
+                    <td>${new Date(order.createdAt).toLocaleDateString()}</td>
+                    <td>${order.userId.name}</td>
+                    <td>
+                        <span class="badge bg-${
+                            order.orderedItems[0].status === 'Delivered' ? 'success' : 
+                            order.orderedItems[0].status === 'Pending' ? 'warning' :
+                            order.orderedItems[0].status === 'Cancelled' ? 'danger' : 'primary'
+                        }">
+                            ${order.orderedItems[0].status}
+                        </span>
+                    </td>
+                    <td>₹${order.FinalAmount.toLocaleString('en-IN')}</td>
+                </tr>
+            `).join('');
+        }
+
+        function updateStatsAndTable(revenue, orders, ordersToShow) {
+            // Update revenue stat
+            const totalRevenue = revenue.reduce((a, b) => a + Number(b), 0);
+            document.getElementById('revenueStat').textContent = `₹${totalRevenue.toLocaleString('en-IN')}`;
+            
+            // Update orders stat
+            const totalOrders = orders.reduce((a, b) => a + Number(b), 0);
+            document.getElementById('ordersStat').textContent = totalOrders;
+
+            // Update orders table
+            const tbody = document.getElementById('ordersTableBody');
+            if (ordersToShow && ordersToShow.length > 0) {
+                tbody.innerHTML = ordersToShow.slice(0, 5).map(order => `
+                    <tr>
+                        <td>${order.orderId}</td>
+                        <td>${new Date(order.createdAt).toLocaleDateString()}</td>
+                        <td>${order.userId.name}</td>
+                        <td>
+                            <span class="badge bg-${
+                                order.orderedItems[0].status === 'Delivered' ? 'success' : 
+                                order.orderedItems[0].status === 'Pending' ? 'warning' :
+                                order.orderedItems[0].status === 'Cancelled' ? 'danger' : 'primary'
+                            }">
+                                ${order.orderedItems[0].status}
+                            </span>
+                        </td>
+                        <td>₹${order.FinalAmount.toLocaleString('en-IN')}</td>
+                    </tr>
+                `).join('');
+            } else {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center">No orders found</td></tr>';
+            }
+        }
+
+        // Click handler for view changes
+        document.querySelectorAll('.dropdown-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const range = this.dataset.range;
+                
+                // Update button text and active state
+                document.getElementById('timeRangeDropdown').textContent = this.textContent;
+                document.querySelectorAll('.dropdown-item').forEach(el => el.classList.remove('active'));
+                this.classList.add('active');
+
+                // Get the appropriate data based on range
+                let labels, orders, revenue, ordersToShow;
+                switch(range) {
+                    case 'today':
+                        labels = <%- todayLabels %>;
+                        orders = <%- todayData %>;
+                        revenue = <%- todayRevenue %>;
+                        ordersToShow = <%- todaysOrders %>;
+                        break;
+                    case 'yearly':
+                        const yearlyData = groupDataByYear(<%- orderChartLabels %>, <%- orderChartData %>, <%- orderChartRevenue %>);
+                        labels = yearlyData.labels;
+                        orders = yearlyData.orders;
+                        revenue = yearlyData.revenue;
+                        ordersToShow = <%- monthlyOrdersList %>; // Use monthly for yearly view
+                        break;
+                    case 'monthly':
+                        labels = <%- orderChartLabels %>;
+                        orders = <%- orderChartData %>;
+                        revenue = <%- orderChartRevenue %>;
+                        ordersToShow = <%- monthlyOrdersList %>;
+                        break;
+                    case 'weekly':
+                        labels = <%- weeklyLabels %>;
+                        orders = <%- weeklyData %>;
+                        revenue = <%- weeklyRevenue %>;
+                        ordersToShow = <%- weeklyOrdersList %>;
+                        break;
+                }
+
+                // Render the chart with selected data
+                renderChart(labels, orders, revenue);
+                updateStatsAndTable(revenue, orders, ordersToShow);
+            });
+        });
+
+        // Initial render with weekly data
+        renderChart(<%- weeklyLabels %>, <%- weeklyData %>, <%- weeklyRevenue %>);
+        updateStatsAndTable(<%- weeklyRevenue %>, <%- weeklyData %>, <%- weeklyOrdersList %>);
+    } catch (error) {
+        console.error('Chart Error:', error);
+    }
+});
+</script>
+
 <!-- Custom JS -->
-<script src="/scripts/user/login.js"> </script>
+<script src="/scripts/user/login.js"></script>
 
 <%- include('../../views/layout/admin/footer.ejs')%>

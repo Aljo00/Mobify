@@ -6,7 +6,7 @@ const loadBrandPage = async (req,res) => {
     try {
 
         const page = parseInt(req.query.page) || 1;
-        const limit = 4;
+        const limit = 2;
         const skip = (page-1)* limit ;
 
         const brandData = await Brand.find({}).sort({createdAt:-1}).skip(skip).limit(limit);

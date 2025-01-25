@@ -20,6 +20,44 @@
   .card {
     cursor: pointer;
   }
+  
+  /* Add these new styles for the download buttons */
+  .download-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  .download-btn-excel {
+    background-color: #10b981;
+    border: 1px solid #059669;
+    color: white;
+  }
+
+  .download-btn-excel:hover {
+    background-color: #059669;
+    color: white;
+  }
+
+  .download-btn-pdf {
+    background-color: #ef4444;
+    border: 1px solid #dc2626;
+    color: white;
+  }
+
+  .download-btn-pdf:hover {
+    background-color: #dc2626;
+    color: white;
+  }
+
+  .download-btn i {
+    font-size: 14px;
+  }
 </style>
 
 <div class="wrapper">
@@ -119,41 +157,51 @@
                 class="d-flex justify-content-between align-items-center mb-3"
               >
                 <h5 class="card-title mb-0">Orders Trend</h5>
-                <div class="dropdown">
-                  <button
-                    class="btn btn-primary dropdown-toggle"
-                    type="button"
-                    id="timeRangeDropdown"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    Weekly View
+                <div class="d-flex gap-2">
+                  <div class="dropdown">
+                    <button
+                      class="btn btn-primary dropdown-toggle"
+                      type="button"
+                      id="timeRangeDropdown"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                    >
+                      Weekly View
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="timeRangeDropdown">
+                      <li>
+                        <a class="dropdown-item" href="#" data-range="today"
+                          >Today's View</a
+                        >
+                      </li>
+                      <li>
+                        <a class="dropdown-item" href="#" data-range="yearly"
+                          >Yearly View</a
+                        >
+                      </li>
+                      <li>
+                        <a class="dropdown-item" href="#" data-range="monthly"
+                          >Monthly View</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          class="dropdown-item active"
+                          href="#"
+                          data-range="weekly"
+                          >Weekly View</a
+                        >
+                      </li>
+                    </ul>
+                  </div>
+                  <button class="download-btn download-btn-excel" onclick="downloadReport('excel')">
+                    <i class="fas fa-file-excel"></i>
+                    Excel Report
                   </button>
-                  <ul class="dropdown-menu" aria-labelledby="timeRangeDropdown">
-                    <li>
-                      <a class="dropdown-item" href="#" data-range="today"
-                        >Today's View</a
-                      >
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="#" data-range="yearly"
-                        >Yearly View</a
-                      >
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="#" data-range="monthly"
-                        >Monthly View</a
-                      >
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item active"
-                        href="#"
-                        data-range="weekly"
-                        >Weekly View</a
-                      >
-                    </li>
-                  </ul>
+                  <button class="download-btn download-btn-pdf" onclick="downloadReport('pdf')">
+                    <i class="fas fa-file-pdf"></i>
+                    PDF Report
+                  </button>
                 </div>
               </div>
               <div class="chart-container" style="height: 400px">
@@ -508,6 +556,11 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Chart Error:', error);
     }
 });
+
+function downloadReport(type) {
+    const timeRange = document.getElementById('timeRangeDropdown').textContent.trim();
+    window.location.href = `/admin/download-report?type=${type}&range=${timeRange.toLowerCase()}`;
+}
 </script>
 
 <!-- Custom JS -->

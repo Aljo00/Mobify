@@ -40,6 +40,8 @@ admin_route.get(
   adminController.loadDashboard
 );
 
+admin_route.get('/download-report', adminAuth.protectAdmin, adminController.downloadReport);
+
 admin_route.get("/logout", adminController.logout);
 
 //Admin users management routes

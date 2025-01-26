@@ -230,7 +230,10 @@ user_router.post(
 //Shop Management
 user_router.get("/shop", userAuth.notProtect, shopController.loadShopPage);
 
-//wishlist Mangement
+// Update search route to use new controller
+user_router.get("/search", userAuth.notProtect, shopController.searchProducts);
+
+//wishlist Management
 user_router.post(
   "/addToWishlist",
   userAuth.notProtect,

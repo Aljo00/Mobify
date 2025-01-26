@@ -17,6 +17,8 @@ const productController = require("../controllers/admin/productController");
 
 const orderController = require("../controllers/admin/orderController");
 
+const couponController = require("../controllers/admin/couponController");
+
 const multer = require("multer");
 
 const storage = require("../helpers/multer");
@@ -160,5 +162,11 @@ admin_route.post(
   adminAuth.protectAdmin,
   orderController.updateStatus
 );
+
+//Coupon Management Routes
+admin_route.get("/coupons", adminAuth.protectAdmin, couponController.getCouponsPage);
+admin_route.post("/coupons/add", adminAuth.protectAdmin, couponController.addCoupon);
+admin_route.put("/coupons/toggle-status/:id", adminAuth.protectAdmin, couponController.toggleStatus);
+admin_route.delete("/coupons/delete/:id", adminAuth.protectAdmin, couponController.deleteCoupon);
 
 module.exports = admin_route;

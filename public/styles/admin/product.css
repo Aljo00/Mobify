@@ -141,7 +141,6 @@ body {
 
 /* Breadcrumb container */
 .breadcrumb-container {
-  margin-left: 270px; /* Align with the content area */
   padding: 15px;
   background: white;
   border-radius: 15px;

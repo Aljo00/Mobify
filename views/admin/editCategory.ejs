@@ -1,113 +1,141 @@
 <%- include('../../views/layout/admin/header.ejs')%>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="/styles/admin/category.css">
+<link
+  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+  rel="stylesheet"
+/>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+/>
+<link
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<link rel="stylesheet" href="/styles/admin/category.css" />
 
 <div class="wrapper">
-    <div class="sidebar">
-        <h2><i class="fas fa-mobile-alt me-2"></i>Mobify</h2>
-        <a href="/admin/dashboard">
-            <i class="fas fa-chart-line"></i>
-            <span>Dashboard</span>
-        </a>
-        <a href="/admin/users">
-            <i class="fas fa-users"></i>
-            <span>Users</span>
-        </a>
-        <a href="/admin/category" class="active">
-            <i class="fas fa-list"></i>
-            <span>Categories</span>
-        </a>
-        <a href="/admin/brands">
-            <i class="fas fa-tags"></i>
-            <span>Brands</span>
-        </a>
-        <a href="/admin/addProducts">
-            <i class="fas fa-plus"></i>
-            <span>Add Products</span>
-        </a>
-        <a href="/admin/products">
-            <i class="fas fa-box"></i>
-            <span>Products</span>
-        </a>
-        <a href="/admin/orders">
-            <i class="fas fa-shopping-cart"></i>
-            <span>Orders</span>
-        </a>
-        <a href="#">
-            <i class="fas fa-cog"></i>
-            <span>Settings</span>
-        </a>
-        <a href="/admin/logout">
-            <i class="fas fa-sign-out-alt"></i>
-            <span>Logout</span>
-        </a>
-    </div>
+  <div class="sidebar">
+    <h2><i class="fas fa-mobile-alt me-2"></i>Mobify</h2>
+    <a href="/admin/dashboard">
+      <i class="fas fa-chart-line"></i>
+      <span>Dashboard</span>
+    </a>
+    <a href="/admin/users">
+      <i class="fas fa-users"></i>
+      <span>Users</span>
+    </a>
+    <a href="/admin/category" class="active">
+      <i class="fas fa-list"></i>
+      <span>Categories</span>
+    </a>
+    <a href="/admin/brands">
+      <i class="fas fa-tags"></i>
+      <span>Brands</span>
+    </a>
+    <a href="/admin/addProducts">
+      <i class="fas fa-plus"></i>
+      <span>Add Products</span>
+    </a>
+    <a href="/admin/products">
+      <i class="fas fa-box"></i>
+      <span>Products</span>
+    </a>
+    <a href="/admin/orders">
+      <i class="fas fa-shopping-cart"></i>
+      <span>Orders</span>
+    </a>
+    <a href="/admin/coupons">
+      <i class="fas fa-ticket-alt"></i>
+      <span>Coupons</span>
+    </a>
+    <a href="#">
+      <i class="fas fa-cog"></i>
+      <span>Settings</span>
+    </a>
+    <a href="/admin/logout">
+      <i class="fas fa-sign-out-alt"></i>
+      <span>Logout</span>
+    </a>
+  </div>
 
-    <div class="main-content">
-        <div class="container-fluid">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="mb-0">Edit Category</h4>
-                <div class="date text-muted">
-                    <%= new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
-                </div>
-            </div>
-
-            <div class="breadcrumb-container mb-4">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="/admin/category">Categories</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Edit Category</li>
-                    </ol>
-                </nav>
-            </div>
-
-            <div class="card">
-                <div class="card-body">
-                    <div class="row justify-content-center">
-                        <div class="col-md-8">
-                            <form method="post" action="/admin/editCategory/<%= category._id%>">
-                                <div class="mb-4">
-                                    <label for="name" class="form-label">Category Name</label>
-                                    <input 
-                                        type="text" 
-                                        class="form-control" 
-                                        id="name" 
-                                        name="name" 
-                                        value="<%= category.name%>" 
-                                        required
-                                    >
-                                </div>
-                                <div class="mb-4">
-                                    <label for="description" class="form-label">Description</label>
-                                    <input 
-                                        type="text" 
-                                        class="form-control" 
-                                        id="description" 
-                                        name="description" 
-                                        value="<%= category.description%>" 
-                                        required
-                                    >
-                                    <div id="description-error" class="error-message text-danger"></div>
-                                </div>
-                                <div class="d-flex gap-3">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-save me-2"></i>Update Category
-                                    </button>
-                                    <a href="/admin/category" class="btn btn-secondary">
-                                        <i class="fas fa-arrow-left me-2"></i>Back to Categories
-                                    </a>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <div class="main-content">
+    <div class="container-fluid">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0">Edit Category</h4>
+        <div class="date text-muted">
+          <%= new Date().toLocaleDateString('en-US', { weekday: 'long', year:
+          'numeric', month: 'long', day: 'numeric' }) %>
         </div>
+      </div>
+
+      <div class="breadcrumb-container mb-4">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item">
+              <a href="/admin/dashboard">Dashboard</a>
+            </li>
+            <li class="breadcrumb-item">
+              <a href="/admin/category">Categories</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+              Edit Category
+            </li>
+          </ol>
+        </nav>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <div class="row justify-content-center">
+            <div class="col-md-8">
+              <form
+                method="post"
+                action="/admin/editCategory/<%= category._id%>"
+              >
+                <div class="mb-4">
+                  <label for="name" class="form-label">Category Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="name"
+                    name="name"
+                    value="<%= category.name%>"
+                    required
+                  />
+                </div>
+                <div class="mb-4">
+                  <label for="description" class="form-label"
+                    >Description</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="description"
+                    name="description"
+                    value="<%= category.description%>"
+                    required
+                  />
+                  <div
+                    id="description-error"
+                    class="error-message text-danger"
+                  ></div>
+                </div>
+                <div class="d-flex gap-3">
+                  <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>Update Category
+                  </button>
+                  <a href="/admin/category" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Categories
+                  </a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
 
 <!-- Bootstrap JS -->

@@ -222,9 +222,15 @@ user_router.get(
 );
 
 user_router.post(
-  "'/cancel-order",
+  "/cancel-order",
   userAuth.protect,
   accountController.cancelOrder
+);
+
+user_router.post(
+  "/return-request",
+  userAuth.protect,
+  accountController.initiateReturn
 );
 
 //Shop Management

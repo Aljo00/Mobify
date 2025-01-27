@@ -9,11 +9,22 @@ html {
   color: #000; /* Black text */
 }
 
+body {
+  background-color: #f8f9fa;
+  font-family: "Inter", sans-serif;
+}
+
 .container {
   width: 100%;
   padding: 0 15px; /* Adjust padding as needed */
   margin: 0 auto;
   max-width: 1400px; /* Ensure the container spans the full width */
+}
+
+.container-fluid {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
 }
 
 /* Dropdown Container */
@@ -172,6 +183,12 @@ footer {
   margin-bottom: 20px;
 }
 
+.list-group {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
 .list-group-item.active {
   background-color: #007bff; /* Blue background */
   border-color: #007bff; /* Blue border */
@@ -193,22 +210,30 @@ footer {
   font-size: 16px;
   padding: 10px 15px; /* Adjust padding for better spacing */
   transition: background-color 0.3s ease, transform 0.3s ease;
+  border: none;
+  padding: 1rem 1.5rem;
+  font-weight: 500;
 }
 
 .list-group-item i {
   margin-right: 10px;
   font-size: 18px;
+  width: 24px;
+  margin-right: 12px;
+  font-size: 1.1rem;
 }
 
 .list-group-item:hover {
   background-color: #f1f1f1; /* Light grey background on hover */
   transform: translateX(5px); /* Slight move to the right on hover */
+  background-color: #f0f2f5;
 }
 
 .list-group-item.active {
   background-color: #007bff; /* Blue background */
   border-color: #007bff; /* Blue border */
   color: #fff; /* White text */
+  background-color: #4a90e2;
 }
 
 .list-group-item.active i {
@@ -321,10 +346,16 @@ footer {
   height: auto; /* Adjust height to fit content */
   position: relative; /* Ensure status is positioned correctly */
   padding: 20px; /* Add padding */
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 1.5rem;
 }
 
 .order-card:hover {
   transform: translateY(-5px); /* Slight move up on hover */
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
 .order-card img {
@@ -390,6 +421,17 @@ footer {
   padding: 15px; /* Add padding */
   border-radius: 5px; /* Rounded corners */
   border: 1px solid #ddd; /* Light grey border */
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.order-address i {
+  color: #4a90e2;
+  margin-right: 0.5rem;
 }
 
 .order-status {
@@ -402,6 +444,13 @@ footer {
   display: flex;
   align-items: center;
   margin-bottom: 10px; /* Add margin */
+  gap: 1.5rem;
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.order-item:last-child {
+  border-bottom: none;
 }
 
 .order-item-image img {
@@ -409,6 +458,9 @@ footer {
   height: 100px; /* Fixed height */
   object-fit: cover; /* Ensure image covers the area */
   border-radius: 5px; /* Rounded corners */
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
 }
 
 .order-item-details {
@@ -420,10 +472,20 @@ footer {
   margin-bottom: 5px; /* Add margin */
 }
 
+.order-item-details h5 {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
 .order-item-details .card-title a {
   color: #007bff; /* Blue text */
   text-decoration: none;
   transition: color 0.3s ease;
+}
+
+.order-item-details a {
+  color: #4a90e2;
+  text-decoration: none;
 }
 
 .order-item-details .card-title a:hover {
@@ -444,12 +506,52 @@ footer {
   background-color: #f1f1f1; /* Light grey background */
   padding: 15px; /* Add padding */
   border-radius: 5px; /* Rounded corners */
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
 }
 
 .order-status-cancel {
   background-color: #f1f1f1; /* Light grey background */
   padding: 15px; /* Add padding */
   border-radius: 5px; /* Rounded corners */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.order-status-cancelled {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 1rem;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.order-status.cancelled {
+  background-color: #dc3545;
+  color: white;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  border-radius: 6px;
+}
+
+.cancelled-message {
+  color: #721c24;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cancelled-message i {
+  font-size: 1.1rem;
 }
 
 .order-status-bar {
@@ -459,6 +561,11 @@ footer {
   margin-top: 10px;
   padding: 10px 0;
   position: relative;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+  padding: 1rem 0;
+  position: relative;
 }
 
 .status-step {
@@ -467,19 +574,57 @@ footer {
   position: relative;
   color: #ccc;
   font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  color: #9ca3af;
 }
 
 .status-step.active {
   color: #007bff;
+  color: #4a90e2;
 }
 
 .status-step i {
   display: block;
   margin-bottom: 5px;
+  background: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+  border: 2px solid #e5e7eb;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.status-step.active i {
+  background: #4a90e2;
+  color: white;
+  border-color: #4a90e2;
+}
+
+.status-step.cancelled {
+  color: #dc3545;
+}
+
+.status-step.cancelled i {
+  background: #dc3545;
+  color: white;
+  border-color: #dc3545;
+}
+
+.status-step.cancelled::before {
+  background: #dc3545;
 }
 
 .status-step::before {
-  content: '';
+  content: "";
   width: 100%;
   height: 4px;
   background-color: #ccc;
@@ -488,15 +633,25 @@ footer {
   left: 0;
   z-index: -1;
   transition: background-color 0.3s ease;
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background: #e5e7eb;
+  top: 20px;
+  left: -50%;
+  z-index: -1;
 }
 
 .status-step.active::before {
   background-color: #007bff;
+  background: #4a90e2;
 }
 
 .status-step:first-child::before {
   width: 50%;
   left: 50%;
+  display: none;
 }
 
 .status-step:last-child::before {
@@ -506,4 +661,129 @@ footer {
 
 .status-step:not(:first-child)::before {
   left: -50%;
+}
+
+.badge {
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  border-radius: 6px;
+}
+
+.btn-danger {
+  background: #dc3545;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-danger:hover:not([disabled]) {
+  background: #c82333;
+  transform: translateY(-2px);
+}
+
+.btn-danger[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Add these new styles */
+.btn-warning {
+  background: #ffc107;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  color: #000;
+}
+
+.btn-warning:hover {
+  background: #ffb300;
+  transform: translateY(-2px);
+}
+
+/* Add these new status message styles */
+.return-message,
+.returned-message {
+  color: #0c5460;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #d1ecf1;
+  border-radius: 4px;
+}
+
+.return-message i {
+  color: #17a2b8;
+  font-size: 1.1rem;
+}
+
+.returned-message {
+  color: #155724;
+  background-color: #d4edda;
+}
+
+.returned-message i {
+  color: #28a745;
+  font-size: 1.1rem;
+}
+
+/* Update badge colors for different statuses */
+.order-status.badge {
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+}
+
+.order-status.bg-info {
+  background-color: #17a2b8 !important;
+  color: white;
+}
+
+.order-status.bg-secondary {
+  background-color: #6c757d !important;
+  color: white;
+}
+
+/* Add these new styles */
+.order-payment-info {
+  background: #f8f9fa;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.order-payment-info i {
+  color: #4a90e2;
+  font-size: 1.1rem;
+}
+
+.payment-badge {
+  padding: 0.3rem 0.8rem;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+.badge-cod {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.badge-wallet {
+  background-color: #28a745;
+  color: white;
+}
+
+.badge-online {
+  background-color: #17a2b8;
+  color: white;
 }

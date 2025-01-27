@@ -10,6 +10,8 @@ const Address = require("../../models/addressSchema");
 const cloudinary = require("../../config/cloudinary");
 // const { profile } = require("console");
 const Order = require("../../models/orderSchema");
+const Wallet = require("../../models/walletSchema");
+const Product = require("../../models/productSchema");
 
 const load_page404 = async (req, res) => {
   try {
@@ -602,24 +604,181 @@ const loadOrdersDetailPage = async (req, res) => {
 
 const cancelOrder = async (req, res) => {
   try {
-    console.log(req.body)
-    const { orderId, productId } = req.body;
+    const { orderId } = req.body;
+    const userId = req.user.id;
 
-    // Find the order and update the status of the specific product
-    const order = await Order.findOneAndUpdate(
-      { _id: orderId, "orderedItems._id": productId },
-      { $set: { "orderedItems.$.status": "Cancelled" } },
-      { new: true }
-    );
-
-    if (!order) {
-      return res.status(404).json({ success: false, message: "Order not found" });
+    if (!orderId) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Order ID is required" 
+      });
     }
 
-    res.status(200).json({ success: true, message: "Order cancelled successfully" });
+    // Find the order
+    const order = await Order.findById(orderId).populate('orderedItems.product');
+    
+    if (!order) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Order not found" 
+      });
+    }
+
+    // Validate if order belongs to user
+    if (order.userId.toString() !== userId) {
+      return res.status(403).json({ 
+        success: false, 
+        message: "Unauthorized to cancel this order" 
+      });
+    }
+
+    // Check if all items can be cancelled
+    const canCancel = order.orderedItems.every(item => 
+      !['Shipped', 'Delivered', 'Cancelled'].includes(item.status)
+    );
+
+    if (!canCancel) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Cannot cancel order - some items are already shipped, delivered, or cancelled" 
+      });
+    }
+
+    // Update product quantities
+    for (const item of order.orderedItems) {
+      const product = await Product.findById(item.product._id);
+      
+      const comboIndex = product.combos.findIndex(combo => 
+        combo.ram === item.RAM && 
+        combo.storage === item.Storage
+      );
+
+      if (comboIndex !== -1) {
+        product.combos[comboIndex].quantity += item.quantity;
+        await product.save();
+      }
+    }
+
+    // Update order status
+    order.orderedItems.forEach(item => {
+      item.status = 'Cancelled';
+    });
+    await order.save();
+
+    // Only process refund for non-COD orders
+    if (order.paymentMethod !== 'cod') {
+      let wallet = await Wallet.findOne({ user: userId });
+      
+      if (!wallet) {
+        wallet = new Wallet({
+          user: userId,
+          balance: 0,
+          transactions: []
+        });
+      }
+
+      // Add refund transaction
+      wallet.balance += order.FinalAmount;
+      wallet.transactions.push({
+        type: 'credit',
+        amount: order.FinalAmount,
+        description: `Refund for cancelled order #${order.orderId} (${order.paymentMethod})`
+      });
+
+      await wallet.save();
+
+      res.status(200).json({ 
+        success: true, 
+        message: "Order cancelled and refund initiated successfully" 
+      });
+    } else {
+      res.status(200).json({ 
+        success: true, 
+        message: "Order cancelled successfully" 
+      });
+    }
+
   } catch (error) {
     console.error("Error cancelling order:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || "An unexpected error occurred while cancelling the order" 
+    });
+  }
+};
+
+const initiateReturn = async (req, res) => {
+  try {
+    const { orderId, reason } = req.body;
+    const userId = req.user.id;
+
+    if (!orderId || !reason) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Order ID and reason are required" 
+      });
+    }
+
+    // Find the order
+    const order = await Order.findById(orderId);
+    
+    if (!order) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Order not found" 
+      });
+    }
+
+    // Validate if order belongs to user
+    if (order.userId.toString() !== userId) {
+      return res.status(403).json({ 
+        success: false, 
+        message: "Unauthorized to return this order" 
+      });
+    }
+
+    // Check if order is delivered and within return window (e.g., 7 days)
+    const deliveredItem = order.orderedItems.find(item => item.status === 'Delivered');
+    if (!deliveredItem) {
+      return res.status(400).json({
+        success: false,
+        message: "Order must be delivered to initiate return"
+      });
+    }
+
+    const deliveryDate = new Date(order.updatedAt);
+    const today = new Date();
+    const daysSinceDelivery = Math.floor((today - deliveryDate) / (1000 * 60 * 60 * 24));
+
+    if (daysSinceDelivery > 7) {
+      return res.status(400).json({
+        success: false,
+        message: "Return window has expired (7 days from delivery)"
+      });
+    }
+
+    // Update order status to Return Request
+    order.orderedItems.forEach(item => {
+      if (item.status === 'Delivered') {
+        item.status = 'Return Request';
+      }
+    });
+
+    // Save return reason
+    order.returnReason = reason;
+    await order.save();
+
+    res.status(200).json({ 
+      success: true, 
+      message: "Return request submitted successfully" 
+    });
+
+  } catch (error) {
+    console.error("Error processing return request:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || "An unexpected error occurred while processing return request" 
+    });
   }
 };
 
@@ -647,4 +806,5 @@ module.exports = {
   loadOrdersPage,
   loadOrdersDetailPage,
   cancelOrder,
+  initiateReturn,
 };

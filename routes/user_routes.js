@@ -268,6 +268,11 @@ user_router.post("/add-money", userAuth.protect,walletController.addMoneyToWalle
 
 user_router.post("/verify-payment",userAuth.protect,walletController.verifyPayment);
 
+const couponController = require('../controllers/user/coupon_controller');
+
+user_router.get('/api/available-coupons', userAuth.protect, couponController.getAvailableCoupons);
+user_router.post('/api/validate-coupon', userAuth.protect, couponController.validateCoupon);
+
 user_router.get("/logout", user_controller.logout);
 
 module.exports = user_router;

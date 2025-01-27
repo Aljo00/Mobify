@@ -13,193 +13,396 @@
 <!-- Custom CSS -->
 <link rel="stylesheet" href="/styles/user/checkOut.css" />
 
-<div class="checkout-container">
-  <!-- Breadcrumbs -->
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="/">Home</a></li>
-      <li class="breadcrumb-item active" aria-current="page">Checkout</li>
-    </ol>
-  </nav>
-  <div class="row">
-    <div class="col-md-8">
-      <div class="checkout-header">
-        <h1>Checkout</h1>
-      </div>
-      <form
-        class="checkout-form"
-        action="/place-order"
-        method="post"
-        id="checkoutForm"
-      >
-        <!-- Step 1: Address Section -->
-        <div id="addressSection" class="section">
-          <h2>Shipping Address</h2>
-          <div class="row">
-            <% addresses.forEach((address, index) => { %>
-              <% address.address.forEach((addr, addrIndex) => { %>
-                <div class="col-md-6 mb-4">
-                  <div class="card address-card hover-effect" onclick="selectAddress('<%= index %>-<%= addrIndex %>')">
-                    <div class="card-body">
-                      <input type="radio" id="address<%= index %>-<%= addrIndex %>"
-                      name="selectedAddress" value="<%= addr._id %>" onchange="toggleAddressActions(this)">
-                      <label for="address<%= index %>-<%= addrIndex %>">
-                        <h5 class="card-title">
-                          <%= addr.houseName %> (<%= addr.addressType %>)
-                        </h5>
-                        <p class="card-text">
-                          <%= addr.city %>, <%= addr.state %> - <%= addr.pincode %>
-                        </p>
-                        <p class="card-text">Landmark: <%= addr.landMark %></p>
-                        <p class="card-text">Phone: <%= addr.phone %></p>
-                        <p class="card-text">Alt Phone: <%= addr.altPhone %></p>
-                      </label>
-                      <div class="address-actions" style="display: none;">
-                        <a href="/edit-address/<%= addr._id %>">
-                          <button type="button" class="btn btn-secondary btn-sm edit-address">
-                            <i class="fas fa-edit"></i> Edit
-                          </button>
-                        </a>
-                        <a href="#" onclick="deleteAddress('<%= addr._id %>')">
-                          <button type="button" class="btn btn-danger btn-sm delete-address">
-                            <i class="fas fa-trash-alt"></i> Delete
-                          </button>
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              <% }) %>
-            <% }) %>
-          </div>
-        </div>
-
-        <!-- Step 2: Payment Options Section -->
-        <div id="paymentOptions" class="section">
-          <h2>Payment Options</h2>
-          <div class="btn-group" role="group" aria-label="Payment Methods">
-            <input type="radio" class="btn-check" name="paymentMethod" id="cod" value="cod" autocomplete="off">
-            <label class="btn btn-outline-primary" for="cod">
-              <i class="fas fa-money-bill-wave"></i> Cash on Delivery (COD)
-            </label>
-
-            <input type="radio" class="btn-check" name="paymentMethod" id="razorpay" value="razorpay" autocomplete="off">
-            <label class="btn btn-outline-primary" for="razorpay">
-              <i class="fas fa-credit-card"></i> Razorpay
-            </label>
-
-            <input type="radio" class="btn-check" name="paymentMethod" id="wallet" value="wallet" autocomplete="off">
-            <label class="btn btn-outline-primary" for="wallet">
-              <i class="fas fa-wallet"></i> Wallet
-            </label>
-          </div>
-        </div>
-    </div>
-
-    <!-- Cart Summary Section -->
-    <div class="col-md-4">
-      <div class="cart-summary">
-        <h2>Cart Summary</h2>
-        <% cart.items.filter(item => item.quantity > 0).forEach(item => { %>
-          <div class="cart-item">
-            <img src="<%= item.ProductId.productImage[0] %>" alt="<%= item.ProductId.productName %>" style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px; margin-right: 10px;">
-            <div class="cart-item-details">
-              <p class="cart-item-name"><%= item.ProductId.productName %></p>
-              <p class="cart-item-quantity">Quantity: <%= item.quantity %></p>
-              <p class="cart-item-total">Total: ₹<%= item.totalPrice %></p>
-            </div>
-          </div>
-        <% }) %>
-        <p class="cart-total">Total: ₹<%= cart.items.filter(item => item.quantity > 0).reduce((acc, item) => acc + item.totalPrice, 0) %></p>
-        <button class="btn btn-primary" type="submit">Place Order</button>
-      </div>
-    </div>
-    </form>
+<div class="minimal-header">
+  <div class="header-content">
+    <h1>Checkout</h1>
+    <nav class="minimal-breadcrumb">
+      <a href="/">Home</a>
+      <span class="separator">/</span>
+      <a href="/cart">Cart</a>
+      <span class="separator">/</span>
+      <span class="current">Checkout</span>
+    </nav>
   </div>
 </div>
 
+<div class="checkout-wrapper">
+  <div class="checkout-main">
+    <form
+      class="checkout-form"
+      action="/place-order"
+      method="post"
+      id="checkoutForm"
+    >
+      <div class="glass-card address-section">
+        <h2>
+          <i class="fas fa-map-marker-alt pulse"></i> Select Delivery Address
+        </h2>
+        <div class="address-grid">
+          <% addresses.forEach((address, index) => { %> <%
+          address.address.forEach((addr, addrIndex) => { %>
+          <div
+            class="address-card"
+            onclick="selectAddress('<%= index %>-<%= addrIndex %>')"
+          >
+            <div class="card-content">
+              <div class="address-type-badge"><%= addr.addressType %></div>
+              <input
+                type="radio"
+                id="address<%= index %>-<%= addrIndex %>"
+                name="selectedAddress"
+                value="<%= addr._id %>"
+                class="hidden-radio"
+              />
+              <div class="address-info">
+                <h4><%= addr.houseName %></h4>
+                <p>
+                  <i class="fas fa-map-pin"></i> <%= addr.city %>, <%=
+                  addr.state %>
+                </p>
+                <p><i class="fas fa-hashtag"></i> <%= addr.pincode %></p>
+                <p><i class="fas fa-phone"></i> <%= addr.phone %></p>
+                <p><i class="fas fa-phone-alt"></i> <%= addr.altPhone %></p>
+              </div>
+              <div class="card-actions">
+                <button
+                  type="button"
+                  class="btn-edit"
+                  onclick="window.location.href='/edit-address/<%= addr._id %>'"
+                >
+                  <i class="fas fa-edit"></i> Edit
+                </button>
+                <button
+                  type="button"
+                  class="btn-delete"
+                  onclick="deleteAddress('<%= addr._id %>')"
+                >
+                  <i class="fas fa-trash"></i> Delete
+                </button>
+              </div>
+            </div>
+          </div>
+          <% }) %> <% }) %>
+        </div>
+      </div>
+
+      <div class="glass-card payment-section">
+        <h2><i class="fas fa-wallet bounce"></i> Payment Method</h2>
+        <div class="payment-options">
+          <label class="payment-option">
+            <input type="radio" name="paymentMethod" value="cod" />
+            <span class="option-content">
+              <i class="fas fa-money-bill-wave"></i>
+              <div class="option-text">
+                <span>Cash on Delivery</span>
+                <small>Pay when you receive</small>
+              </div>
+            </span>
+          </label>
+
+          <label class="payment-option">
+            <input type="radio" name="paymentMethod" value="razorpay" />
+            <span class="option-content">
+              <i class="fas fa-credit-card"></i>
+              <div class="option-text">
+                <span>Razorpay</span>
+                <small>Cards, UPI, NetBanking</small>
+              </div>
+            </span>
+          </label>
+
+          <label class="payment-option">
+            <input type="radio" name="paymentMethod" value="wallet" />
+            <span class="option-content">
+              <i class="fas fa-wallet"></i>
+              <div class="option-text">
+                <span>Wallet</span>
+                <small>Available balance</small>
+              </div>
+            </span>
+          </label>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="checkout-sidebar">
+    <div class="coupon-section">
+      <div class="coupon-header">
+        <h3><i class="fas fa-tags"></i> Save on your order</h3>
+        <p class="coupon-description">
+          Apply a promo code or view available offers
+        </p>
+      </div>
+      <div class="available-coupons">
+        <a href="#" onclick="showAvailableCoupons()">
+          <i class="fas fa-ticket-alt"></i>
+          <div class="offer-text">
+            <span>View Available Offers</span>
+            <small>Save up to 20% on your purchase</small>
+          </div>
+          <i class="fas fa-chevron-right show-more"></i>
+        </a>
+      </div>
+      <div class="coupon-input">
+        <input
+          type="text"
+          id="couponCode"
+          placeholder="Enter promo code"
+          class="coupon-field"
+        />
+        <button type="button" class="apply-coupon" onclick="applyCoupon()">
+          Apply
+        </button>
+      </div>
+    </div>
+
+    <div class="glass-card order-summary">
+      <div class="summary-header">
+        <h2><i class="fas fa-shopping-bag swing"></i> Order Summary</h2>
+        <button type="button" class="toggle-cart" id="toggleCart">
+          <i class="fas fa-chevron-up"></i>
+        </button>
+      </div>
+
+      <div class="cart-content" id="cartContent">
+        <div class="items-count">
+          <%= cart.items.filter(item => item.quantity > 0).length %> items in
+          cart
+        </div>
+
+        <div class="cart-items">
+          <% cart.items.filter(item => item.quantity > 0).forEach(item => { %>
+          <div class="cart-item">
+            <div class="item-image">
+              <img
+                src="<%= item.ProductId.productImage[0] %>"
+                alt="<%= item.ProductId.productName %>"
+              />
+              <span class="item-quantity"><%= item.quantity %></span>
+            </div>
+            <div class="item-details">
+              <h6><%= item.ProductId.productName %></h6>
+              <div class="item-meta">
+                <span class="price">₹<%= item.totalPrice %></span>
+                <span class="unit-price">₹<%= item.price %> each</span>
+              </div>
+            </div>
+          </div>
+          <% }) %>
+        </div>
+
+        <div class="price-breakdown">
+          <div class="price-row">
+            <span>Subtotal</span>
+            <span
+              >₹<%= cart.items.filter(item => item.quantity > 0).reduce((acc,
+              item) => acc + item.totalPrice, 0) %></span
+            >
+          </div>
+          <div class="price-row">
+            <span>Shipping</span>
+            <span class="free-shipping">FREE</span>
+          </div>
+          <div class="price-row total">
+            <span>Total</span>
+            <span class="total-amount"
+              >₹<%= cart.items.filter(item => item.quantity > 0).reduce((acc,
+              item) => acc + item.totalPrice, 0) %></span
+            >
+          </div>
+        </div>
+
+        <button
+          class="submit-order pulse-button"
+          type="submit"
+          form="checkoutForm"
+        >
+          <i class="fas fa-lock"></i> Place Order Securely
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mobile-action-bar">
+  <div class="mobile-total">
+    <span>Total:</span>
+    <span class="total-amount"
+      >₹<%= cart.items.filter(item => item.quantity > 0).reduce((acc, item) =>
+      acc + item.totalPrice, 0) %></span
+    >
+  </div>
+  <button class="submit-order" type="submit" form="checkoutForm">
+    <i class="fas fa-lock"></i> Place Order
+  </button>
+</div>
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-
-  document.getElementById('checkoutForm').addEventListener('submit', async function(event) {
+  document
+    .getElementById("checkoutForm")
+    .addEventListener("submit", async function (event) {
       event.preventDefault(); // Prevent the default form submission
 
       const form = this;
       const formData = new FormData(form);
 
       try {
-          const response = await fetch(form.action, {
-              method: 'POST',
-              body: formData
-          });
+        const response = await fetch(form.action, {
+          method: "POST",
+          body: formData,
+        });
 
-          const data = await response.json();
-          console.log('Response from backend:', data); // Debugging log
+        const data = await response.json();
+        console.log("Response from backend:", data); // Debugging log
 
-          if (data.success) {
-              // If successful, redirect to the order success page
-              window.location.href = data.redirectUrl || '/order-success';
-          } else {
-              // Show error toast if order was not successful
-              Swal.fire({
-                  toast: true,
-                  position: 'top-end',
-                  icon: 'error',
-                  title: 'Error!',
-                  text: data.message || 'Failed to place the order. Please try again.',
-                  showConfirmButton: false,
-                  timer: 3000,
-                  timerProgressBar: true,
-                  customClass: {
-                      popup: 'colored-toast error-toast',
-                      icon: 'error-icon'
-                  }
-              });
-          }
-      } catch (error) {
-          console.error("Error:", error);
+        if (data.success) {
+          // If successful, redirect to the order success page
+          window.location.href = data.redirectUrl || "/order-success";
+        } else {
+          // Show error toast if order was not successful
           Swal.fire({
-              toast: true,
-              position: 'top-end',
-              icon: 'error',
-              title: 'Error!',
-              text: 'An error occurred. Please try again.',
-              showConfirmButton: false,
-              timer: 3000,
-              timerProgressBar: true,
-              customClass: {
-                  popup: 'colored-toast error-toast',
-                  icon: 'error-icon'
-              }
+            toast: true,
+            position: "top-end",
+            icon: "error",
+            title: "Error!",
+            text:
+              data.message || "Failed to place the order. Please try again.",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            customClass: {
+              popup: "colored-toast error-toast",
+              icon: "error-icon",
+            },
           });
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "error",
+          title: "Error!",
+          text: "An error occurred. Please try again.",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          customClass: {
+            popup: "colored-toast error-toast",
+            icon: "error-icon",
+          },
+        });
       }
-  });
+    });
 
   function toggleAddressActions(radio) {
-    document.querySelectorAll('.address-actions').forEach(action => {
-      action.style.display = 'none';
+    document.querySelectorAll(".address-actions").forEach((action) => {
+      action.style.display = "none";
     });
     if (radio.checked) {
-      radio.closest('.card-body').querySelector('.address-actions').style.display = 'flex';
+      radio
+        .closest(".card-body")
+        .querySelector(".address-actions").style.display = "flex";
     }
   }
 
   function selectAddress(id) {
-    const radio = document.getElementById('address' + id);
+    const radio = document.getElementById("address" + id);
     radio.checked = true;
     toggleAddressActions(radio);
   }
 
   // Initialize the display for the initially checked address
-  document.addEventListener('DOMContentLoaded', () => {
-    const checkedRadio = document.querySelector('input[name="selectedAddress"]:checked');
+  document.addEventListener("DOMContentLoaded", () => {
+    const checkedRadio = document.querySelector(
+      'input[name="selectedAddress"]:checked'
+    );
     if (checkedRadio) {
       toggleAddressActions(checkedRadio);
     }
   });
+
+  // Toggle cart summary on mobile
+  document.getElementById("toggleCart").addEventListener("click", function () {
+    const cartContent = document.getElementById("cartContent");
+    const icon = this.querySelector("i");
+
+    cartContent.classList.toggle("collapsed");
+    icon.classList.toggle("fa-chevron-up");
+    icon.classList.toggle("fa-chevron-down");
+  });
+
+  // Replace the existing showAvailableCoupons function
+
+  // Replace the existing showAvailableCoupons function
+  async function showAvailableCoupons() {
+    try {
+        const response = await fetch("/api/available-coupons");
+        const data = await response.json();
+        console.log("Coupon response:", data);
+
+        if (data.status === "success" && data.coupons && data.coupons.length > 0) {
+            const couponsHtml = data.coupons.map(coupon => `
+                <div class="modern-coupon-item">
+                    <div class="coupon-left-part">
+                        <div class="discount-circle">
+                            <span class="discount-amount">₹${coupon.discount}</span>
+                            <span class="discount-label">OFF</span>
+                        </div>
+                        <div class="coupon-divider">
+                            <div class="circle top"></div>
+                            <div class="dashed-line"></div>
+                            <div class="circle bottom"></div>
+                        </div>
+                    </div>
+                    <div class="coupon-details">
+                        <div class="coupon-header">
+                            <h4 class="coupon-code">${coupon.code}</h4>
+                            <span class="validity">Valid till ${new Date(coupon.expiry).toLocaleDateString()}</span>
+                        </div>
+                        <p class="coupon-description">${coupon.description}</p>
+                        <div class="coupon-footer">
+                            <span class="min-purchase">Min. Purchase: ₹${coupon.minPurchase}</span>
+                            <button onclick="applyCoupon('${coupon.code}')" class="apply-btn">
+                                <span>APPLY</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            Swal.fire({
+                title: '<div class="coupon-popup-header"><i class="fas fa-ticket-alt"></i> Available Offers</div>',
+                html: `
+                    <div class="modern-coupon-container">
+                        ${couponsHtml}
+                    </div>
+                `,
+                showCloseButton: true,
+                showConfirmButton: false,
+                width: '600px',
+                customClass: {
+                    popup: 'modern-coupon-popup',
+                    closeButton: 'modern-close-button'
+                }
+            });
+        } else {
+            Swal.fire({
+                icon: 'info',
+                title: 'No Active Coupons',
+                text: 'Sorry, there are no active offers at the moment.',
+                confirmButtonColor: '#007bff'
+            });
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
 </script>
 
 <style>

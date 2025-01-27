@@ -163,10 +163,25 @@ admin_route.post(
   orderController.updateStatus
 );
 
-//Coupon Management Routes
-admin_route.get("/coupons", adminAuth.protectAdmin, couponController.getCouponsPage);
-admin_route.post("/coupons/add", adminAuth.protectAdmin, couponController.addCoupon);
-admin_route.put("/coupons/toggle-status/:id", adminAuth.protectAdmin, couponController.toggleStatus);
-admin_route.delete("/coupons/delete/:id", adminAuth.protectAdmin, couponController.deleteCoupon);
+admin_route.get(
+  "/coupons",
+  adminAuth.protectAdmin,
+  couponController.getCouponsPage
+);
+admin_route.post(
+  "/coupons/add",
+  adminAuth.protectAdmin,
+  couponController.addCoupon
+);
+admin_route.put(
+  "/coupons/toggle-status/:id",
+  adminAuth.protectAdmin,
+  couponController.toggleStatus
+);
+admin_route.delete(
+  "/coupons/delete/:id",
+  adminAuth.protectAdmin,
+  couponController.deleteCoupon
+);
 
 module.exports = admin_route;

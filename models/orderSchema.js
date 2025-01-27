@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
-const {Schema} = mongoose;
+const { Schema } = mongoose;
 
-const {v4:uuidv4} = require("uuid")
+const { v4: uuidv4 } = require("uuid");
 
 const orderSchema = new Schema(
   {
@@ -94,15 +94,25 @@ const orderSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    appliedCouponCode: {
+      type: String,
+      default: null,
+    },
+    couponId: {
+      // Add this field
+      type: Schema.Types.ObjectId,
+      ref: "Coupon",
+      default: null,
+    },
     paymentDetails: {
       razorpay_payment_id: String,
       razorpay_order_id: String,
-      razorpay_signature: String
-    }
+      razorpay_signature: String,
+    },
   },
   { timestamps: true }
 );
 
 const Order = mongoose.model("Order", orderSchema);
 
-module.exports = Order
+module.exports = Order;

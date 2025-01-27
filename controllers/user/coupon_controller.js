@@ -4,11 +4,13 @@ const couponController = {
   getAvailableCoupons: async (req, res) => {
     try {
       const currentDate = new Date();
-      // Remove the $lt comparison since it's comparing with a string
+      const cartTotal = parseFloat(req.query.total) || 0;
+
       const coupons = await Coupon.find({
         isListed: true,
         isDeleted: false,
         expireOn: { $gt: currentDate },
+        minimumPrice: { $lte: cartTotal },
       });
 
       console.log("Found coupons:", coupons); // Debug log
@@ -16,7 +18,7 @@ const couponController = {
       if (!coupons || coupons.length === 0) {
         return res.json({
           status: "error",
-          message: "No active coupons found",
+          message: "No coupons available for your cart value",
           coupons: [],
         });
       }
@@ -28,6 +30,7 @@ const couponController = {
         expiry: coupon.expireOn,
         usesLeft: coupon.maxUses - (coupon.usesCount || 0),
         description: `Get ₹${coupon.offerPrice} off on orders above ₹${coupon.minimumPrice}`,
+        savings: `₹${coupon.offerPrice}`, // Changed to show fixed amount instead of percentage
       }));
 
       console.log("Formatted coupons:", formattedCoupons); // Debug log

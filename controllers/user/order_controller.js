@@ -9,6 +9,7 @@ const Wallet = require("../../models/walletSchema");
 const { razorpay } = require("../../config/razarPay");
 const env = require("dotenv").config();
 const { v4: uuidv4 } = require("uuid");
+const Coupon = require("../../models/couponSchema"); // Add this import
 
 // Process the checkout page
 const processCheckout = async (req, res) => {
@@ -72,7 +73,7 @@ const processCheckout = async (req, res) => {
 const placeOrder = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { selectedAddress, paymentMethod } = req.body;
+    const { selectedAddress, paymentMethod, appliedCoupon } = req.body;
 
     if (!selectedAddress || !paymentMethod) {
       return res
@@ -113,10 +114,39 @@ const placeOrder = async (req, res) => {
       (acc, item) => acc + item.totalPrice,
       0
     );
+    let finalAmount = totalAmount;
+    let discount = 0;
+    let couponApplied = false;
+
+    // Apply coupon if present
+    if (appliedCoupon) {
+      const coupon = await Coupon.findOne({ name: appliedCoupon });
+      if (coupon && totalAmount >= coupon.minimumPrice) {
+        discount = coupon.offerPrice;
+        finalAmount = totalAmount - discount;
+        couponApplied = true;
+
+        // Create order with coupon details
+        const newOrder = new Order({
+          // ...existing order fields...
+          totalPrice: totalAmount,
+          discount: discount,
+          FinalAmount: finalAmount,
+          couponApplied: couponApplied,
+          appliedCouponCode: appliedCoupon,
+          couponId: coupon._id,  // Save the coupon ID
+          status: "Pending",
+        });
+
+        // Update coupon usage
+        coupon.usesCount += 1;
+        await coupon.save();
+      }
+    }
 
     if (paymentMethod === "wallet") {
       // Call walletPayment and handle the error if any
-      const errorMessage = await walletPayment(totalAmount, req.user.id);
+      const errorMessage = await walletPayment(finalAmount, req.user.id);
 
       if (errorMessage) {
         // If an error message is returned, send the response
@@ -125,7 +155,7 @@ const placeOrder = async (req, res) => {
     } else if (paymentMethod === "razorpay") {
       try {
         const options = {
-          amount: totalAmount * 100,
+          amount: finalAmount * 100, // Use finalAmount instead of totalAmount
           currency: "INR",
           receipt: `order_${Date.now()}`,
         };
@@ -138,7 +168,11 @@ const placeOrder = async (req, res) => {
           order: razorpayOrder,
           cartDetails: {
             items: orderItems,
-            totalAmount,
+            totalAmount: totalAmount,
+            finalAmount: finalAmount,
+            discount: discount,
+            couponApplied: couponApplied,
+            appliedCoupon: appliedCoupon,
             address: selectedAddress,
           },
         });
@@ -159,7 +193,10 @@ const placeOrder = async (req, res) => {
       paymentMethod,
       orderedItems: orderItems,
       totalPrice: totalAmount,
-      FinalAmount: totalAmount,
+      discount: discount,
+      FinalAmount: finalAmount,
+      couponApplied: couponApplied,
+      appliedCouponCode: appliedCoupon, // Add this field to orderSchema if not exists
       status: "Pending",
     });
 
@@ -327,7 +364,14 @@ const verifyRazorpayPayment = async (req, res) => {
     const generatedSignature = hmac.digest("hex");
 
     if (generatedSignature === razorpay_signature) {
-      // Create the order
+      let couponId = null;
+      if (cartDetails.appliedCoupon) {
+        const coupon = await Coupon.findOne({ name: cartDetails.appliedCoupon });
+        if (coupon) {
+          couponId = coupon._id;
+        }
+      }
+
       const newOrder = new Order({
         orderId: uuidv4(),
         userId: req.user.id,
@@ -335,7 +379,11 @@ const verifyRazorpayPayment = async (req, res) => {
         paymentMethod: "razorpay",
         orderedItems: cartDetails.items,
         totalPrice: cartDetails.totalAmount,
-        FinalAmount: cartDetails.totalAmount,
+        discount: cartDetails.discount || 0,
+        FinalAmount: cartDetails.finalAmount,
+        couponApplied: cartDetails.couponApplied || false,
+        appliedCouponCode: cartDetails.appliedCoupon,
+        couponId: couponId,  // Save the coupon ID
         status: "Processing",
         paymentDetails: {
           razorpay_payment_id,

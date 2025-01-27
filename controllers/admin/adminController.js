@@ -410,7 +410,7 @@ const downloadReport = async (req, res) => {
         (order) => order.paymentMethod?.toLowerCase() === "cod"
       ).length,
       Online: orders.filter(
-        (order) => order.paymentMethod?.toLowerCase() === "online"
+        (order) => order.paymentMethod?.toLowerCase() === "razorpay"
       ).length,
       Wallet: orders.filter(
         (order) => order.paymentMethod?.toLowerCase() === "wallet"

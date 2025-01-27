@@ -7,37 +7,28 @@ const Order = require("../../models/orderSchema");
 
 const getOrdersPage = async (req, res) => {
   try {
-    // Fetch orders with user and product details populated
     const orders = await Order.find()
-      .populate("userId", "name") // Populate user details (name field only)
-      .populate("orderedItems.product", "productName price _id"); // Populate product details
-    // Transform orders for the EJS page
+      .populate("userId", "name")
+      .populate("orderedItems.product", "productName price _id")
+      .sort({ createdAt: -1 });
+
     const transformedOrders = orders.flatMap((order) =>
       order.orderedItems.map((item) => ({
         orderId: order.orderId,
         customerName:
-          order.userId && order.userId.name ? order.userId.name : "Unknown", // Handle missing user
-        productId: item.product ? item.product._id : null, // Include product ID
+          order.userId && order.userId.name ? order.userId.name : "Unknown",
+        productId: item.product ? item.product._id : null,
         productName: item.product
           ? item.product.productName
           : "Unknown Product",
         quantity: item.quantity,
         price: item.price,
         totalPrice: item.totalPrice,
-        itemStatus: item.status, // Status of the individual item
-        orderStatus: order.status, // Overall order status
-        totalAmount: order.FinalAmount, // Total final amount for the order
+        itemStatus: item.status,
+        orderStatus: order.status,
+        totalAmount: order.FinalAmount,
       }))
     );
-
-    // Debugging: Log the original and transformed orders
-    // console.log("Original Orders:", JSON.stringify(orders, null, 2));
-    // console.log(
-    //   "Transformed Orders for Frontend:",
-    //   JSON.stringify(transformedOrders, null, 2)
-    // );
-
-    // Send transformed orders to the frontend
     res.render("admin/orders", { orders: transformedOrders });
   } catch (error) {
     console.error("Error fetching orders:", error.message);

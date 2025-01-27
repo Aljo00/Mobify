@@ -532,6 +532,7 @@ const loadOrdersPage = async (req, res) => {
 
     const orders = await Order.find({ userId: user })
       .populate("orderedItems.product")
+      .sort({ createdAt: -1 }) // Sort by creation date in descending order
       .lean();
 
     // Fetch the address for each order

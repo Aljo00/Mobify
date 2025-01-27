@@ -145,6 +145,8 @@ user_router.get("/order-success", userAuth.protect, orderController.orderSuccess
 
 user_router.post("/create-order", userAuth.protect, orderController.razarPay);
 
+user_router.post('/verify-razorpay-payment', userAuth.protect, orderController.verifyRazorpayPayment);
+
 //User Profile Management
 
 // Route: GET /account

@@ -245,10 +245,11 @@
   document
     .getElementById("checkoutForm")
     .addEventListener("submit", async function (event) {
-      event.preventDefault(); // Prevent the default form submission
+      event.preventDefault();
 
       const form = this;
       const formData = new FormData(form);
+      const paymentMethod = formData.get('paymentMethod');
 
       try {
         const response = await fetch(form.action, {
@@ -257,20 +258,73 @@
         });
 
         const data = await response.json();
-        console.log("Response from backend:", data); // Debugging log
+        console.log("Response from backend:", data);
 
         if (data.success) {
-          // If successful, redirect to the order success page
-          window.location.href = data.redirectUrl || "/order-success";
+          if (paymentMethod === 'razorpay' && data.order) {
+            // Handle Razorpay payment
+            const options = {
+              key: '<%= process.env.RAZARPAY_API_KEY_ID %>', // Add this to your EJS template
+              amount: data.order.amount,
+              currency: data.order.currency,
+              name: 'Your Store Name',
+              description: 'Purchase Order',
+              order_id: data.order.id,
+              handler: async function (response) {
+                try {
+                  // Verify the payment
+                  const verificationResponse = await fetch('/verify-razorpay-payment', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                      razorpay_payment_id: response.razorpay_payment_id,
+                      razorpay_order_id: response.razorpay_order_id,
+                      razorpay_signature: response.razorpay_signature,
+                      cartDetails: data.cartDetails
+                    })
+                  });
+
+                  const verificationResult = await verificationResponse.json();
+                  
+                  if (verificationResult.success) {
+                    window.location.href = verificationResult.redirectUrl;
+                  } else {
+                    throw new Error(verificationResult.message);
+                  }
+                } catch (error) {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Payment Verification Failed',
+                    text: error.message || 'Please try again',
+                  });
+                }
+              },
+              prefill: {
+                name: '<%= user.name %>',
+                email: '<%= user.email %>',
+                contact: '<%= user.phone %>'
+              },
+              theme: {
+                color: '#3399cc'
+              }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.open();
+
+          } else {
+            // Handle other payment methods
+            window.location.href = data.redirectUrl;
+          }
         } else {
-          // Show error toast if order was not successful
           Swal.fire({
             toast: true,
             position: "top-end",
             icon: "error",
             title: "Error!",
-            text:
-              data.message || "Failed to place the order. Please try again.",
+            text: data.message || "Failed to place the order. Please try again.",
             showConfirmButton: false,
             timer: 3000,
             timerProgressBar: true,
@@ -291,10 +345,6 @@
           showConfirmButton: false,
           timer: 3000,
           timerProgressBar: true,
-          customClass: {
-            popup: "colored-toast error-toast",
-            icon: "error-icon",
-          },
         });
       }
     });

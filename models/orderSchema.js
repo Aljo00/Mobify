@@ -61,7 +61,9 @@ const orderSchema = new Schema(
             "Delivered",
             "Cancelled",
             "Return Request",
-            "Returned",
+            "Return Approved",
+            "Return Rejected",
+            "Returned"
           ],
         },
       },

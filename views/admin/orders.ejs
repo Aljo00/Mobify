@@ -76,58 +76,314 @@
                 </nav>
             </div>
 
+            <!-- Update the buttons container -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <!-- Return Requests button on the left -->
+                <button type="button" 
+                        class="btn btn-primary return-requests-btn <%= returnRequests > 0 ? 'has-requests' : '' %>" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#returnRequestsModal">
+                    Return Requests
+                    <% if (returnRequests > 0) { %>
+                        <span class="notification-badge"><%= returnRequests %></span>
+                    <% } %>
+                </button>
+
+                <!-- Filter containers on the right -->
+                <div class="d-flex gap-3">
+                    <!-- Status Filter -->
+                    <div class="filter-container">
+                        <div class="dropdown">
+                            <button class="btn btn-light filter-btn" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-filter"></i> 
+                                <% if (currentFilter === 'all') { %>
+                                    Status Filter
+                                <% } else { %>
+                                    Status: <%= currentFilter %>
+                                <% } %>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item <%= currentFilter === 'all' ? 'active' : '' %>" href="?status=all&payment=<%= paymentFilter %>">All Orders</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item <%= currentFilter === 'Pending' ? 'active' : '' %>" href="?status=Pending&payment=<%= paymentFilter %>">Pending</a></li>
+                                <li><a class="dropdown-item <%= currentFilter === 'Processing' ? 'active' : '' %>" href="?status=Processing&payment=<%= paymentFilter %>">Processing</a></li>
+                                <li><a class="dropdown-item <%= currentFilter === 'Shipped' ? 'active' : '' %>" href="?status=Shipped&payment=<%= paymentFilter %>">Shipped</a></li>
+                                <li><a class="dropdown-item <%= currentFilter === 'Delivered' ? 'active' : '' %>" href="?status=Delivered&payment=<%= paymentFilter %>">Delivered</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item <%= currentFilter === 'Return Request' ? 'active' : '' %>" href="?status=Return Request&payment=<%= paymentFilter %>">Return Requests</a></li>
+                                <li><a class="dropdown-item <%= currentFilter === 'Return Approved' ? 'active' : '' %>" href="?status=Return Approved&payment=<%= paymentFilter %>">Return Approved</a></li>
+                                <li><a class="dropdown-item <%= currentFilter === 'Return Rejected' ? 'active' : '' %>" href="?status=Return Rejected&payment=<%= paymentFilter %>">Return Rejected</a></li>
+                                <li><a class="dropdown-item <%= currentFilter === 'Returned' ? 'active' : '' %>" href="?status=Returned&payment=<%= paymentFilter %>">Returned</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item <%= currentFilter === 'Cancelled' ? 'active' : '' %>" href="?status=Cancelled&payment=<%= paymentFilter %>">Cancelled</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Payment Filter -->
+                    <div class="filter-container">
+                        <div class="dropdown">
+                            <button class="btn btn-light filter-btn" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-money-bill"></i> 
+                                <% if (paymentFilter === 'all') { %>
+                                    Payment Filter
+                                <% } else { %>
+                                    Payment: <%= paymentFilter %>
+                                <% } %>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item <%= paymentFilter === 'all' ? 'active' : '' %>" href="?status=<%= currentFilter %>&payment=all">All Payments</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item <%= paymentFilter === 'razorpay' ? 'active' : '' %>" href="?status=<%= currentFilter %>&payment=razorpay">Online Payment</a></li>
+                                <li><a class="dropdown-item <%= paymentFilter === 'wallet' ? 'active' : '' %>" href="?status=<%= currentFilter %>&payment=wallet">Wallet</a></li>
+                                <li><a class="dropdown-item <%= paymentFilter === 'cod' ? 'active' : '' %>" href="?status=<%= currentFilter %>&payment=cod">Cash on Delivery</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Return Requests Modal -->
+            <div class="modal fade" id="returnRequestsModal" tabindex="-1" aria-labelledby="returnRequestsModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header sticky-top bg-white">
+                            <h5 class="modal-title" id="returnRequestsModalLabel">
+                                Return Requests (<%= returnRequests %>)
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="table-responsive">
+                                <% if (!returnRequestsData || returnRequestsData.length === 0) { %>
+                                    <div class="text-center py-4">
+                                        <i class="fas fa-check-circle text-success fs-1 mb-3"></i>
+                                        <h5>No Pending Return Requests</h5>
+                                        <p class="text-muted">All return requests have been processed.</p>
+                                    </div>
+                                <% } else { %>
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Order ID</th>
+                                                <th>Customer Name</th>
+                                                <th>Product Name</th>
+                                                <th>Quantity</th>
+                                                <th>Total Price</th>
+                                                <th>Payment</th>  <!-- New column -->
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% returnRequestsData.forEach(order => { %>
+                                                <tr>
+                                                    <td>#<%= order.orderId %></td>
+                                                    <td><%= order.customerName %></td>
+                                                    <td><%= order.productName %></td>
+                                                    <td><%= order.quantity %></td>
+                                                    <td><%= order.totalPrice %></td>
+                                                    <td>
+                                                        <span class="payment-badge <%= 
+                                                            order.paymentMethod === 'razorpay' ? 'payment-online' : 
+                                                            order.paymentMethod === 'wallet' ? 'payment-wallet' : 
+                                                            'payment-cod' %>">
+                                                            <%= order.paymentMethod === 'razorpay' ? 'Online' : 
+                                                            order.paymentMethod === 'wallet' ? 'Wallet' : 
+                                                            'COD' %>
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <form action="/admin/orders/update-status" method="POST">
+                                                            <input type="hidden" name="orderId" value="<%= order.orderId %>" />
+                                                            <input type="hidden" name="productId" value="<%= order.productId?.toString() %>" />
+                                                            <select name="status" class="form-select">
+                                                                <option value="Return Request">Return Request</option>
+                                                                <option value="Return Approved">Approve Return</option>
+                                                                <option value="Return Rejected">Reject Return</option>
+                                                            </select>
+                                                            <button type="submit" class="btn btn-primary btn-sm mt-2">Update</button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            <% }) %>
+                                        </tbody>
+                                    </table>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Orders Table Card -->
             <div class="card">
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Order ID</th>
-                                    <th>Customer Name</th>
-                                    <th>Product Name</th>
-                                    <th>Quantity</th>
-                                    <th>Total Price</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% orders.forEach(order => { %>
-                                <tr>
-                                    <td>#<%= order.orderId %></td>
-                                    <td><%= order.customerName %></td>
-                                    <td><%= order.productName %></td>
-                                    <td><%= order.quantity %></td>
-                                    <td><%= order.totalPrice %></td>
-                                    <td>
-                                        <span class="badge <%= order.itemStatus === 'Delivered' ? 'bg-success' : order.itemStatus === 'Returned'? 'bg-danger' : order.itemStatus === 'Cancelled'? 'bg-danger' : 'bg-warning' %>">
-                                            <%= order.itemStatus %>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <!-- Form for updating the status -->
-                                        <form action="/admin/orders/update-status" method="POST">
-                                            <input type="hidden" name="orderId" value="<%= order.orderId %>" />
-                                            <input type="hidden" name="productId" value="<%= order.productId %>" />
-                                            <select name="status" class="form-select">
-                                                <option value="Pending" <%= order.status === 'Pending' ? 'selected' : '' %>>Pending</option>
-                                                <option value="Processing" <%= order.status === 'Processing' ? 'selected' : '' %>>Processing</option>
-                                                <option value="Shipped" <%= order.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
-                                                <option value="Delivered" <%= order.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
-                                                <option value="Cancelled" <%= order.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
-                                                <option value="Returned" <%= order.status === 'Returned' ? 'selected' : '' %>>Returned</option>
-                                            </select>
-                                            <button type="submit" class="btn btn-primary btn-sm mt-2">Update</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                <% }) %>
-                            </tbody>
-                        </table>
+                        <% if (orders.length === 0) { %>
+                            <div class="no-orders-message">
+                                <div class="text-center py-5">
+                                    <i class="fas fa-box-open fs-1 text-muted mb-3"></i>
+                                    <h4 class="text-muted">No Orders Found</h4>
+                                    <p class="text-muted mb-0">
+                                        <%= currentFilter === 'all' ? 
+                                            'There are no orders available at the moment.' : 
+                                            `No orders found with status "${currentFilter}".` %>
+                                    </p>
+                                    <a href="/admin/orders" class="btn btn-outline-primary mt-3">
+                                        <i class="fas fa-sync-alt me-2"></i>View All Orders
+                                    </a>
+                                </div>
+                            </div>
+                        <% } else { %>
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Customer Name</th>
+                                        <th>Product Name</th>
+                                        <th>Quantity</th>
+                                        <th>Total Price</th>
+                                        <th>Payment</th>  <!-- New column -->
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% orders.forEach(order => { %>
+                                    <tr>
+                                        <td>#<%= order.orderId %></td>
+                                        <td><%= order.customerName %></td>
+                                        <td><%= order.productName %></td>
+                                        <td><%= order.quantity %></td>
+                                        <td><%= order.totalPrice %></td>
+                                        <td>
+                                            <span class="payment-badge <%= 
+                                                order.paymentMethod === 'razorpay' ? 'payment-online' : 
+                                                order.paymentMethod === 'wallet' ? 'payment-wallet' : 
+                                                'payment-cod' %>">
+                                                <%= order.paymentMethod === 'razorpay' ? 'Online' : 
+                                                order.paymentMethod === 'wallet' ? 'Wallet' : 
+                                                'COD' %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge <%= 
+                                                order.itemStatus === 'Pending' ? 'status-pending' : 
+                                                order.itemStatus === 'Processing' ? 'status-processing' : 
+                                                order.itemStatus === 'Shipped' ? 'status-shipped' : 
+                                                order.itemStatus === 'Delivered' ? 'status-delivered' : 
+                                                order.itemStatus === 'Cancelled' ? 'status-cancelled' : 
+                                                order.itemStatus === 'Return Request' ? 'status-return-request' :
+                                                order.itemStatus === 'Return Approved' ? 'status-return-approved' :
+                                                order.itemStatus === 'Return Rejected' ? 'status-return-rejected' :
+                                                order.itemStatus === 'Returned' ? 'status-returned' : 
+                                                'status-pending' %>">
+                                                <%= order.itemStatus %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <!-- Form for updating the status -->
+                                            <form action="/admin/orders/update-status" method="POST" class="status-update-form">
+                                                <input type="hidden" name="orderId" value="<%= order.orderId %>" />
+                                                <input type="hidden" name="productId" value="<%= order.productId?.toString() %>" />
+                                                <select name="status" class="form-select status-select" 
+                                                    <%= ['Cancelled', 'Returned', 'Delivered', 'Return Rejected'].includes(order.itemStatus) ? 'disabled' : '' %>>
+                                                    <% 
+                                                    // Define available status transitions
+                                                    let availableStatuses = [];
+                                                    switch(order.itemStatus) {
+                                                        case 'Pending':
+                                                            availableStatuses = ['Pending', 'Processing', 'Cancelled'];
+                                                            break;
+                                                        case 'Processing':
+                                                            availableStatuses = ['Processing', 'Shipped', 'Cancelled'];
+                                                            break;
+                                                        case 'Shipped':
+                                                            availableStatuses = ['Shipped', 'Delivered', 'Cancelled'];
+                                                            break;
+                                                        case 'Delivered':
+                                                            availableStatuses = ['Delivered'];
+                                                            break;
+                                                        case 'Return Request':
+                                                            availableStatuses = ['Return Request', 'Return Approved', 'Return Rejected'];
+                                                            break;
+                                                        case 'Return Approved':
+                                                            availableStatuses = ['Return Approved', 'Returned'];
+                                                            break;
+                                                        case 'Return Rejected':
+                                                            availableStatuses = ['Return Rejected'];
+                                                            break;
+                                                        case 'Returned':
+                                                            availableStatuses = ['Returned'];
+                                                            break;
+                                                        case 'Cancelled':
+                                                            availableStatuses = ['Cancelled'];
+                                                            break;
+                                                        default:
+                                                            availableStatuses = ['Pending'];
+                                                    }
+                                                    %>
+                                                    
+                                                    <% availableStatuses.forEach(status => { %>
+                                                        <option value="<%= status %>" <%= order.itemStatus === status ? 'selected' : '' %>><%= status %></option>
+                                                    <% }) %>
+                                                </select>
+                                                <button type="submit" class="btn btn-primary btn-sm" 
+                                                    <%= ['Cancelled', 'Returned', 'Delivered', 'Return Rejected'].includes(order.itemStatus) ? 'disabled' : '' %>>
+                                                    Update Status
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        <% } %>
                     </div>
                 </div>
             </div>
+
+            <!-- Add this after the orders table card -->
+            <% if (pagination.totalPages > 1) { %>
+            <nav aria-label="Orders pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <!-- First Page -->
+                    <li class="page-item <%= pagination.page === 1 ? 'disabled' : '' %>">
+                        <a class="page-link" href="?page=1&status=<%= currentFilter %>&payment=<%= paymentFilter %>" aria-label="First">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+                    
+                    <!-- Previous Page -->
+                    <li class="page-item <%= !pagination.hasPrevPage ? 'disabled' : '' %>">
+                        <a class="page-link" href="?page=<%= pagination.prevPage %>&status=<%= currentFilter %>&payment=<%= paymentFilter %>" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+
+                    <!-- Page Numbers -->
+                    <% for(let i = Math.max(1, pagination.page - 2); i <= Math.min(pagination.totalPages, pagination.page + 2); i++) { %>
+                        <li class="page-item <%= pagination.page === i ? 'active' : '' %>">
+                            <a class="page-link" href="?page=<%= i %>&status=<%= currentFilter %>&payment=<%= paymentFilter %>"><%= i %></a>
+                        </li>
+                    <% } %>
+
+                    <!-- Next Page -->
+                    <li class="page-item <%= !pagination.hasNextPage ? 'disabled' : '' %>">
+                        <a class="page-link" href="?page=<%= pagination.nextPage %>&status=<%= currentFilter %>&payment=<%= paymentFilter %>" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+
+                    <!-- Last Page -->
+                    <li class="page-item <%= pagination.page === pagination.totalPages ? 'disabled' : '' %>">
+                        <a class="page-link" href="?page=<%= pagination.totalPages %>&status=<%= currentFilter %>&payment=<%= paymentFilter %>" aria-label="Last">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <% } %>
         </div>
     </div>
 </div>

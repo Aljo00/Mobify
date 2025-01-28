@@ -42,9 +42,17 @@ admin_route.get(
   adminController.loadDashboard
 );
 
-admin_route.get('/custom-range-data', adminAuth.protectAdmin, adminController.getCustomRangeData);
+admin_route.get(
+  "/custom-range-data",
+  adminAuth.protectAdmin,
+  adminController.getCustomRangeData
+);
 
-admin_route.get('/download-report', adminAuth.protectAdmin, adminController.downloadReport);
+admin_route.get(
+  "/download-report",
+  adminAuth.protectAdmin,
+  adminController.downloadReport
+);
 
 admin_route.get("/logout", adminController.logout);
 
@@ -86,9 +94,17 @@ admin_route.post("/editCategory/:id", categoryController.editCategory);
 
 admin_route.post("/deleteCategory/:id", categoryController.softDeleteCategory);
 
-admin_route.put("/category/add-offer", adminAuth.protectAdmin , categoryController.addOffer);
+admin_route.put(
+  "/category/add-offer",
+  adminAuth.protectAdmin,
+  categoryController.addOffer
+);
 
-admin_route.put("/category/remove-offer", adminAuth.protectAdmin , categoryController.removeOffer); 
+admin_route.put(
+  "/category/remove-offer",
+  adminAuth.protectAdmin,
+  categoryController.removeOffer
+);
 
 //Admin Brand Management Routes
 admin_route.get(
@@ -122,9 +138,17 @@ admin_route.get(
   productController.getAllProducts
 );
 
-admin_route.put("/products/add-offer",adminAuth.protectAdmin,productController.addOffer);
+admin_route.put(
+  "/products/add-offer",
+  adminAuth.protectAdmin,
+  productController.addOffer
+);
 
-admin_route.put("/products/remove-offer",adminAuth.protectAdmin,productController.removeOffer);
+admin_route.put(
+  "/products/remove-offer",
+  adminAuth.protectAdmin,
+  productController.removeOffer
+);
 
 admin_route.post("/deleteProduct/:id", productController.softDeleteProduct);
 

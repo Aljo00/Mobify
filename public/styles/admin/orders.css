@@ -57,7 +57,8 @@ body {
   transition: all 0.3s ease;
 }
 
-.sidebar a:hover, .sidebar a.active {
+.sidebar a:hover,
+.sidebar a.active {
   background: rgba(255, 255, 255, 0.1);
   color: white;
   transform: translateX(5px);
@@ -141,7 +142,11 @@ body {
   display: flex;
   flex-direction: column;
   padding: 1.5rem;
-  background: linear-gradient(to bottom, #ffffff, #fcfcfc); /* Subtle gradient */
+  background: linear-gradient(
+    to bottom,
+    #ffffff,
+    #fcfcfc
+  ); /* Subtle gradient */
 }
 
 .card-title {
@@ -183,6 +188,109 @@ body {
   background-color: #f8fafc; /* Hover effect */
 }
 
+/* Enhanced Form Controls in Table */
+.table .form-select {
+  min-width: 180px;
+  max-width: 100%;
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
+
+.table .form-select option {
+  padding: 12px;
+  font-size: 0.875rem;
+  background-color: white;
+  color: #1e293b;
+}
+
+.table .form-select:hover {
+  border-color: var(--primary-color);
+  background-color: #f1f5f9;
+}
+
+.table .form-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.1);
+  background-color: white;
+}
+
+/* Enhanced Status Select Styles to match filter dropdown */
+.status-select {
+  min-width: 200px;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: #4a5568;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%234361ee' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 12px;
+  padding-right: 2.5rem;
+  font-weight: 500;
+}
+
+.status-select:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.status-select:focus {
+  border-color: #4361ee;
+  box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.1);
+  outline: none;
+  background-color: white;
+}
+
+/* Style the options to match dropdown items */
+.status-select option {
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: #4a5568;
+  background-color: white;
+}
+
+.status-select option:checked {
+  background-color: #4361ee;
+  color: white;
+}
+
+/* Update form layout */
+.status-update-form {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.status-update-form .btn {
+  padding: 0.75rem 1rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Style for table cell containing form */
+.table td:last-child {
+  min-width: 200px;
+  width: auto;
+  padding: 1rem;
+}
+
+/* Container for form in table */
+.status-update-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 /* Status Badge styles */
 .badge {
   padding: 0.5em 1em;
@@ -205,6 +313,62 @@ body {
 .badge.bg-danger {
   background: rgba(239, 68, 68, 0.1) !important;
   color: #dc2626;
+}
+
+.badge.bg-info {
+  background: rgba(6, 182, 212, 0.1) !important;
+  color: #0891b2;
+}
+
+.badge.bg-primary {
+  background: rgba(59, 130, 246, 0.1) !important;
+  color: #2563eb;
+}
+
+/* Unique colors for each status */
+.badge.status-pending {
+  background: rgba(234, 179, 8, 0.1) !important;
+  color: #b45309;
+}
+
+.badge.status-processing {
+  background: rgba(147, 51, 234, 0.1) !important;
+  color: #7e22ce;
+}
+
+.badge.status-shipped {
+  background: rgba(59, 130, 246, 0.1) !important;
+  color: #2563eb;
+}
+
+.badge.status-delivered {
+  background: rgba(16, 185, 129, 0.1) !important;
+  color: #059669;
+}
+
+.badge.status-cancelled {
+  background: rgba(239, 68, 68, 0.1) !important;
+  color: #dc2626;
+}
+
+.badge.status-return-request {
+  background: rgba(245, 158, 11, 0.1) !important;
+  color: #d97706;
+}
+
+.badge.status-return-approved {
+  background: rgba(37, 99, 235, 0.1) !important;
+  color: #1d4ed8;
+}
+
+.badge.status-return-rejected {
+  background: rgba(220, 38, 38, 0.1) !important;
+  color: #b91c1c;
+}
+
+.badge.status-returned {
+  background: rgba(79, 70, 229, 0.1) !important;
+  color: #4338ca;
 }
 
 /* Form Control styles */
@@ -249,4 +413,335 @@ body {
   background: var(--secondary-color);
   transform: translateY(-1px);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.return-requests-btn {
+  position: relative;
+  padding-right: 2.5rem;
+  background: linear-gradient(45deg, #ff6b6b, #f53844);
+  border: none;
+  color: white;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  animation: pulse 2s infinite;
+}
+
+.return-requests-btn:hover {
+  background: linear-gradient(45deg, #f53844, #ff6b6b);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(245, 56, 68, 0.35);
+}
+
+.return-requests-btn:disabled {
+  background: #cbd5e1;
+  animation: none;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.return-requests-btn.has-requests {
+  background: linear-gradient(45deg, #ff6b6b, #f53844);
+  border: none;
+  animation: pulse 2s infinite;
+  box-shadow: 0 0 15px rgba(245, 56, 68, 0.4);
+}
+
+.return-requests-btn.has-requests:hover {
+  background: linear-gradient(45deg, #f53844, #ff6b6b);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(245, 56, 68, 0.35);
+}
+
+.notification-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #ffd000;
+  color: #000;
+  border-radius: 50%;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  min-width: 1.5rem;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  font-weight: 700;
+  border: 2px solid #fff;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(245, 56, 68, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(245, 56, 68, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(245, 56, 68, 0);
+  }
+}
+
+.modal-content {
+  border-radius: 15px;
+  border: none;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  border-radius: 15px 15px 0 0;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+/* Enhanced Modal Styles */
+.modal-dialog.modal-xl {
+    max-width: 95vw;
+    margin: 1.75rem auto;
+}
+
+.modal-content {
+    max-height: 90vh;
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    background-color: #fff;
+    border-bottom: 1px solid #e9ecef;
+    padding: 1rem 1.5rem;
+}
+
+.modal-body {
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+
+.modal .table-responsive {
+    margin: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.modal .table {
+    min-width: 800px; /* Ensures table has minimum width */
+    margin-bottom: 0;
+}
+
+.modal .table th,
+.modal .table td {
+    white-space: nowrap; /* Prevents text wrapping */
+    padding: 1rem;
+}
+
+/* Custom scrollbar for better UX */
+.modal-body::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.filter-container {
+  position: relative;
+}
+
+.filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.625rem 1rem;
+  background-color: #fff;
+  border: 1px solid #e2e8f0;
+  color: #4a5568;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.filter-btn i {
+  color: #4361ee;
+  font-size: 0.875rem;
+}
+
+/* Enhanced filter button when filtered */
+.filter-btn.filtered {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.filter-btn.filtered i {
+  color: white;
+}
+
+/* Enhanced Filter Container Styles */
+.filter-container .filter-btn {
+    min-width: 160px;
+    justify-content: space-between;
+}
+
+.filter-btn i.fa-money-bill {
+    color: #10b981;  /* Green color for payment icon */
+}
+
+.filter-btn:hover i.fa-money-bill {
+    color: #059669;
+}
+
+.dropdown-menu {
+  padding: 0.5rem;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.dropdown-item {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #f1f5f9;
+  color: #4361ee;
+}
+
+/* Active state for dropdown items */
+.dropdown-item.active {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.dropdown-item.active:hover {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+/* Pagination Styles */
+.pagination {
+  margin-top: 2rem;
+}
+
+.page-link {
+  color: var(--primary-color);
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease;
+  border: 1px solid #e2e8f0;
+}
+
+.page-link:hover {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.page-item.active .page-link {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.page-item.disabled .page-link {
+  color: #cbd5e1;
+  pointer-events: none;
+  background-color: #f8fafc;
+}
+
+.pagination .page-link:focus {
+  box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+}
+
+/* No Orders Message styles */
+.no-orders-message {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.no-orders-message i {
+  font-size: 3rem;
+  color: #cbd5e1;
+}
+
+.no-orders-message h4 {
+  color: #64748b;
+  font-weight: 600;
+  margin: 1rem 0;
+}
+
+.no-orders-message p {
+  color: #94a3b8;
+}
+
+.no-orders-message .btn-outline-primary {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  transition: all 0.2s ease;
+  font-size: 0.875rem; /* Smaller font size */
+  padding: 0.5rem 1rem; /* Reduced padding */
+}
+
+.no-orders-message .btn-outline-primary:hover {
+  background-color: var(--primary-color);
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* Dropdown divider enhancement */
+.dropdown-divider {
+  margin: 0.5rem 0;
+  border-color: #e2e8f0;
+}
+
+/* Payment Method Badge Styles */
+.payment-badge {
+  display: inline-block;
+  padding: 0.35em 0.8em;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.payment-online {
+  background: rgba(59, 130, 246, 0.1);
+  color: #2563eb;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.payment-wallet {
+  background: rgba(147, 51, 234, 0.1);
+  color: #7e22ce;
+  border: 1px solid rgba(147, 51, 234, 0.2);
+}
+
+.payment-cod {
+  background: rgba(79, 70, 229, 0.1);
+  color: #4338ca;
+  border: 1px solid rgba(79, 70, 229, 0.2);
 }

@@ -271,77 +271,104 @@
     <div class="page-container">
       <div class="order-success-container">
         <div class="order-content">
-          <div class="success-header">
-            <div class="success-icon">
-              <i class="fas fa-check"></i>
+          <% if (!order) { %>
+            <div class="error-message">
+              <h2>Order Not Found</h2>
+              <p>Sorry, we couldn't find the order you're looking for.</p>
+              <a href="/orders" class="btn btn-primary">View All Orders</a>
             </div>
-            <h2>Order Placed Successfully!</h2>
-            <p class="text-muted">Thank you for shopping with us.</p>
-          </div>
+          <% } else { %>
+            <div class="success-header">
+              <div class="success-icon">
+                <i class="fas fa-check"></i>
+              </div>
+              <h2>
+                <% if (order.status === "Payment Pending") { %>
+                  Order Created - Payment Pending
+                <% } else { %>
+                  Order Placed Successfully!
+                <% } %>
+              </h2>
+              <p class="text-muted">
+                <% if (order.status === "Payment Pending") { %>
+                  Please complete your payment to confirm the order.
+                <% } else { %>
+                  Thank you for shopping with us.
+                <% } %>
+              </p>
+            </div>
 
-          <div class="order-meta">
-            <h4 class="mb-4">Order Information</h4>
-            <div class="mb-3">
-              <strong>Order ID:</strong>
-              <div class="text-muted"><%= order.orderId %></div>
+            <div class="order-meta">
+              <h4 class="mb-4">Order Information</h4>
+              <div class="mb-3">
+                <strong>Order ID:</strong>
+                <div class="text-muted"><%= order.orderId || 'N/A' %></div>
+              </div>
+              <div class="mb-3">
+                <strong>Order Date:</strong>
+                <div class="text-muted"><%= order.createdAt ? order.createdAt.toDateString() : 'N/A' %></div>
+              </div>
+              <div class="mb-4">
+                <strong>Delivery Address:</strong>
+                <% if (order.formattedAddress) { %>
+                  <div class="address-details">
+                    <strong class="d-block mb-2"><%= order.formattedAddress.type %></strong>
+                    <div class="text-muted">
+                      <%= order.formattedAddress.name %><br>
+                      <%= order.formattedAddress.city %>, 
+                      <%= order.formattedAddress.state %> - 
+                      <%= order.formattedAddress.pincode %><br>
+                      📱 <%= order.formattedAddress.phone %><br>
+                      <% if (order.formattedAddress.alternatePhone) { %>
+                        📞 <%= order.formattedAddress.alternatePhone %>
+                      <% } %>
+                    </div>
+                  </div>
+                <% } else { %>
+                  <div class="address-details">
+                    <p class="text-muted">Address information not available</p>
+                  </div>
+                <% } %>
+              </div>
             </div>
-            <div class="mb-3">
-              <strong>Order Date:</strong>
-              <div class="text-muted"><%= order.createdAt.toDateString() %></div>
-            </div>
-            <div class="mb-4">
-              <strong>Delivery Address:</strong>
-              <% if (order.formattedAddress) { %>
-                <div class="address-details">
-                  <strong class="d-block mb-2"><%= order.formattedAddress.type %></strong>
-                  <div class="text-muted">
-                    <%= order.formattedAddress.name %><br>
-                    Near <%= order.formattedAddress.landmark %><br>
-                    <%= order.formattedAddress.city %>, 
-                    <%= order.formattedAddress.state %> - 
-                    <%= order.formattedAddress.pincode %><br>
-                    📱 <%= order.formattedAddress.phone %><br>
-                    📞 <%= order.formattedAddress.alternatePhone %>
+
+            <div class="ordered-items">
+              <h4 class="mb-4">Order Summary</h4>
+              <% if (order.formattedItems && order.formattedItems.length > 0) { %>
+                <% order.formattedItems.forEach((item, index) => { %>
+                  <div class="item-card" style="--item-index: <%= index %>">
+                    <h6 class="mb-2"><%= item.name %></h6>
+                    <div class="text-muted small mb-2">
+                      <%= item.specifications.RAM %> RAM | 
+                      <%= item.specifications.Storage %> Storage | 
+                      <%= item.specifications.color %>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span class="text-muted">Qty: <%= item.quantity %></span>
+                      <span class="fw-bold">₹<%= item.totalPrice.toFixed(2) %></span>
+                    </div>
+                  </div>
+                <% }) %>
+                <div class="total-amount">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span>Total Amount</span>
+                    <span class="h5 mb-0">₹<%= order.totalPrice.toFixed(2) %></span>
                   </div>
                 </div>
+              <% } else { %>
+                <p class="text-muted">No items found in this order</p>
               <% } %>
             </div>
-          </div>
 
-          <div class="ordered-items">
-            <h4 class="mb-4">Order Summary</h4>
-            <% if (order.formattedItems && order.formattedItems.length > 0) { %>
-              <% order.formattedItems.forEach(item => { %>
-                <div class="item-card">
-                  <h6 class="mb-2"><%= item.name %></h6>
-                  <div class="text-muted small mb-2">
-                    <%= item.specifications.RAM %> RAM | 
-                    <%= item.specifications.Storage %> Storage | 
-                    <%= item.specifications.color %>
-                  </div>
-                  <div class="d-flex justify-content-between align-items-center">
-                    <span class="text-muted">Qty: <%= item.quantity %></span>
-                    <span class="fw-bold">₹<%= item.totalPrice.toFixed(2) %></span>
-                  </div>
-                </div>
-              <% }) %>
-              <div class="total-amount">
-                <div class="d-flex justify-content-between align-items-center">
-                  <span>Total Amount</span>
-                  <span class="h5 mb-0">₹<%= order.totalPrice.toFixed(2) %></span>
-                </div>
-              </div>
-            <% } %>
-          </div>
+            <div class="delivery-time">
+              <i class="fas fa-truck me-2"></i>
+              Expected Delivery: Within 3-5 Business Days
+            </div>
 
-          <div class="delivery-time">
-            <i class="fas fa-truck me-2"></i>
-            Expected Delivery: Within 3-5 Business Days
-          </div>
-
-          <a href="/orders" class="btn btn-primary btn-lg btn-view-orders">
-            View My Orders
-          </a>
+            <a href="/orders" class="btn btn-primary btn-lg btn-view-orders">
+              View My Orders
+            </a>
+          <% } %>
         </div>
       </div>
     </div>

@@ -55,6 +55,7 @@ const orderSchema = new Schema(
           type: String,
           required: true,
           enum: [
+            "Payment Pending",  // Add this new status
             "Pending",
             "Processing",
             "Shipped",
@@ -65,6 +66,7 @@ const orderSchema = new Schema(
             "Return Rejected",
             "Returned"
           ],
+          default: "Payment Pending"
         },
       },
     ],

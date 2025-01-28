@@ -277,6 +277,29 @@
         </div>
       </div>
 
+      <!-- New Charts Row -->
+      <div class="row chart-row">
+        <!-- Payment Methods Chart -->
+        <div class="col-md-6">
+          <div class="chart-card">
+            <h5 class="chart-title">Payment Methods Distribution</h5>
+            <div class="chart-container-small">
+              <canvas id="paymentMethodsChart"></canvas>
+              <div id="paymentLegend" class="custom-legend mt-3"></div>
+            </div>
+          </div>
+        </div>
+        <!-- Order Status Chart -->
+        <div class="col-md-6">
+          <div class="chart-card">
+            <h5 class="chart-title">Order Status Distribution</h5>
+            <div class="chart-container-small">
+              <canvas id="orderStatusChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Orders Table Section -->
       <div class="row mt-4">
         <div class="col-12">
@@ -582,7 +605,7 @@
 
           // Click handler for view changes
           document.querySelectorAll('.dropdown-item').forEach(item => {
-              item.addEventListener('click', function(e) {
+              item.addEventListener('click', async function(e) {
                   e.preventDefault();
                   const range = this.dataset.range;
                   const dateRangePicker = document.getElementById('dateRangePicker');
@@ -639,6 +662,13 @@
                       updateStatsAndTable(revenue, orders, ordersToShow);
                       // Enable/disable buttons based on data availability
                       updateDownloadButtons(ordersToShow && ordersToShow.length > 0);
+
+                      // After updating the main chart and table, update the additional charts
+                      const response = await fetch(`/admin/chart-stats?range=${range}`);
+                      const statsData = await response.json();
+                      if (statsData.success) {
+                          updateSecondaryCharts(statsData);
+                      }
                   }
               });
           });
@@ -702,6 +732,13 @@
 
                       // Enable/disable download buttons based on data
                       updateDownloadButtons(data.orders && data.orders.length > 0);
+
+                      // Update the additional charts with the custom range data
+                      const statsResponse = await fetch(`/admin/chart-stats?range=custom&start=${startDate}&end=${endDate}`);
+                      const statsData = await statsResponse.json();
+                      if (statsData.success) {
+                          updateSecondaryCharts(statsData);
+                      }
                   } else {
                       alert('Failed to fetch data for selected date range');
                       updateDownloadButtons(false);
@@ -744,6 +781,333 @@
           updateStatsAndTable(<%- weeklyRevenue %>, <%- weeklyData %>, <%- weeklyOrdersList %>);
           // Initial state - enable/disable based on weekly data
           updateDownloadButtons(<%- weeklyOrdersList %> && <%- weeklyOrdersList %>.length > 0);
+
+          // Payment Methods Chart initialization
+          const paymentCtx = document.getElementById('paymentMethodsChart').getContext('2d');
+          const paymentData = {
+              cod: <%= paymentStats.COD || 0 %>,
+              online: <%= paymentStats.Online || 0 %>,
+              wallet: <%= paymentStats.Wallet || 0 %>
+          };
+
+          // Check if there's any payment data
+          const totalPayments = paymentData.cod + paymentData.online + paymentData.wallet;
+
+          let paymentChart;
+
+          if (totalPayments === 0) {
+              // Show empty state with message
+              paymentChart = new Chart(paymentCtx, {
+                  type: 'doughnut',
+                  data: {
+                      labels: ['No Data'],
+                      datasets: [{
+                          data: [1],
+                          backgroundColor: ['#f1f5f9'],
+                          borderWidth: 0
+                      }]
+                  },
+                  options: {
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      cutout: '60%',
+                      plugins: {
+                          legend: {
+                              display: false
+                          },
+                          tooltip: {
+                              enabled: false
+                          }
+                      }
+                  },
+                  plugins: [{
+                      id: 'emptyState',
+                      afterDraw: (chart) => {
+                          const { ctx, width, height } = chart;
+                          ctx.save();
+                          ctx.textAlign = 'center';
+                          ctx.textBaseline = 'middle';
+                          ctx.font = '14px Inter';
+                          ctx.fillStyle = '#64748b';
+                          ctx.fillText('No payment data available', width / 2, height / 2);
+                          ctx.restore();
+                      }
+                  }]
+              });
+          } else {
+              // Show actual payment data
+              paymentChart = new Chart(paymentCtx, {
+                  type: 'doughnut',
+                  data: {
+                      labels: ['COD', 'Online', 'Wallet'],
+                      datasets: [{
+                          data: [paymentData.cod, paymentData.online, paymentData.wallet],
+                          backgroundColor: ['#4f46e5', '#10b981', '#f59e0b'],
+                          borderWidth: 2,
+                          borderColor: '#ffffff'
+                      }]
+                  },
+                  options: {
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      cutout: '60%',
+                      plugins: {
+                          legend: {
+                              position: 'bottom',
+                              display: true,
+                              labels: {
+                                  color: '#64748b',
+                                  padding: 10,
+                                  usePointStyle: true,
+                                  font: {
+                                      family: "'Inter', sans-serif",
+                                      size: 12
+                                  }
+                              }
+                          },
+                          tooltip: {
+                              backgroundColor: 'white',
+                              titleColor: '#1e293b',
+                              bodyColor: '#64748b',
+                              borderColor: '#e2e8f0',
+                              borderWidth: 1,
+                              padding: 12,
+                              callbacks: {
+                                  label: function(context) {
+                                      const value = context.raw;
+                                      const percentage = ((value / totalPayments) * 100).toFixed(1);
+                                      return `${context.label}: ${value} (${percentage}%)`;
+                                  }
+                              }
+                          }
+                      }
+                  }
+              });
+          }
+
+          // Updated Order Status Chart
+          const statusCtx = document.getElementById('orderStatusChart').getContext('2d');
+          let statusChart = new Chart(statusCtx, {
+              type: 'bar',
+              data: {
+                  labels: [
+                      'Delivered',
+                      'Pending',
+                      'Processing',
+                      'Shipped',
+                      'Cancelled',
+                      'Return Request',
+                      'Return Approved',
+                      'Return Rejected',
+                      'Returned'
+                  ],
+                  datasets: [{
+                      label: 'Orders',
+                      data: [
+                          <%= salesStats.deliveredOrders || 0 %>,
+                          <%= salesStats.pendingOrders || 0 %>,
+                          <%= salesStats.processingOrders || 0 %>,
+                          <%= salesStats.shippedOrders || 0 %>,
+                          <%= salesStats.cancelledOrders || 0 %>,
+                          <%= salesStats.returnRequestedOrders || 0 %>,
+                          <%= salesStats.returnApprovedOrders || 0 %>,
+                          <%= salesStats.returnRejectedOrders || 0 %>,
+                          <%= salesStats.returnedOrders || 0 %>
+                      ],
+                      backgroundColor: [
+                          '#10b981', // Delivered - Green
+                          '#f59e0b', // Pending - Orange
+                          '#3b82f6', // Processing - Blue
+                          '#6366f1', // Shipped - Indigo
+                          '#ef4444', // Cancelled - Red
+                          '#8b5cf6', // Return Request - Purple
+                          '#14b8a6', // Return Approved - Teal
+                          '#f43f5e', // Return Rejected - Rose
+                          '#64748b'  // Returned - Gray
+                      ],
+                      borderRadius: 8,
+                      borderWidth: 0
+                  }]
+              },
+              options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  indexAxis: 'y',
+                  plugins: {
+                      legend: {
+                          display: false
+                      },
+                      tooltip: {
+                          backgroundColor: 'white',
+                          titleColor: '#1e293b',
+                          bodyColor: '#64748b',
+                          borderColor: '#e2e8f0',
+                          borderWidth: 1,
+                          padding: 12,
+                          displayColors: true,
+                          callbacks: {
+                              label: function(context) {
+                                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                  const value = context.raw || 0;
+                                  const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0';
+                                  return `Orders: ${value} (${percentage}%)`;
+                              }
+                          }
+                      }
+                  },
+                  scales: {
+                      y: {
+                          beginAtZero: true,
+                          grid: {
+                              display: false
+                          },
+                          ticks: {
+                              font: {
+                                  family: "'Inter', sans-serif",
+                                  size: 12
+                              }
+                          }
+                      },
+                      x: {
+                          beginAtZero: true, // Add this
+                          min: 0, // Add this
+                          grid: {
+                              color: '#e2e8f0'
+                          },
+                          ticks: {
+                              font: {
+                                  family: "'Inter', sans-serif",
+                                  size: 12
+                              }
+                          }
+                      }
+                  }
+              }
+          });
+
+          function updateSecondaryCharts(data) {
+              // Update payment methods chart
+              if (paymentChart) {
+                  const newPaymentData = {
+                      cod: data.paymentStats.COD || 0,
+                      online: data.paymentStats.Online || 0,
+                      wallet: data.paymentStats.Wallet || 0
+                  };
+                  
+                  const newTotalPayments = newPaymentData.cod + newPaymentData.online + newPaymentData.wallet;
+
+                  // Destroy existing chart
+                  paymentChart.destroy();
+
+                  // Recreate chart based on new data
+                  if (newTotalPayments === 0) {
+                      paymentChart = new Chart(paymentCtx, {
+                          type: 'doughnut',
+                          data: {
+                              labels: ['No Data'],
+                              datasets: [{
+                                  data: [1],
+                                  backgroundColor: ['#f1f5f9'],
+                                  borderWidth: 0
+                              }]
+                          },
+                          options: {
+                              responsive: true,
+                              maintainAspectRatio: false,
+                              cutout: '60%',
+                              plugins: {
+                                  legend: {
+                                      display: false
+                                  },
+                                  tooltip: {
+                                      enabled: false
+                                  }
+                              }
+                          },
+                          plugins: [{
+                              id: 'emptyState',
+                              afterDraw: (chart) => {
+                                  const { ctx, width, height } = chart;
+                                  ctx.save();
+                                  ctx.textAlign = 'center';
+                                  ctx.textBaseline = 'middle';
+                                  ctx.font = '14px Inter';
+                                  ctx.fillStyle = '#64748b';
+                                  ctx.fillText('No payment data available', width / 2, height / 2);
+                                  ctx.restore();
+                              }
+                          }]
+                      });
+                  } else {
+                      paymentChart = new Chart(paymentCtx, {
+                          type: 'doughnut',
+                          data: {
+                              labels: ['COD', 'Online', 'Wallet'],
+                              datasets: [{
+                                  data: [newPaymentData.cod, newPaymentData.online, newPaymentData.wallet],
+                                  backgroundColor: ['#4f46e5', '#10b981', '#f59e0b'],
+                                  borderWidth: 2,
+                                  borderColor: '#ffffff'
+                              }]
+                          },
+                          options: {
+                              responsive: true,
+                              maintainAspectRatio: false,
+                              cutout: '60%',
+                              plugins: {
+                                  legend: {
+                                      position: 'bottom',
+                                      display: true,
+                                      labels: {
+                                          color: '#64748b',
+                                          padding: 10,
+                                          usePointStyle: true,
+                                          font: {
+                                              family: "'Inter', sans-serif",
+                                              size: 12
+                                          }
+                                      }
+                                  },
+                                  tooltip: {
+                                      backgroundColor: 'white',
+                                      titleColor: '#1e293b',
+                                      bodyColor: '#64748b',
+                                      borderColor: '#e2e8f0',
+                                      borderWidth: 1,
+                                      padding: 12,
+                                      callbacks: {
+                                          label: function(context) {
+                                              const value = context.raw;
+                                              const percentage = ((value / newTotalPayments) * 100).toFixed(1);
+                                              return `${context.label}: ${value} (${percentage}%)`;
+                                          }
+                                      }
+                                  }
+                              }
+                          }
+                      });
+                  }
+              }
+
+              // Update order status chart
+              if (statusChart) {
+                  const statusData = [
+                      data.salesStats.deliveredOrders || 0,
+                      data.salesStats.pendingOrders || 0,
+                      data.salesStats.processingOrders || 0,
+                      data.salesStats.shippedOrders || 0, 
+                      data.salesStats.cancelledOrders || 0,
+                      data.salesStats.returnRequestedOrders || 0,
+                      data.salesStats.returnApprovedOrders || 0,
+                      data.salesStats.returnRejectedOrders || 0,
+                      data.salesStats.returnedOrders || 0
+                  ];
+
+                  statusChart.data.datasets[0].data = statusData;
+                  statusChart.update();
+              }
+          }
+
       } catch (error) {
           console.error('Chart Error:', error);
           updateDownloadButtons(false);

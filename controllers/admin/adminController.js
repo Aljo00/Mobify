@@ -267,6 +267,55 @@ const loadDashboard = async (req, res) => {
       .populate("userId", "name")
       .sort({ createdAt: -1 });
 
+    // Add these statistics calculations
+    const paymentStats = {
+      COD: await Order.countDocuments({
+        paymentMethod: "cod",
+        "orderedItems.status": { $ne: "Cancelled" },
+      }),
+      Online: await Order.countDocuments({
+        paymentMethod: "razorpay",
+        "orderedItems.status": { $ne: "Cancelled" },
+      }),
+      Wallet: await Order.countDocuments({
+        paymentMethod: "wallet",
+        "orderedItems.status": { $ne: "Cancelled" },
+      }),
+    };
+
+    // Make sure payment stats exist
+    console.log("Payment Stats:", paymentStats); // For debugging
+
+    const salesStats = {
+      deliveredOrders: await Order.countDocuments({
+        "orderedItems.status": "Delivered",
+      }),
+      pendingOrders: await Order.countDocuments({
+        "orderedItems.status": "Pending",
+      }),
+      processingOrders: await Order.countDocuments({
+        "orderedItems.status": "Processing",
+      }),
+      shippedOrders: await Order.countDocuments({
+        "orderedItems.status": "Shipped",
+      }),
+      cancelledOrders: await Order.countDocuments({
+        "orderedItems.status": "Cancelled",
+      }),
+      returnRequestedOrders: await Order.countDocuments({
+        "orderedItems.status": "Return Request",
+      }),
+      returnApprovedOrders: await Order.countDocuments({
+        "orderedItems.status": "Return Approved",
+      }),
+      returnRejectedOrders: await Order.countDocuments({
+        "orderedItems.status": "Return Rejected",
+      }),
+      returnedOrders: await Order.countDocuments({
+        "orderedItems.status": "Returned",
+      }),
+    };
+
     return res.render("admin/dashboard", {
       totalRevenue,
       totalProducts,
@@ -285,6 +334,8 @@ const loadDashboard = async (req, res) => {
       todaysOrders: JSON.stringify(todaysOrders),
       weeklyOrdersList: JSON.stringify(weeklyOrdersList),
       monthlyOrdersList: JSON.stringify(monthlyOrdersList),
+      paymentStats,
+      salesStats,
     });
   } catch (error) {
     console.log("Admin Dashboard Rendered Incomplete because ", error.message);
@@ -317,27 +368,30 @@ const downloadReport = async (req, res) => {
     let startDate, endDate;
 
     // Normalize the range string
-    const normalizedRange = range.toLowerCase().replace(/\s+view$/, '').trim();
+    const normalizedRange = range
+      .toLowerCase()
+      .replace(/\s+view$/, "")
+      .trim();
 
     // Set date range based on selected view
     switch (normalizedRange) {
-      case 'custom':
+      case "custom":
         if (!start || !end) {
-          throw new Error('Start and end dates are required for custom range');
+          throw new Error("Start and end dates are required for custom range");
         }
         startDate = new Date(start);
         startDate.setHours(0, 0, 0, 0);
         endDate = new Date(end);
         endDate.setHours(23, 59, 59, 999);
         break;
-      
+
       case "today's":
         startDate = new Date();
         startDate.setHours(0, 0, 0, 0);
         endDate = new Date();
         endDate.setHours(23, 59, 59, 999);
         break;
-      
+
       case "weekly":
         endDate = new Date();
         startDate = new Date();
@@ -345,29 +399,29 @@ const downloadReport = async (req, res) => {
         startDate.setHours(0, 0, 0, 0);
         endDate.setHours(23, 59, 59, 999);
         break;
-      
+
       case "monthly":
         startDate = new Date(today.getFullYear(), today.getMonth(), 1);
         startDate.setHours(0, 0, 0, 0);
         endDate = new Date();
         endDate.setHours(23, 59, 59, 999);
         break;
-      
+
       case "yearly":
         startDate = new Date(today.getFullYear(), 0, 1);
         startDate.setHours(0, 0, 0, 0);
         endDate = new Date();
         endDate.setHours(23, 59, 59, 999);
         break;
-      
+
       default:
         throw new Error(`Invalid date range: ${range}`);
     }
 
     // Enhanced orders query with proper population
     const orders = await Order.find({
-      createdAt: { $gte: startDate, $lte: endDate }
-    }).populate('userId', 'name');
+      createdAt: { $gte: startDate, $lte: endDate },
+    }).populate("userId", "name");
 
     if (!orders || orders.length === 0) {
       throw new Error(`No orders found for the selected period (${range})`);
@@ -436,6 +490,31 @@ const downloadReport = async (req, res) => {
     // Calculate total payments
     const totalPayments = orders.length;
 
+    // Group orders by status
+    const ordersByStatus = orders.reduce((acc, order) => {
+      order.orderedItems.forEach(item => {
+        if (!acc[item.status]) {
+          acc[item.status] = [];
+        }
+        acc[item.status].push({
+          orderId: order.orderId,
+          date: order.createdAt,
+          customer: order.userId.name,
+          product: item.productName,
+          quantity: item.quantity,
+          price: item.totalPrice,
+          payment: order.paymentMethod
+        });
+      });
+      return acc;
+    }, {});
+
+    // Calculate status counts
+    const statusCounts = Object.keys(ordersByStatus).reduce((acc, status) => {
+      acc[status] = ordersByStatus[status].length;
+      return acc;
+    }, {});
+
     if (type === "excel") {
       const workbook = new Excel.Workbook();
 
@@ -469,36 +548,19 @@ const downloadReport = async (req, res) => {
       summarySheet.addRow(["Order Status Distribution"]).font = { bold: true };
       summarySheet.addRow(["Status", "Count", "Percentage"]);
       [
-        { label: "Delivered", count: salesStats.deliveredOrders },
-        { label: "Pending", count: salesStats.pendingOrders },
-        { label: "Cancelled", count: salesStats.cancelledOrders },
+        { label: "Delivered", count: statusCounts["Delivered"] || 0 },
+        { label: "Pending", count: statusCounts["Pending"] || 0 },
+        { label: "Processing", count: statusCounts["Processing"] || 0 },
+        { label: "Shipped", count: statusCounts["Shipped"] || 0 },
+        { label: "Cancelled", count: statusCounts["Cancelled"] || 0 },
+        { label: "Return Request", count: statusCounts["Return Request"] || 0 },
+        { label: "Return Approved", count: statusCounts["Return Approved"] || 0 },
+        { label: "Return Rejected", count: statusCounts["Return Rejected"] || 0 },
+        { label: "Returned", count: statusCounts["Returned"] || 0 }
       ].forEach((status) => {
-        const percentage = (
-          (status.count / salesStats.totalOrders) *
-          100
-        ).toFixed(1);
+        const percentage = ((status.count / salesStats.totalOrders) * 100).toFixed(1);
         summarySheet.addRow([status.label, status.count, `${percentage}%`]);
       });
-      summarySheet.addRow([]);
-
-      // Payment Methods Distribution
-      summarySheet.addRow(["Payment Methods Distribution"]).font = {
-        bold: true,
-      };
-      summarySheet.addRow(["Payment Method", "Count", "Percentage"]);
-      [
-        { label: "COD", count: paymentStats.COD },
-        { label: "Online Payment", count: paymentStats.Online },
-        { label: "Wallet", count: paymentStats.Wallet },
-      ]
-        .filter((method) => method.count > 0)
-        .forEach((method) => {
-          const percentage =
-            totalPayments > 0
-              ? ((method.count / totalPayments) * 100).toFixed(1)
-              : "0.0";
-          summarySheet.addRow([method.label, method.count, `${percentage}%`]);
-        });
       summarySheet.addRow([]);
 
       // Orders Detail Sheet - Keep only this one, remove the duplicate
@@ -526,7 +588,7 @@ const downloadReport = async (req, res) => {
       };
 
       // Add order data with product details
-      let rowIndex = 2;
+      let orderRowIndex = 2;
       orders.forEach((order) => {
         order.orderedItems.forEach((item, i) => {
           const row = {
@@ -543,7 +605,7 @@ const downloadReport = async (req, res) => {
           const dataRow = orderDetailsSheet.addRow(row);
 
           // Add zebra striping
-          if (rowIndex % 2 === 0) {
+          if (orderRowIndex % 2 === 0) {
             dataRow.fill = {
               type: "pattern",
               pattern: "solid",
@@ -561,12 +623,12 @@ const downloadReport = async (req, res) => {
             };
           });
 
-          rowIndex++;
+          orderRowIndex++;
         });
 
         // Add a blank row between orders
         orderDetailsSheet.addRow({});
-        rowIndex++;
+        orderRowIndex++;
       });
 
       // Auto-fit columns
@@ -599,6 +661,69 @@ const downloadReport = async (req, res) => {
         });
       });
 
+      // Add detailed status breakdown sheet
+      const statusSheet = workbook.addWorksheet('Status Breakdown');
+      statusSheet.columns = [
+        { header: 'Status', key: 'status', width: 20 },
+        { header: 'Order ID', key: 'orderId', width: 15 },
+        { header: 'Date', key: 'date', width: 20 },
+        { header: 'Customer', key: 'customer', width: 25 },
+        { header: 'Product', key: 'product', width: 40 },
+        { header: 'Quantity', key: 'quantity', width: 10 },
+        { header: 'Price', key: 'price', width: 15 },
+        { header: 'Payment', key: 'payment', width: 15 }
+      ];
+
+      // Style status sheet header
+      const statusHeaderRow = statusSheet.getRow(1);
+      statusHeaderRow.font = { bold: true };
+      statusHeaderRow.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'E5E7EB' }
+      };
+
+      // Add data for each status
+      let statusRowIndex = 2;
+      Object.entries(ordersByStatus).forEach(([status, statusOrders]) => {
+        // Add status header
+        const statusRow = statusSheet.addRow([`${status} (${statusOrders.length} orders)`]);
+        statusRow.font = { bold: true };
+        statusRow.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'F3F4F6' }
+        };
+        statusRowIndex++;
+
+        // Add orders for this status
+        statusOrders.forEach(order => {
+          const dataRow = statusSheet.addRow({
+            status: '',  // Leave blank as we have the header
+            orderId: order.orderId,
+            date: new Date(order.date).toLocaleDateString(),
+            customer: order.customer,
+            product: order.product,
+            quantity: order.quantity,
+            price: `₹${order.price.toLocaleString('en-IN')}`,
+            payment: order.payment
+          });
+
+          if (statusRowIndex % 2 === 0) {
+            dataRow.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: 'FAFAFA' }
+            };
+          }
+          statusRowIndex++;
+        });
+
+        // Add a blank row between statuses
+        statusSheet.addRow([]);
+        statusRowIndex++;
+      });
+
       res.setHeader(
         "Content-Type",
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -618,6 +743,7 @@ const downloadReport = async (req, res) => {
           Title: "Mobify Sales Report",
           Author: "Mobify Admin",
         },
+        bufferPages: true // Add this to enable page buffering
       });
 
       // Setup document
@@ -628,40 +754,41 @@ const downloadReport = async (req, res) => {
       );
       doc.pipe(res);
 
-      // Header with proper spacing
-      doc
-        .font("Helvetica-Bold")
-        .fontSize(24)
-        .fillColor("#1e293b")
-        .text("MOBIFY", { align: "center" })
-        .moveDown(0.5);
+      // Header with fixed positioning and proper spacing
+      doc.moveDown(1);
+      doc.font("Helvetica-Bold")
+         .fontSize(24)
+         .fillColor("#1e293b")
+         .text("MOBIFY", {
+             align: "center",
+             width: doc.page.width - 100,  // Account for margins
+         })
+         .moveDown(0.5);
 
-      doc
-        .fontSize(14)
-        .fillColor("#64748b")
-        .text("Sales Report", { align: "center" })
-        .moveDown(1);
+      doc.fontSize(14)
+         .fillColor("#64748b")
+         .text("Sales Report", {
+             align: "center",
+             width: doc.page.width - 100,
+         })
+         .moveDown(1);
 
-      // Report Info Box with fixed positioning and proper spacing
-      const infoBoxY = doc.y + 10;
-      doc.rect(50, infoBoxY, 495, 40).fillAndStroke("#f8fafc", "#e2e8f0");
+      // Report Info Box with fixed width and centering
+      const pageWidth = doc.page.width - 100; // Account for margins
+      const infoBoxY = doc.y;
+      doc.rect(50, infoBoxY, pageWidth, 40)
+         .fillAndStroke("#f8fafc", "#e2e8f0");
 
-      doc
-        .fontSize(10)
-        .fillColor("#1e293b")
-        .text(
-          `Period: ${range} | Generated: ${new Date().toLocaleDateString()}`,
-          {
-            align: "center",
-            y: infoBoxY + 15,
-          }
-        );
+      doc.fontSize(10)
+         .fillColor("#1e293b")
+         .text(`Period: ${range} | Generated: ${new Date().toLocaleDateString()}`, {
+             width: pageWidth,
+             align: "center",
+             y: infoBoxY + 15
+         });
 
-      // Continue with metrics grid with adjusted spacing
-      doc.moveDown(2.5);
-      // const metricsY = doc.y;
-
-      // Rest of the PDF generation code...
+      // Add more spacing after header
+      doc.moveDown(4);
 
       // Key Metrics Grid
       doc.moveDown(1.5);
@@ -814,146 +941,108 @@ const downloadReport = async (req, res) => {
         yPos += 20;
       });
 
-      // Orders Table - Update to show "No orders" if empty
-      doc.moveDown(6);
-      doc
-        .fontSize(12)
-        .fillColor("#1e293b")
-        .text("Recent Orders", 50, doc.y)
-        .moveDown(0.5);
+      // Add Order Status Breakdown section
+      doc.moveDown(4); // Add more space after payment methods
 
-      const tableTop = doc.y;
-      const headers = [
-        "Date",
-        "Order ID",
-        "Customer",
-        "Product",
-        "Payment",
-        "Status",
-        "Amount",
-      ];
-      const colWidths = [70, 80, 100, 120, 60, 70, 80];
+      Object.entries(ordersByStatus).forEach(([status, statusOrders]) => {
+        // Add new page for each status section
+        doc.addPage();
 
-      // Draw header background
-      doc.rect(50, tableTop, 580, 20).fill("#f8fafc");
+        doc.fontSize(16)
+           .fillColor('#1e293b')
+           .text(`${status} Orders (${statusOrders.length})`, {
+               underline: true,
+               align: 'left'
+           })
+           .moveDown(1);
 
-      // Add headers
-      headers.forEach((header, i) => {
-        let x = 50;
-        for (let j = 0; j < i; j++) x += colWidths[j];
-        doc
-          .fillColor("#1e293b")
-          .fontSize(10)
-          .text(header, x + 5, tableTop + 5);
-      });
+        // Table headers with adjusted widths and spacing
+        const headers = ['Order ID', 'Date', 'Customer', 'Product', 'Amount'];
+        const colWidths = [90, 90, 130, 130, 90];
+        const tableWidth = colWidths.reduce((sum, width) => sum + width, 0);
+        
+        // Draw header background
+        doc.rect(50, doc.y, tableWidth, 25).fill('#f8fafc');
 
-      // Table rows with product details
-      let y = tableTop + 25;
-
-      if (orders.length === 0) {
-        // Show "No orders found" message
-        doc.rect(50, y - 5, 580, 30).fill("#f8fafc");
-        doc
-          .fillColor("#64748b")
-          .fontSize(10)
-          .text("No orders found for the selected period", 290, y + 5, {
-            align: "center",
-          });
-      } else {
-        orders.slice(0, 10).forEach((order, i) => {
-          if (y > 700) {
-            doc.addPage();
-            y = 50;
-          }
-
-          // Zebra striping
-          if (i % 2 === 0) {
-            doc.rect(50, y - 5, 580, 20).fill("#f8fafc");
-          }
-
-          let x = 50;
-          doc.fontSize(9).fillColor("#64748b");
-
-          // Date
-          doc.text(new Date(order.createdAt).toLocaleDateString(), x + 5, y);
-          x += colWidths[0];
-
-          // Order ID
-          doc.text(order.orderId.slice(-8), x + 5, y);
-          x += colWidths[1];
-
-          // Customer
-          doc.text(order.userId.name || "N/A", x + 5, y, { width: 90 });
-          x += colWidths[2];
-
-          // Product (first product if multiple)
-          if (order.orderedItems && order.orderedItems.length > 0) {
-            const productName = order.orderedItems[0].productName;
-            doc.text(
-              productName.length > 20
-                ? productName.substring(0, 20) + "..."
-                : productName,
-              x + 5,
-              y,
-              { width: 110 }
-            );
-          } else {
-            doc.text("N/A", x + 5, y);
-          }
-          x += colWidths[3];
-
-          // Payment Method
-          doc.text(order.paymentMethod || "N/A", x + 5, y);
-          x += colWidths[4];
-
-          // Status with color
-          if (order.orderedItems && order.orderedItems.length > 0) {
-            const status = order.orderedItems[0].status;
-            doc
-              .fillColor(
-                status === "Delivered"
-                  ? "#10b981"
-                  : status === "Pending"
-                  ? "#f59e0b"
-                  : "#ef4444"
-              )
-              .text(status, x + 5, y);
-          } else {
-            doc.text("N/A", x + 5, y);
-          }
-          x += colWidths[5];
-
-          // Amount
-          doc
-            .fillColor("#64748b")
-            .text(
-              `₹${
-                order.FinalAmount
-                  ? order.FinalAmount.toLocaleString("en-IN")
-                  : "0"
-              }`,
-              x + 5,
-              y
-            );
-
-          y += 20;
+        // Add headers with proper spacing
+        let xPos = 50;
+        headers.forEach((header, i) => {
+            doc.fillColor('#1e293b')
+               .fontSize(11)
+               .text(header, xPos + 5, doc.y - 20, {
+                   width: colWidths[i] - 10,
+                   align: 'left'
+               });
+            xPos += colWidths[i];
         });
-      }
 
-      // Footer
-      doc
-        .fontSize(8)
-        .fillColor("#64748b")
-        .text(
-          "© Mobify | Generated by Admin Dashboard",
-          50,
-          doc.page.height - 50,
-          {
-            align: "center",
-          }
-        );
+        let yPos = doc.y + 10;
 
-      doc.end();
+        // Add orders with proper spacing
+        statusOrders.forEach((order, index) => {
+            if (yPos > 700) {
+                doc.addPage();
+                yPos = 50;
+
+                // Redraw headers on new page
+                doc.rect(50, yPos, tableWidth, 25).fill('#f8fafc');
+                xPos = 50;
+                headers.forEach((header, i) => {
+                    doc.fillColor('#1e293b')
+                       .fontSize(11)
+                       .text(header, xPos + 5, yPos + 5, {
+                           width: colWidths[i] - 10,
+                           align: 'left'
+                       });
+                    xPos += colWidths[i];
+                });
+                yPos += 35;
+            }
+
+            // Zebra striping
+            if (index % 2 === 0) {
+                doc.rect(50, yPos, tableWidth, 25).fill('#f8fafc');
+            }
+
+            // Order details
+            xPos = 50;
+            [
+                order.orderId.slice(-8),
+                new Date(order.date).toLocaleDateString(),
+                order.customer,
+                order.product,
+                `₹${order.price.toLocaleString('en-IN')}`
+            ].forEach((text, i) => {
+                doc.fillColor('#64748b')
+                   .fontSize(10)
+                   .text(text, xPos + 5, yPos + 5, {
+                       width: colWidths[i] - 10,
+                       align: i === 4 ? 'right' : 'left'
+                   });
+                xPos += colWidths[i];
+            });
+
+            yPos += 25;
+        });
+    });
+
+    // Add footer to all pages
+    const pages = doc.bufferedPageRange();
+    for (let i = 0; i < pages.count; i++) {
+        doc.switchToPage(i);
+        doc.fontSize(8)
+           .fillColor("#64748b")
+           .text(
+               "© Mobify | Generated by Admin Dashboard",
+               50,
+               doc.page.height - 30,
+               {
+                   align: "center"
+               }
+           );
+    }
+
+    doc.end();
     }
   } catch (error) {
     console.error("Download Report Error:", error);
@@ -1033,6 +1122,119 @@ const getCustomRangeData = async (req, res) => {
   }
 };
 
+// Add a new endpoint to handle chart statistics
+const getChartStats = async (req, res) => {
+  try {
+    const { range } = req.query;
+    const today = new Date();
+    let startDate, endDate;
+
+    // Simplified date range logic
+    switch (range) {
+      case "today":
+        startDate = new Date().setHours(0, 0, 0, 0);
+        endDate = new Date().setHours(23, 59, 59, 999);
+        break;
+      case "weekly":
+        startDate = new Date(today.setDate(today.getDate() - 7));
+        endDate = new Date();
+        break;
+      case "monthly":
+        startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+        endDate = new Date();
+        break;
+      case "yearly":
+        startDate = new Date(today.getFullYear(), 0, 1);
+        endDate = new Date();
+        break;
+      default:
+        startDate = new Date(today.setDate(today.getDate() - 7)); // Default to weekly
+        endDate = new Date();
+    }
+
+    const [paymentStats, ordersData] = await Promise.all([
+      Order.aggregate([
+        {
+          $match: {
+            createdAt: { $gte: new Date(startDate), $lte: new Date(endDate) },
+            "orderedItems.status": { $ne: "Cancelled" },
+          },
+        },
+        {
+          $group: {
+            _id: "$paymentMethod",
+            count: { $sum: 1 },
+          },
+        },
+      ]),
+      Order.find({
+        createdAt: { $gte: new Date(startDate), $lte: new Date(endDate) },
+      }),
+    ]);
+
+    // Initialize all possible statuses with 0
+    const salesStats = {
+      deliveredOrders: 0,
+      pendingOrders: 0,
+      processingOrders: 0,
+      shippedOrders: 0,
+      cancelledOrders: 0,
+      returnRequestedOrders: 0,
+      returnApprovedOrders: 0,
+      returnRejectedOrders: 0,
+      returnedOrders: 0,
+    };
+
+    // Count orders for each status
+    ordersData.forEach((order) => {
+      order.orderedItems.forEach((item) => {
+        switch (item.status) {
+          case "Delivered":
+            salesStats.deliveredOrders++;
+            break;
+          case "Pending":
+            salesStats.pendingOrders++;
+            break;
+          case "Processing":
+            salesStats.processingOrders++;
+            break;
+          case "Shipped":
+            salesStats.shippedOrders++;
+            break;
+          case "Cancelled":
+            salesStats.cancelledOrders++;
+            break;
+          case "Return Request":
+            salesStats.returnRequestedOrders++;
+            break;
+          case "Return Approved":
+            salesStats.returnApprovedOrders++;
+            break;
+          case "Return Rejected":
+            salesStats.returnRejectedOrders++;
+            break;
+          case "Returned":
+            salesStats.returnedOrders++;
+            break;
+        }
+      });
+    });
+
+    res.json({
+      success: true,
+      paymentStats: {
+        COD: paymentStats.find((p) => p._id === "cod")?.count || 0,
+        Online: paymentStats.find((p) => p._id === "razorpay")?.count || 0,
+        Wallet: paymentStats.find((p) => p._id === "wallet")?.count || 0,
+      },
+      salesStats,
+    });
+  } catch (error) {
+    console.error("Chart Stats Error:", error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
 module.exports = {
   loadLogin,
   verifyAdminLogin,
@@ -1041,4 +1243,5 @@ module.exports = {
   logout,
   downloadReport,
   getCustomRangeData,
+  getChartStats,
 };

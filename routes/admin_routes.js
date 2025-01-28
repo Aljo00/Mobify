@@ -54,6 +54,12 @@ admin_route.get(
   adminController.downloadReport
 );
 
+admin_route.get(
+  "/chart-stats",
+  adminAuth.protectAdmin,
+  adminController.getChartStats
+);
+
 admin_route.get("/logout", adminController.logout);
 
 //Admin users management routes

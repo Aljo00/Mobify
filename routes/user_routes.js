@@ -281,6 +281,15 @@ const couponController = require('../controllers/user/coupon_controller');
 user_router.get('/api/available-coupons', userAuth.protect, couponController.getAvailableCoupons);
 user_router.post('/api/validate-coupon', userAuth.protect, couponController.validateCoupon);
 
+const paymentController = require("../controllers/user/payment_controller");
+
+user_router.get('/check-stock/:orderId', userAuth.protect, paymentController.checkStock);
+user_router.post('/initiate-pending-payment', userAuth.protect, paymentController.initiatePendingPayment);
+user_router.post('/verify-pending-payment', userAuth.protect, paymentController.verifyPendingPayment);
+
+user_router.post('/initiate-cod-to-online', userAuth.protect, paymentController.initiateCodToOnline);
+user_router.post('/verify-cod-to-online', userAuth.protect, paymentController.verifyCodToOnline);
+
 user_router.get("/logout", user_controller.logout);
 
 module.exports = user_router;

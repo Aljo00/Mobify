@@ -144,43 +144,82 @@
           </div>
           <div class="order-payment-info">
             <i class="fas fa-money-bill-wave"></i>
-            Payment Method: 
-            <span class="payment-badge <%= 
-              order.paymentMethod === 'COD' ? 'badge-cod' : 
-              order.paymentMethod === 'wallet' ? 'badge-wallet' : 
-              'badge-online' %>">
+            Payment Method:
+            <span
+              class="payment-badge <%= order.paymentMethod === 'cod' ? 'badge-cod' : order.paymentMethod === 'wallet' ? 'badge-wallet' : 'badge-online' %>"
+            >
               <%= order.paymentMethod %>
             </span>
+            <% if (order.paymentMethod === 'COD' && order.orderedItems[0].status
+            !== 'Cancelled' && (order.orderedItems[0].status === 'Pending' ||
+            order.orderedItems[0].status === 'Processing')) { %>
+            <button
+              class="btn btn-outline-primary btn-sm ms-2"
+              onclick="handleCodToOnline('<%= order._id %>')"
+            >
+              Pay with Razorpay
+            </button>
+            <% } %>
           </div>
-          <div class="<%= order.orderedItems[0].status === 'Cancelled' ? 'order-status-cancelled' : 'order-status-cancel' %>">
-            <span class="order-status badge <%= order.orderedItems[0].status === 'Cancelled' ? 'cancelled' : order.orderedItems[0].status === 'Return Request' ? 'bg-info' : order.orderedItems[0].status === 'Returned' ? 'bg-secondary' : 'bg-warning text-dark' %>">
+          <div
+            class="<%= order.orderedItems[0].status === 'Cancelled' ? 'order-status-cancelled' : 'order-status-cancel' %>"
+          >
+            <span
+              class="order-status badge <%= order.orderedItems[0].status === 'Cancelled' ? 'cancelled' : order.orderedItems[0].status === 'Return Request' ? 'bg-info' : order.orderedItems[0].status === 'Returned' ? 'bg-secondary' : 'bg-warning text-dark' %>"
+            >
               <%= order.orderedItems[0].status %>
             </span>
-            
-            <% if (order.orderedItems[0].status === 'Cancelled') { %>
+
+            <div class="d-flex gap-2">
+              <% if (order.orderedItems[0].status === 'Cancelled') { %>
               <div class="cancelled-message">
                 <i class="fas fa-info-circle"></i>
                 Amount refunded to wallet
               </div>
-            <% } else if (order.orderedItems[0].status === 'Delivered' || order.orderedItems[0].status === 'Shipped') { %>
-              <button class="btn btn-warning btn-sm" onclick="initiateReturn('<%= order._id %>')">
+              <% } else if (order.orderedItems[0].status === 'Payment Pending'
+              && order.paymentMethod === 'razorpay') { %>
+              <button
+                class="btn btn-primary btn-sm"
+                onclick="handlePayNow('<%= order._id %>')"
+              >
+                Pay Now
+              </button>
+              <% } else if (order.orderedItems[0].status === 'Delivered' ||
+              order.orderedItems[0].status === 'Shipped') { %>
+              <button
+                class="btn btn-warning btn-sm"
+                onclick="initiateReturn('<%= order._id %>')"
+              >
                 Return Request
               </button>
-            <% } else if (order.orderedItems[0].status === 'Return Request') { %>
+              <% } else if (order.orderedItems[0].status === 'Return Request') {
+              %>
               <div class="return-message">
                 <i class="fas fa-hourglass-half"></i>
                 Return request processing
               </div>
-            <% } else if (order.orderedItems[0].status === 'Returned') { %>
+              <% } else if (order.orderedItems[0].status === 'Returned') { %>
               <div class="returned-message">
                 <i class="fas fa-check-circle"></i>
                 Product returned successfully
               </div>
-            <% } else if (!['Shipped', 'Delivered', 'Cancelled', 'Return Request', 'Returned'].includes(order.orderedItems[0].status)) { %>
-              <button class="btn btn-danger btn-sm" onclick="cancelOrder('<%= order._id %>', '<%= order.paymentMethod %>')">
+              <% } else { %>
+              <button
+                class="btn btn-danger btn-sm"
+                onclick="cancelOrder('<%= order._id %>', '<%= order.paymentMethod %>')"
+              >
                 Cancel Order
               </button>
-            <% } %>
+              <% if (order.paymentMethod === 'cod' && ['Pending',
+              'Processing'].includes(order.orderedItems[0].status)) { %>
+              <button
+                class="btn btn-outline-primary btn-sm"
+                onclick="handleCodToOnline('<%= order._id %>')"
+              >
+                Pay with Razorpay
+              </button>
+              <% } %> <% } %>
+            </div>
           </div>
         </div>
         <% }) %>
@@ -189,65 +228,70 @@
   </div>
 </div>
 
+<!-- Add this before your other scripts -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
 
 <script>
   function cancelOrder(orderId, paymentMethod) {
-    const message = paymentMethod === 'COD' 
-      ? "Are you sure you want to cancel this order?"
-      : "The order amount will be refunded to your wallet.";
+    const message =
+      paymentMethod === "COD"
+        ? "Are you sure you want to cancel this order?"
+        : "The order amount will be refunded to your wallet.";
 
     Swal.fire({
-      title: 'Are you sure?',
+      title: "Are you sure?",
       text: message,
-      icon: 'warning',
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, cancel it!',
-      cancelButtonText: 'No, keep it'
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, cancel it!",
+      cancelButtonText: "No, keep it",
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch('/cancel-order', {
-          method: 'POST',
+        fetch("/cancel-order", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify({ orderId })
+          body: JSON.stringify({ orderId }),
         })
-        .then(async response => {
-          const data = await response.json();
-          if (!response.ok) {
-            throw new Error(data.message || 'Failed to cancel order');
-          }
-          return data;
-        })
-        .then(data => {
-          if (data.success) {
-            const successMessage = paymentMethod === 'COD' 
-              ? 'Order has been cancelled.'
-              : 'Order has been cancelled and amount refunded to your wallet.';
+          .then(async (response) => {
+            const data = await response.json();
+            if (!response.ok) {
+              throw new Error(data.message || "Failed to cancel order");
+            }
+            return data;
+          })
+          .then((data) => {
+            if (data.success) {
+              const successMessage =
+                paymentMethod === "COD"
+                  ? "Order has been cancelled."
+                  : "Order has been cancelled and amount refunded to your wallet.";
 
+              Swal.fire({
+                title: "Cancelled!",
+                text: successMessage,
+                icon: "success",
+              }).then(() => {
+                location.reload();
+              });
+            } else {
+              throw new Error(data.message || "Failed to cancel order");
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
             Swal.fire({
-              title: 'Cancelled!',
-              text: successMessage,
-              icon: 'success'
-            }).then(() => {
-              location.reload();
+              title: "Error!",
+              text:
+                error.message || "An error occurred while cancelling the order",
+              icon: "error",
+              confirmButtonColor: "#3085d6",
             });
-          } else {
-            throw new Error(data.message || 'Failed to cancel order');
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          Swal.fire({
-            title: 'Error!',
-            text: error.message || 'An error occurred while cancelling the order',
-            icon: 'error',
-            confirmButtonColor: '#3085d6'
           });
-        });
       }
     });
   }
@@ -314,6 +358,223 @@
                 "An error occurred while submitting return request",
               icon: "error",
               confirmButtonColor: "#3085d6",
+            });
+          });
+      }
+    });
+  }
+
+  function handlePayNow(orderId) {
+    Swal.fire({
+      title: "Processing...",
+      text: "Checking stock availability",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    // First check stock availability
+    fetch(`/check-stock/${orderId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (!data.success) {
+          throw new Error(data.message);
+        }
+
+        // If stock is available, initiate payment
+        return fetch("/initiate-pending-payment", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ orderId }),
+        });
+      })
+      .then((response) => response.json())
+      .then((order) => {
+        if (!order.success) {
+          throw new Error(order.message);
+        }
+
+        Swal.close();
+
+        var options = {
+          key: order.key_id,
+          amount: order.amount,
+          currency: "INR",
+          name: "Mobify",
+          description: "Payment for order",
+          order_id: order.id,
+          handler: function (response) {
+            Swal.fire({
+              title: "Processing Payment...",
+              allowOutsideClick: false,
+              didOpen: () => {
+                Swal.showLoading();
+              },
+            });
+
+            fetch("/verify-pending-payment", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                orderId: orderId,
+                payment_id: response.razorpay_payment_id,
+                order_id: response.razorpay_order_id,
+                signature: response.razorpay_signature,
+              }),
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                if (data.success) {
+                  Swal.fire({
+                    title: "Success!",
+                    text: "Payment successful!",
+                    icon: "success",
+                  }).then(() => {
+                    location.reload();
+                  });
+                } else {
+                  throw new Error(data.message);
+                }
+              })
+              .catch((error) => {
+                Swal.fire({
+                  title: "Payment Verification Failed",
+                  text: error.message || "Failed to verify payment",
+                  icon: "error",
+                });
+              });
+          },
+          prefill: {
+            name: "<%= user.name %>",
+            email: "<%= user.email %>",
+          },
+          theme: {
+            color: "#3399cc",
+          },
+        };
+
+        var rzp1 = new Razorpay(options);
+        rzp1.on("payment.failed", function (response) {
+          Swal.fire({
+            title: "Payment Failed",
+            text: response.error.description,
+            icon: "error",
+          });
+        });
+        rzp1.open();
+      })
+      .catch((error) => {
+        Swal.fire({
+          title: "Error",
+          text: error.message || "Something went wrong",
+          icon: "error",
+        });
+      });
+  }
+
+  function handleCodToOnline(orderId) {
+    Swal.fire({
+      title: "Switch to Online Payment?",
+      text: "You're about to pay online for your COD order",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, pay now",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch("/initiate-cod-to-online", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ orderId }),
+        })
+          .then((response) => response.json())
+          .then((order) => {
+            if (!order.success) {
+              throw new Error(order.message);
+            }
+
+            var options = {
+              key: order.key_id,
+              amount: order.amount,
+              currency: "INR",
+              name: "Mobify",
+              description: "Payment for COD order",
+              order_id: order.id,
+              handler: function (response) {
+                Swal.fire({
+                  title: "Processing Payment...",
+                  allowOutsideClick: false,
+                  didOpen: () => {
+                    Swal.showLoading();
+                  },
+                });
+
+                fetch("/verify-cod-to-online", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    orderId: orderId,
+                    payment_id: response.razorpay_payment_id,
+                    order_id: response.razorpay_order_id,
+                    signature: response.razorpay_signature,
+                  }),
+                })
+                  .then((response) => response.json())
+                  .then((data) => {
+                    if (data.success) {
+                      Swal.fire({
+                        title: "Success!",
+                        text: "Payment method updated successfully!",
+                        icon: "success",
+                      }).then(() => {
+                        location.reload();
+                      });
+                    } else {
+                      throw new Error(data.message);
+                    }
+                  })
+                  .catch((error) => {
+                    Swal.fire({
+                      title: "Error!",
+                      text: error.message || "Failed to update payment method",
+                      icon: "error",
+                    });
+                  });
+              },
+              prefill: {
+                name: "<%= user.name %>",
+                email: "<%= user.email %>",
+              },
+              theme: {
+                color: "#3399cc",
+              },
+            };
+
+            var rzp1 = new Razorpay(options);
+            rzp1.on("payment.failed", function (response) {
+              Swal.fire({
+                title: "Payment Failed",
+                text: response.error.description,
+                icon: "error",
+              });
+            });
+            rzp1.open();
+          })
+          .catch((error) => {
+            Swal.fire({
+              title: "Error",
+              text: error.message || "Something went wrong",
+              icon: "error",
             });
           });
       }

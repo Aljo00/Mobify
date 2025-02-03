@@ -12,6 +12,8 @@ const cloudinary = require("../../config/cloudinary");
 const Order = require("../../models/orderSchema");
 const Wallet = require("../../models/walletSchema");
 const Product = require("../../models/productSchema");
+const PDFDocument = require('pdfkit');
+const fs = require('fs');
 
 const load_page404 = async (req, res) => {
   try {
@@ -783,6 +785,193 @@ const initiateReturn = async (req, res) => {
   }
 };
 
+const downloadInvoice = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const userId = req.user.id;
+
+    // First find the order and populate necessary fields
+    const order = await Order.findById(orderId)
+      .populate('orderedItems.product')
+      .populate('userId', 'name email')
+      .lean();
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    // Check authorization
+    if (order.userId._id.toString() !== userId) {
+      return res.status(403).json({ success: false, message: 'Unauthorized access' });
+    }
+
+    // Fetch address details
+    const userAddress = await Address.findOne({ userId });
+    if (!userAddress) {
+      return res.status(404).json({ success: false, message: 'Address not found' });
+    }
+
+    const deliveryAddress = userAddress.address.find(addr => 
+      addr._id.toString() === order.address.toString()
+    );
+
+    if (!deliveryAddress) {
+      return res.status(404).json({ success: false, message: 'Delivery address not found' });
+    }
+
+    // Initialize PDF document
+    const doc = new PDFDocument({ 
+      margin: 50,
+      size: 'A4',
+      layout: 'portrait'
+    });
+
+    // Setup document
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=invoice-${order.orderId}.pdf`);
+    doc.pipe(res);
+
+    // Add some nice graphics at the top
+    doc.rect(0, 0, doc.page.width, 150).fill('#4a90e2');
+    
+    // White circle behind logo
+    doc.circle(doc.page.width / 2, 75, 30)
+      .fill('#ffffff');
+    
+    // Logo
+    doc.fontSize(40)
+      .fillColor('#4a90e2')
+      .text('M', doc.page.width / 2 - 15, 55);
+
+    // Company name in white
+    doc.fontSize(30)
+      .fillColor('#ffffff')
+      .text('MOBIFY', doc.page.width / 2 - 50, 20);
+    
+    // Slogan
+    doc.fontSize(12)
+      .text('Your Trusted Mobile Partner', doc.page.width / 2 - 70, 110);
+
+    // Invoice title with stylish background
+    doc.rect(50, 170, 495, 40)
+      .fill('#f8f9fa');
+    doc.fontSize(20)
+      .fillColor('#333333')
+      .text('TAX INVOICE', 270, 180);
+    
+    // Add invoice details in a box
+    doc.rect(50, 230, 495, 80)
+      .lineWidth(1)
+      .stroke('#dddddd');
+    
+    doc.fontSize(10)
+      .text(`Invoice No: #${order.orderId}`, 60, 240)
+      .text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`, 60, 255)
+      .text(`Payment Method: ${order.paymentMethod.toUpperCase()}`, 60, 270)
+      .text(`Order Status: ${order.orderedItems[0].status}`, 60, 285);
+
+    // Add company info box
+    doc.rect(50, 330, 240, 100)
+      .fill('#f8f9fa');
+    doc.fillColor('#333333')
+      .fontSize(12)
+      .text('From:', 60, 340)
+      .fontSize(10)
+      .text('Mobify Technologies Pvt. Ltd.', 60, 360)
+      .text('123 Tech Street, Digital Plaza', 60, 375)
+      .text('Bangalore, Karnataka - 560001', 60, 390)
+      .text('GST: 29ABCDE1234F1Z5', 60, 405);
+
+    // Add customer info box
+    doc.rect(305, 330, 240, 100)
+      .fill('#f8f9fa');
+    doc.fillColor('#333333')
+      .fontSize(12)
+      .text('Bill To:', 315, 340)
+      .fontSize(10)
+      .text(`${order.userId.name}`, 315, 360)
+      .text(`${deliveryAddress.houseName}`, 315, 375)
+      .text(`${deliveryAddress.city}, ${deliveryAddress.state}`, 315, 390)
+      .text(`Phone: ${deliveryAddress.phone}`, 315, 405);
+
+    // Items table header with gradient
+    const tableTop = 450;
+    doc.rect(50, tableTop, 495, 30)
+      .fill('#4a90e2');
+    
+    doc.fillColor('#ffffff')
+      .text('Product', 60, tableTop + 10)
+      .text('Specifications', 220, tableTop + 10)
+      .text('Qty', 340, tableTop + 10)
+      .text('Price', 400, tableTop + 10)
+      .text('Total', 470, tableTop + 10);
+
+    // Items table rows with alternating colors
+    let yPos = tableTop + 30;
+    order.orderedItems.forEach((item, i) => {
+      doc.rect(50, yPos, 495, 25)
+        .fill(i % 2 === 0 ? '#ffffff' : '#f8f9fa');
+
+      doc.fillColor('#333333')
+        .text(item.product.productName, 60, yPos + 7, { width: 150 })
+        .text(`${item.RAM}GB RAM, ${item.Storage}GB`, 220, yPos + 7)
+        .text(item.quantity.toString(), 340, yPos + 7)
+        .text(`₹${Number(item.price).toFixed(2)}`, 400, yPos + 7)
+        .text(`₹${Number(item.totalPrice).toFixed(2)}`, 470, yPos + 7);
+
+      yPos += 25;
+    });
+
+    // Totals section with box
+    doc.rect(305, yPos + 20, 240, 100)
+      .fill('#f8f9fa');
+
+    const subtotal = order.orderedItems.reduce((sum, item) => sum + Number(item.totalPrice), 0);
+    const discount = subtotal - Number(order.FinalAmount);
+    
+    doc.fontSize(10)
+      .text('Subtotal:', 315, yPos + 30)
+      .text(`₹${subtotal.toFixed(2)}`, 485, yPos + 30, { align: 'right' })
+      .text('Discount:', 315, yPos + 50)
+      .text(`₹${discount.toFixed(2)}`, 485, yPos + 50, { align: 'right' })
+      .fontSize(12)
+      .fillColor('#4a90e2')
+      .text('Final Amount:', 315, yPos + 80)
+      .text(`₹${Number(order.FinalAmount).toFixed(2)}`, 485, yPos + 80, { align: 'right' });
+
+    // Footer with terms and QR code
+    const footerTop = yPos + 150;
+    doc.rect(50, footerTop, 495, 80)
+      .fill('#f8f9fa');
+
+    doc.fontSize(8)
+      .fillColor('#666666')
+      .text('Terms & Conditions:', 60, footerTop + 10)
+      .text('1. All prices include GST', 60, footerTop + 25)
+      .text('2. Returns accepted within 7 days of delivery', 60, footerTop + 35)
+      .text('3. Warranty as per manufacturer terms', 60, footerTop + 45);
+
+    // Add a decorative bottom border
+    doc.rect(0, doc.page.height - 20, doc.page.width, 20)
+      .fill('#4a90e2');
+
+    // Centered text at the bottom
+    doc.fontSize(8)
+      .fillColor('#ffffff')
+      .text('Thank you for shopping with Mobify!', 0, doc.page.height - 15, { align: 'center' });
+
+    // End the document
+    doc.end();
+
+  } catch (error) {
+    console.error('Error generating invoice:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to generate invoice: ' + error.message 
+    });
+  }
+};
+
 try {
 } catch (error) {
   console.error(error);
@@ -808,4 +997,5 @@ module.exports = {
   loadOrdersDetailPage,
   cancelOrder,
   initiateReturn,
+  downloadInvoice,
 };

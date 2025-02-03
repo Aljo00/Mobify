@@ -192,6 +192,12 @@
               >
                 Return Request
               </button>
+              <button
+                class="btn btn-primary btn-sm"
+                onclick="downloadInvoice('<%= order._id %>')"
+              >
+                <i class="fas fa-download"></i> Invoice
+              </button>
               <% } else if (order.orderedItems[0].status === 'Return Request') {
               %>
               <div class="return-message">
@@ -579,6 +585,29 @@
           });
       }
     });
+  }
+
+  function downloadInvoice(orderId) {
+    fetch(`/download-invoice/${orderId}`)
+      .then(response => response.blob())
+      .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `invoice-${orderId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+      })
+      .catch(error => {
+        console.error('Error downloading invoice:', error);
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to download invoice',
+          icon: 'error'
+        });
+      });
   }
 </script>
 

@@ -290,6 +290,8 @@ user_router.post('/verify-pending-payment', userAuth.protect, paymentController.
 user_router.post('/initiate-cod-to-online', userAuth.protect, paymentController.initiateCodToOnline);
 user_router.post('/verify-cod-to-online', userAuth.protect, paymentController.verifyCodToOnline);
 
+user_router.get('/download-invoice/:orderId', userAuth.protect, accountController.downloadInvoice);
+
 user_router.get("/logout", user_controller.logout);
 
 module.exports = user_router;

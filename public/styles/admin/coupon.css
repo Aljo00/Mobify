@@ -799,3 +799,40 @@ footer {
     width: 120px;
     text-align: left;
 }
+
+/* Pagination Styles */
+.pagination {
+    gap: 0.25rem;
+}
+
+.page-link {
+    border: none;
+    padding: 0.5rem 1rem;
+    color: #64748b;
+    background-color: #f8fafc;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.page-link:hover {
+    color: var(--primary-color);
+    background-color: rgba(67, 97, 238, 0.1);
+    transform: translateY(-1px);
+}
+
+.page-item.active .page-link {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2);
+}
+
+.page-item.disabled .page-link {
+    background-color: #f1f5f9;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+.page-link:focus {
+    box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+}

@@ -3,8 +3,25 @@ const Coupon = require('../../models/couponSchema');
 const couponController = {
     getCouponsPage: async (req, res) => {
         try {
-            const coupons = await Coupon.find({ isDeleted: false }).sort({ createdOn: -1 });
-            res.render('admin/coupon', { coupons });
+            const page = parseInt(req.query.page) || 1;
+            const limit = 3; // Show 3 coupons per page
+            const skip = (page - 1) * limit;
+
+            const totalCoupons = await Coupon.countDocuments({ isDeleted: false });
+            const totalPages = Math.ceil(totalCoupons / limit);
+
+            const coupons = await Coupon.find({ isDeleted: false })
+                .sort({ createdOn: -1 })
+                .skip(skip)
+                .limit(limit);
+
+            res.render('admin/coupon', { 
+                coupons,
+                currentPage: page,
+                totalPages,
+                hasNextPage: page < totalPages,
+                hasPrevPage: page > 1
+            });
         } catch (error) {
             console.error('Error fetching coupons:', error);
             res.status(500).json({ error: 'Internal server error' });

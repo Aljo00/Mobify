@@ -245,6 +245,7 @@
                     id="expireDate"
                     name="expireOn"
                     required
+                    min="<%= new Date().toISOString().split('T')[0] %>"
                   />
                   <div class="error-feedback text-danger mt-1"></div>
                 </div>

@@ -94,19 +94,39 @@
       <!-- Search Section -->
       <div class="card mb-4">
         <div class="card-body">
-          <form action="" method="get">
-            <div class="input-group">
-              <input
-                type="text"
-                class="form-control"
-                placeholder="Search products or brands"
-                name="search"
-              />
-              <button class="btn btn-primary" type="submit">
-                <i class="fas fa-search me-1"></i>Search
-              </button>
+          <div class="d-flex justify-content-between align-items-center">
+            <form action="" method="get" class="flex-grow-1 me-3">
+              <div class="input-group">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Search products or brands"
+                  name="search"
+                />
+                <button class="btn btn-primary" type="submit">
+                  <i class="fas fa-search me-1"></i>Search
+                </button>
+              </div>
+            </form>
+            <button class="btn btn-primary" onclick="showTopProducts()">
+              <i class="fas fa-crown me-1"></i>Top 10 Products
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Products Modal -->
+      <div class="modal fade" id="topProductsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+              <h5 class="modal-title">Top 10 Selling Products</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-          </form>
+            <div class="modal-body">
+              <div id="topProductsList"></div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -423,6 +443,98 @@
             }
           });
         }
+
+        function showTopProducts() {
+          console.log('Starting to fetch top products');
+          
+          $('#topProductsModal').modal('show');
+          $('#topProductsList').html(`
+            <div class="text-center p-4">
+              <div class="spinner-border text-primary" role="status"></div>
+              <p class="mt-2">Loading top selling products...</p>
+            </div>
+          `);
+
+          $.ajax({
+            url: '/admin/top-products',
+            method: 'GET',
+            success: function(response) {
+              if (!response.products || response.products.length === 0) {
+                $('#topProductsList').html(`
+                  <div class="alert alert-info m-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>No sales data available yet</strong>
+                  </div>
+                `);
+                return;
+              }
+
+              let html = '<div class="list-group">';
+              response.products.forEach((product, index) => {
+                if (product.totalSold > 0) { // Only show products with sales
+                  html += `
+                    <div class="list-group-item animated fadeIn">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0">
+                          <span class="badge bg-primary me-2">#${index + 1}</span>
+                          ${product.productName}
+                        </h6>
+                        <span class="badge bg-success">
+                          ${product.totalSold} units sold
+                        </span>
+                      </div>
+                      <div class="small">
+                        <div class="mb-1">
+                          <i class="fas fa-tag me-2"></i>
+                          <strong>Brand:</strong> ${product.brand}
+                        </div>
+                        <div>
+                          <i class="fas fa-star me-2"></i>
+                          <strong>Best Selling Combo:</strong>
+                          ${product.topCombo.ram}GB RAM,
+                          ${product.topCombo.storage}GB Storage
+                          <span class="badge bg-info ms-2">
+                            ${product.topCombo.soldCount} units
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  `;
+                }
+              });
+              html += '</div>';
+              
+              $('#topProductsList').html(html);
+            },
+            error: function(xhr, status, error) {
+              console.error('Error details:', {
+                status: status,
+                error: error,
+                response: xhr.responseText
+              });
+
+              $('#topProductsList').html(`
+                <div class="alert alert-danger m-3">
+                  <i class="fas fa-exclamation-triangle me-2"></i>
+                  Failed to fetch top products. Please try again.
+                </div>
+              `);
+            }
+          });
+        }
+
+        // Add some CSS for animation
+        $('<style>')
+          .text(`
+            .animated.fadeIn {
+              animation: fadeIn 0.5s ease-in;
+            }
+            @keyframes fadeIn {
+              from { opacity: 0; transform: translateY(10px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+          `)
+          .appendTo('head');
       </script>
 
       <%- include('../../views/layout/admin/footer.ejs')%>

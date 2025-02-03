@@ -6,6 +6,7 @@ const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp");
 const cloudinary = require("../../config/cloudinary");
+const Order = require("../../models/orderSchema");
 
 const loadProductAddPage = async (req, res) => {
   try {
@@ -388,7 +389,114 @@ const removeOffer = async (req, res) => {
     res.status(200).json({ message: "Offer removed successfully" });
   } catch (error) {
     console.error("Error fetching product combos:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status (500).json({ error: "Internal server error" });
+  }
+};
+
+const getTopProducts = async (req, res) => {
+  try {
+    console.log('⭐ Starting getTopProducts function');
+
+    // Get all completed orders only
+    const orders = await Order.find({
+      'orderedItems.status': 'Delivered'
+    }).select('orderedItems').lean();
+
+    console.log(`Found ${orders.length} completed orders`);
+
+    if (orders.length === 0) {
+      return res.status(200).json({
+        products: [],
+        message: 'No completed orders found'
+      });
+    }
+
+    // Create sales map
+    const salesMap = new Map();
+
+    // Process only delivered orders
+    orders.forEach(order => {
+      order.orderedItems.forEach(item => {
+        if (item.status === 'Delivered') {
+          const key = `${item.product}`;
+          const currentData = salesMap.get(key) || {
+            productId: item.product,
+            totalSold: 0,
+            combos: new Map()
+          };
+          
+          currentData.totalSold += item.quantity;
+          
+          // Track combo-specific sales
+          const comboKey = `${item.RAM}_${item.Storage}`;
+          const comboCount = currentData.combos.get(comboKey) || {
+            ram: item.RAM,
+            storage: item.Storage,
+            count: 0
+          };
+          comboCount.count += item.quantity;
+          currentData.combos.set(comboKey, comboCount);
+          
+          salesMap.set(key, currentData);
+        }
+      });
+    });
+
+    // Get products that have sales
+    const productIds = Array.from(salesMap.keys());
+    const products = await Product.find({
+      _id: { $in: productIds },
+      isBlocked: false
+    }).select('productName brand combos').lean();
+
+    // Create final product list with sales data
+    const productsWithSales = products
+      .map(product => {
+        const salesData = salesMap.get(product._id.toString());
+        if (!salesData || salesData.totalSold === 0) return null;
+
+        // Find best selling combo
+        const bestCombo = Array.from(salesData.combos.values())
+          .reduce((best, current) => 
+            current.count > (best.count || 0) ? current : best
+          , { count: 0 });
+
+        return {
+          productName: product.productName,
+          brand: product.brand,
+          totalSold: salesData.totalSold,
+          topCombo: {
+            ram: bestCombo.ram,
+            storage: bestCombo.storage,
+            soldCount: bestCombo.count
+          }
+        };
+      })
+      .filter(Boolean) // Remove null entries
+      .sort((a, b) => b.totalSold - a.totalSold)
+      .slice(0, 10);
+
+    if (productsWithSales.length === 0) {
+      return res.status(200).json({
+        products: [],
+        message: 'No products with sales found'
+      });
+    }
+
+    return res.status(200).json({
+      products: productsWithSales,
+      debug: {
+        totalOrders: orders.length,
+        productsWithSales: productsWithSales.length
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Error in getTopProducts:', error);
+    return res.status(500).json({
+      error: 'Failed to fetch top products',
+      details: error.message
+    });
   }
 };
 
@@ -403,4 +511,5 @@ module.exports = {
   loadComboDetails,
   addOffer,
   removeOffer,
+  getTopProducts,
 };

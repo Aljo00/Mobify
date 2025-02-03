@@ -144,6 +144,23 @@ admin_route.get(
   productController.getAllProducts
 );
 
+admin_route.get(
+  "/top-products",
+  adminAuth.protectAdmin,
+  async (req, res, next) => {
+    try {
+      console.log('🎯 Top products route hit');
+      await productController.getTopProducts(req, res);
+    } catch (error) {
+      console.error('❌ Error in top-products route:', error);
+      res.status(500).json({
+        error: 'Route error: Failed to fetch top products',
+        details: error.message
+      });
+    }
+  }
+);
+
 admin_route.put(
   "/products/add-offer",
   adminAuth.protectAdmin,

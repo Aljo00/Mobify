@@ -1,5 +1,3 @@
-
-
 $(document).ready(function() {
   if (typeof Swal === 'undefined') {
     console.error('SweetAlert library is not loaded.');
@@ -41,5 +39,48 @@ $(document).ready(function() {
       Swal.fire('Error', 'An error occurred while removing the item from the wishlist', 'error');
       console.error(error);
     }
+  });
+
+  // Update delete button handler
+  $('.delete-btn').click(function(e) {
+    e.preventDefault();
+    const productId = $(this).data('id');
+    
+    Swal.fire({
+      title: 'Remove from Wishlist?',
+      text: "Are you sure you want to remove this item?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Yes, remove it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $.ajax({
+          url: `/wishlist/remove?id=${productId}`,
+          method: 'DELETE',
+          success: function(response) {
+            if(response.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Removed!',
+                text: 'Item has been removed from your wishlist.',
+                showConfirmButton: false,
+                timer: 1500
+              }).then(() => {
+                location.reload();
+              });
+            }
+          },
+          error: function() {
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: 'Something went wrong!'
+            });
+          }
+        });
+      }
+    });
   });
 });

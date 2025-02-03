@@ -167,38 +167,192 @@ html {
   max-width: 50%; /* Ensure two items per row */
 }
 
+/* Modern Card Styles */
 .card {
-  width: 100%;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  border: none;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 12px;
   overflow: hidden;
+  background: #fff;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.12);
+}
+
+.card .row {
+  align-items: center;
 }
 
 .card-img-top {
-  height: 150px; /* Reduce the height */
-  object-fit: contain; /* Ensure the image fits within the card without being cropped */
-  width: 100%; /* Ensure the image fills the width of the card */
-  background-color: #f8f8f8; /* Add a background color to fill the empty space */
+  height: 180px;
+  padding: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.card:hover .card-img-top {
+  transform: scale(1.05);
 }
 
 .card-body {
-  padding: 15px;
-  position: relative; /* Add relative positioning */
+  padding: 1.5rem;
 }
 
 .card-title {
-  font-size: 1.25rem;
-  margin-bottom: 10px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: #2c3e50;
 }
 
 .card-text {
-  margin-bottom: 5px;
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
 }
 
+.card-text strong {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+/* Price Style */
+.price-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 1rem 0;
+}
+
+/* Remove Button Style */
 .remove-from-wishlist {
-  position: absolute; /* Position the button absolutely */
-  top: 10px; /* Adjust the top position */
-  right: 10px; /* Adjust the right position */
-  margin-top: 0; /* Remove the margin-top */
-  transform: translate(0, 0); /* Ensure the button stays within the div */
+  display: none;
+}
+
+/* Modern Pagination Style */
+.pagination {
+  gap: 5px;
+}
+
+.page-item {
+  margin: 0 2px;
+}
+
+.page-link {
+  border: none;
+  padding: 0.8rem 1.2rem;
+  color: #2c3e50;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.page-item.active .page-link {
+  background-color: #007bff;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+.page-link:hover {
+  background-color: #f8f9fa;
+  color: #007bff;
+  transform: translateY(-2px);
+}
+
+.page-item:first-child .page-link,
+.page-item:last-child .page-link {
+  border-radius: 8px;
+}
+
+/* Empty Wishlist Style */
+.empty-wishlist {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #6c757d;
+}
+
+.empty-wishlist i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #dee2e6;
+}
+
+/* Updated Card and Image Styles */
+.image-container {
+  position: relative;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+}
+
+.product-image {
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.card:hover .product-image {
+  transform: scale(1.05);
+}
+
+/* Delete Button Style */
+.delete-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #dc3545;
+  transition: all 0.3s ease;
+  opacity: 0;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.card:hover .delete-btn {
+  opacity: 1;
+}
+
+.delete-btn:hover {
+  background: #dc3545;
+  color: white;
+  transform: scale(1.1);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .card-img-top {
+    height: 150px;
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+  
+  .price-text {
+    font-size: 1.1rem;
+  }
+
+  .image-container {
+    padding: 0.5rem;
+  }
+
+  .product-image {
+    height: 150px;
+  }
+
+  .delete-btn {
+    opacity: 1; /* Always visible on mobile */
+  }
 }

@@ -9,6 +9,8 @@ const mongoose = require("mongoose");
 const load_wishlist = async (req, res) => {
   try {
     const userId = req.user ? req.user.id : null;
+    const page = parseInt(req.query.page) || 1;
+    const limit = 4; // Items per page
 
     const brand = await Brand.find({ isBlocked: false });
     const category = await Category.find({ isListed: true });
@@ -46,22 +48,37 @@ const load_wishlist = async (req, res) => {
       "items.ProductId"
     );
 
-    // Add product image and name to each wishlist item
+    let paginatedItems = [];
+    let totalPages = 0;
+    
     if (userWishlist && userWishlist.items.length > 0) {
-      userWishlist.items = userWishlist.items.map((item) => {
-        item.image = item.ProductId.productImage[0];
-        item.name = item.ProductId.productName;
-        return item;
-      });
+      // Calculate pagination
+      const startIndex = (page - 1) * limit;
+      const endIndex = startIndex + limit;
+      
+      // Process and paginate items
+      const processedItems = userWishlist.items.map(item => ({
+        ...item.toObject(),
+        image: item.ProductId.productImage[0],
+        name: item.ProductId.productName
+      }));
+      
+      paginatedItems = processedItems.slice(startIndex, endIndex);
+      totalPages = Math.ceil(processedItems.length / limit);
     }
 
     res.render("user/wishlist", {
-      wishlist: userWishlist,
+      wishlist: { items: paginatedItems },
       user: userData,
       brand,
       category,
       cartItemCount,
+      currentPage: page,
+      totalPages: totalPages,
+      hasNextPage: page < totalPages,
+      hasPrevPage: page > 1
     });
+
   } catch (error) {
     console.log("Error loading wishlist:", error.message);
     res.status(500).json({

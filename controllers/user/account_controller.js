@@ -520,29 +520,44 @@ const loadOrdersPage = async (req, res) => {
     const brand = await Brand.find({ isBlocked: false });
     const user = req.user.id;
     const userData = user ? await User.findById(user).lean() : null;
+    
+    // Pagination parameters
+    const page = parseInt(req.query.page) || 1;
+    const limit = 5;
+    const skip = (page - 1) * limit;
+
     // Generate initials if no profile picture exists
     if (!userData.profileImage) {
       const name = userData.name || "";
       userData.initials = name
-        .replace(/\s+/g, "") // Remove all spaces in the name
-        .slice(0, 2) // Take the first two characters
-        .toUpperCase(); // Convert to uppercase
+        .replace(/\s+/g, "")
+        .slice(0, 2)
+        .toUpperCase();
     }
 
     const usercart = await cart.findOne({ userId: user });
     const cartItemCount = usercart.items.length;
 
+    // Get total count of orders for pagination
+    const totalOrders = await Order.countDocuments({ userId: user });
+    const totalPages = Math.ceil(totalOrders / limit);
+
+    // Fetch paginated orders
     const orders = await Order.find({ userId: user })
       .populate("orderedItems.product")
-      .sort({ createdAt: -1 }) // Sort by creation date in descending order
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
       .lean();
 
     // Fetch the address for each order
     for (let order of orders) {
       const userAddress = await Address.findOne({ userId: user }).lean();
-      order.address = userAddress ? userAddress.address.find(addr => addr._id.toString() === order.address.toString()) : "No address found";
+      order.address = userAddress 
+        ? userAddress.address.find(addr => addr._id.toString() === order.address.toString()) 
+        : "No address found";
       order.orderedItems.forEach(item => {
-        item.status = item.status || "Pending"; // Default status if not set
+        item.status = item.status || "Pending";
       });
     }
 
@@ -551,6 +566,14 @@ const loadOrdersPage = async (req, res) => {
       cartItemCount,
       brand,
       user: userData,
+      pagination: {
+        currentPage: page,
+        totalPages: totalPages,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+        nextPage: page + 1,
+        prevPage: page - 1
+      }
     });
   } catch (error) {
     console.error("Error loading orders page:", error);

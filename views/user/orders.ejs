@@ -230,6 +230,64 @@
         </div>
         <% }) %>
       </div>
+
+      <!-- Pagination -->
+      <% if (pagination.totalPages > 1) { %>
+      <nav aria-label="Orders pagination" class="mt-4">
+        <ul class="pagination justify-content-center">
+          <!-- First page button -->
+          <li class="page-item <%= pagination.currentPage === 1 ? 'disabled' : '' %>">
+            <a class="page-link" href="/orders?page=1" aria-label="First">
+              <i class="fas fa-angle-double-left"></i>
+            </a>
+          </li>
+          
+          <!-- Previous button -->
+          <% if (pagination.hasPrevPage) { %>
+            <li class="page-item">
+              <a class="page-link" href="/orders?page=<%= pagination.prevPage %>" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+          <% } %>
+
+          <!-- Page numbers -->
+          <% 
+          let startPage = Math.max(1, pagination.currentPage - 1);
+          let endPage = Math.min(pagination.totalPages, startPage + 2);
+          
+          if (endPage - startPage < 2) {
+            if (startPage === 1) {
+              endPage = Math.min(3, pagination.totalPages);
+            } else {
+              startPage = Math.max(1, pagination.totalPages - 2);
+            }
+          }
+          
+          for(let i = startPage; i <= endPage; i++) { %>
+            <li class="page-item <%= i === pagination.currentPage ? 'active' : '' %>">
+              <a class="page-link" href="/orders?page=<%= i %>"><%= i %></a>
+            </li>
+          <% } %>
+
+          <!-- Next button -->
+          <% if (pagination.hasNextPage) { %>
+            <li class="page-item">
+              <a class="page-link" href="/orders?page=<%= pagination.nextPage %>" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          <% } %>
+
+          <!-- Last page button -->
+          <li class="page-item <%= pagination.currentPage === pagination.totalPages ? 'disabled' : '' %>">
+            <a class="page-link" href="/orders?page=<%= pagination.totalPages %>" aria-label="Last">
+              <i class="fas fa-angle-double-right"></i>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <% } %>
     </div>
   </div>
 </div>

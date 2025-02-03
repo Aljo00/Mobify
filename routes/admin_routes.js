@@ -112,6 +112,13 @@ admin_route.put(
   categoryController.removeOffer
 );
 
+// Fix the route definition
+admin_route.get(
+  "/top-categories",
+  adminAuth.protectAdmin,
+  categoryController.getTopCategories  // Make sure this is exported from categoryController
+);
+
 //Admin Brand Management Routes
 admin_route.get(
   "/brands",

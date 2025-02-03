@@ -78,6 +78,13 @@
       <!-- Categories Table Card -->
       <div class="card mb-4">
         <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title mb-0">Category List</h5>
+            <button class="btn btn-primary" onclick="showTopCategories()">
+              <i class="fas fa-chart-bar me-1"></i>Top 5 Categories
+            </button>
+          </div>
+          
           <div class="table-responsive">
             <table class="table table-striped table-hover">
               <thead class="table-light">
@@ -174,6 +181,156 @@
           </div>
         </div>
       </div>
+
+      <!-- Top Categories Modal -->
+      <div class="modal fade" id="topCategoriesModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+              <h5 class="modal-title">Top 5 Performing Categories</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div id="topCategoriesList"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+      function showTopCategories() {
+        $('#topCategoriesModal').modal('show');
+        $('#topCategoriesList').html(`
+          <div class="text-center p-4">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2">Loading top categories...</p>
+          </div>
+        `);
+      
+        $.ajax({
+          url: '/admin/top-categories',
+          method: 'GET',
+          success: function(response) {
+            if (!response.categories || response.categories.length === 0) {
+              $('#topCategoriesList').html(`
+                <div class="alert alert-info">
+                  <i class="fas fa-info-circle me-2"></i>No sales data available
+                </div>
+              `);
+              return;
+            }
+      
+            let html = '<div class="category-stats">';
+            response.categories.forEach((category, index) => {
+              const formattedRevenue = new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR'
+              }).format(category.totalRevenue);
+      
+              html += `
+                <div class="category-stat-item mb-3 ${index === 0 ? 'top-performer' : ''}">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <span class="badge ${index === 0 ? 'bg-warning' : 'bg-primary'} me-2">
+                        ${index === 0 ? '<i class="fas fa-trophy"></i>' : '#' + (index + 1)}
+                      </span>
+                      <span class="fw-bold">${category.name}</span>
+                    </div>
+                    <div>
+                      <span class="badge bg-success me-2">
+                        <i class="fas fa-shopping-cart me-1"></i>${category.totalSold} sales
+                      </span>
+                      <span class="badge bg-info">
+                        <i class="fas fa-inr me-1"></i>${formattedRevenue}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="small text-muted mt-2">
+                    <i class="fas fa-tag me-1"></i>${category.description}
+                    ${category.currentOffer > 0 ? 
+                      `<span class="ms-2 badge bg-warning">
+                        <i class="fas fa-percent me-1"></i>${category.currentOffer}% OFF
+                      </span>` 
+                      : ''}
+                  </div>
+                </div>
+              `;
+            });
+            html += '</div>';
+            
+            $('#topCategoriesList').html(html);
+          },
+          error: function(xhr, status, error) {
+            $('#topCategoriesList').html(`
+              <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Failed to fetch top categories
+              </div>
+            `);
+          }
+        });
+      }
+      
+      $('<style>')
+        .text(`
+          .category-stat-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+          }
+      
+          .category-stat-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          }
+      
+          .top-performer {
+            background: #fff8e1;
+            border-color: #ffd54f;
+          }
+      
+          .category-stats {
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 1rem;
+          }
+        `)
+        .appendTo('head');
+      </script>
+      
+      <style>
+      .category-stats {
+        padding: 1rem;
+      }
+      
+      .category-stat-item {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+      }
+      
+      .category-stat-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      
+      .progress {
+        background-color: #e9ecef;
+        border-radius: 8px;
+      }
+      
+      .progress-bar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 500;
+        transition: width 0.6s ease;
+      }
+      </style>
+
     </div>
   </div>
 </div>
@@ -339,11 +496,7 @@
     Swal.fire({
       title: "Are you sure?",
       text: "Do you want to remove the offer?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, remove it!",
+      icon: "warning",      showCancelButton: true,      confirmButtonColor: "#3085d6",      cancelButtonColor: "#d33",      confirmButtonText: "Yes, remove it!",
     }).then((result) => {
       if (result.isConfirmed) {
         $.ajax({

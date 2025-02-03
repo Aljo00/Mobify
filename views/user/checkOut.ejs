@@ -89,13 +89,21 @@
       <div class="glass-card payment-section">
         <h2><i class="fas fa-wallet bounce"></i> Payment Method</h2>
         <div class="payment-options">
-          <label class="payment-option">
-            <input type="radio" name="paymentMethod" value="cod" />
+          <label class="payment-option" id="codOption">
+            <input type="radio" name="paymentMethod" value="cod" id="codRadio" 
+              <% if (cart.items.filter(item => item.quantity > 0).reduce((acc, item) => acc + item.totalPrice, 0) > 10000) { %>
+                disabled
+              <% } %> 
+            />
             <span class="option-content">
               <i class="fas fa-money-bill-wave"></i>
               <div class="option-text">
                 <span>Cash on Delivery</span>
-                <small>Pay when you receive</small>
+                <% if (cart.items.filter(item => item.quantity > 0).reduce((acc, item) => acc + item.totalPrice, 0) > 10000) { %>
+                  <small class="text-danger">Not available for orders above ₹10,000</small>
+                <% } else { %>
+                  <small>Pay when you receive</small>
+                <% } %>
               </div>
             </span>
           </label>

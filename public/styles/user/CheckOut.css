@@ -2641,3 +2641,23 @@ footer {
   align-items: center;
   gap: 8px;
 }
+
+.payment-option.disabled-option {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.payment-option.disabled-option .option-content {
+  border-color: #ddd;
+  background: #f5f5f5;
+}
+
+.payment-option.disabled-option input[type="radio"]:disabled + .option-content:hover {
+  border-color: #ddd;
+  transform: none;
+}
+
+.payment-option .text-danger {
+  color: #dc3545;
+  font-style: italic;
+}

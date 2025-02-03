@@ -87,7 +87,23 @@
 
     <!-- Main Content -->
     <div class="col-md-9">
-      <h2 class="mb-4 fw-bold">My Orders</h2>
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0">My Orders</h2>
+        <div class="sort-filter">
+          <div class="filter-wrapper">
+            <select class="form-select custom-select" id="orderStatusFilter" onchange="filterOrders(this.value)">
+              <option value="all" <%= filterStatus === 'all' ? 'selected' : '' %>>All Orders</option>
+              <option value="Pending" <%= filterStatus === 'Pending' ? 'selected' : '' %>>Pending Orders</option>
+              <option value="Processing" <%= filterStatus === 'Processing' ? 'selected' : '' %>>Processing Orders</option>
+              <option value="Shipped" <%= filterStatus === 'Shipped' ? 'selected' : '' %>>Shipped Orders</option>
+              <option value="Delivered" <%= filterStatus === 'Delivered' ? 'selected' : '' %>>Delivered Orders</option>
+              <option value="Cancelled" <%= filterStatus === 'Cancelled' ? 'selected' : '' %>>Cancelled Orders</option>
+              <option value="Return Request" <%= filterStatus === 'Return Request' ? 'selected' : '' %>>Return Requested</option>
+              <option value="Returned" <%= filterStatus === 'Returned' ? 'selected' : '' %>>Returned Orders</option>
+            </select>
+          </div>
+        </div>
+      </div>
       <div class="order-cards">
         <% orders.forEach(order => { %>
         <div class="order-card">
@@ -666,6 +682,13 @@
           icon: 'error'
         });
       });
+  }
+
+  function filterOrders(status) {
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set('status', status);
+    currentUrl.searchParams.set('page', '1'); // Reset to first page when filter changes
+    window.location.href = currentUrl.toString();
   }
 </script>
 

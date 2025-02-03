@@ -12,8 +12,8 @@ const cloudinary = require("../../config/cloudinary");
 const Order = require("../../models/orderSchema");
 const Wallet = require("../../models/walletSchema");
 const Product = require("../../models/productSchema");
-const PDFDocument = require('pdfkit');
-const fs = require('fs');
+const PDFDocument = require("pdfkit");
+const fs = require("fs");
 
 const load_page404 = async (req, res) => {
   try {
@@ -23,17 +23,14 @@ const load_page404 = async (req, res) => {
   }
 };
 
-
 // Overall Summary:
-// This section handles the account-related actions for the user. It consists of three controllers: 
+// This section handles the account-related actions for the user. It consists of three controllers:
 // 1. loadAccountPage - Loads the user's account section.
 // 2. loadEditAccountPage - Loads the edit account page for modifying user details.
 // 3. editAccount - Saves the updated user details to the database after editing.
 
-
-
 // Controller: loadAccountPage
-// Description: This controller is responsible for loading the user's account section. It retrieves and displays 
+// Description: This controller is responsible for loading the user's account section. It retrieves and displays
 // the user's profile details, settings, and other relevant information in the account dashboard.
 const loadAccountPage = async (req, res) => {
   try {
@@ -42,10 +39,7 @@ const loadAccountPage = async (req, res) => {
     const userData = user ? await User.findById(user).lean() : null;
     if (!userData.profileImage) {
       const name = userData.name || "";
-      userData.initials = name
-        .replace(/\s+/g, "") 
-        .slice(0, 2) 
-        .toUpperCase();
+      userData.initials = name.replace(/\s+/g, "").slice(0, 2).toUpperCase();
     }
 
     if (userData) {
@@ -67,9 +61,8 @@ const loadAccountPage = async (req, res) => {
   }
 };
 
-
 // Controller: loadEditAccountPage
-// Description: This controller loads the edit account page where the user can modify their personal information, 
+// Description: This controller loads the edit account page where the user can modify their personal information,
 // such as name, email, password, etc. It provides the user with a form pre-filled with their current account details.
 
 const loadEditAccountPage = async (req, res) => {
@@ -80,13 +73,9 @@ const loadEditAccountPage = async (req, res) => {
     const userData = user ? await User.findById(user).lean() : null;
     if (!userData.profileImage) {
       const name = userData.name || "";
-      userData.initials = name
-        .replace(/\s+/g, "") 
-        .slice(0, 2) 
-        .toUpperCase(); 
+      userData.initials = name.replace(/\s+/g, "").slice(0, 2).toUpperCase();
     }
 
-    
     const usercart = await cart.findOne({ userId: user });
     const cartItemCount = usercart.items.length;
 
@@ -101,9 +90,8 @@ const loadEditAccountPage = async (req, res) => {
   }
 };
 
-
 // Controller: editAccount
-// Description: This controller handles the process of saving the updated account details to the database. 
+// Description: This controller handles the process of saving the updated account details to the database.
 // It takes the edited data from the user and updates the corresponding fields in the user's account record.
 
 const editAccount = async (req, res) => {
@@ -111,16 +99,13 @@ const editAccount = async (req, res) => {
     const { name, dob, email, altEmail, phone, altPhone } = req.body;
     const user = req.user.id;
 
-    
     let profileImageUrl = null;
     console.log(req.file);
     if (req.file) {
-      
       const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: "profile_images", 
+        folder: "profile_images",
       });
 
-      
       profileImageUrl = result.secure_url;
     }
 
@@ -514,36 +499,39 @@ const resetPassword = async (req, res) => {
   }
 };
 
-
 const loadOrdersPage = async (req, res) => {
   try {
     const brand = await Brand.find({ isBlocked: false });
     const user = req.user.id;
     const userData = user ? await User.findById(user).lean() : null;
-    
-    // Pagination parameters
+
+    // Pagination and filter parameters
     const page = parseInt(req.query.page) || 1;
     const limit = 5;
     const skip = (page - 1) * limit;
+    const filterStatus = req.query.status || "all";
 
     // Generate initials if no profile picture exists
     if (!userData.profileImage) {
       const name = userData.name || "";
-      userData.initials = name
-        .replace(/\s+/g, "")
-        .slice(0, 2)
-        .toUpperCase();
+      userData.initials = name.replace(/\s+/g, "").slice(0, 2).toUpperCase();
     }
 
     const usercart = await cart.findOne({ userId: user });
     const cartItemCount = usercart.items.length;
 
-    // Get total count of orders for pagination
-    const totalOrders = await Order.countDocuments({ userId: user });
+    // Build query based on filter
+    let query = { userId: user };
+    if (filterStatus !== "all") {
+      query["orderedItems.status"] = filterStatus;
+    }
+
+    // Get total count of filtered orders for pagination
+    const totalOrders = await Order.countDocuments(query);
     const totalPages = Math.ceil(totalOrders / limit);
 
-    // Fetch paginated orders
-    const orders = await Order.find({ userId: user })
+    // Fetch paginated and filtered orders
+    const orders = await Order.find(query)
       .populate("orderedItems.product")
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -553,10 +541,12 @@ const loadOrdersPage = async (req, res) => {
     // Fetch the address for each order
     for (let order of orders) {
       const userAddress = await Address.findOne({ userId: user }).lean();
-      order.address = userAddress 
-        ? userAddress.address.find(addr => addr._id.toString() === order.address.toString()) 
+      order.address = userAddress
+        ? userAddress.address.find(
+            (addr) => addr._id.toString() === order.address.toString()
+          )
         : "No address found";
-      order.orderedItems.forEach(item => {
+      order.orderedItems.forEach((item) => {
         item.status = item.status || "Pending";
       });
     }
@@ -566,14 +556,15 @@ const loadOrdersPage = async (req, res) => {
       cartItemCount,
       brand,
       user: userData,
+      filterStatus,
       pagination: {
         currentPage: page,
         totalPages: totalPages,
         hasNextPage: page < totalPages,
         hasPrevPage: page > 1,
         nextPage: page + 1,
-        prevPage: page - 1
-      }
+        prevPage: page - 1,
+      },
     });
   } catch (error) {
     console.error("Error loading orders page:", error);
@@ -586,7 +577,7 @@ const loadOrdersDetailPage = async (req, res) => {
     const { orderId } = req.params;
     const { productId } = req.query;
 
-    console.log(orderId, productId)
+    console.log(orderId, productId);
 
     const brand = await Brand.find({ isBlocked: false });
     const user = req.user.id;
@@ -634,49 +625,51 @@ const cancelOrder = async (req, res) => {
     const userId = req.user.id;
 
     if (!orderId) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Order ID is required" 
+      return res.status(400).json({
+        success: false,
+        message: "Order ID is required",
       });
     }
 
     // Find the order
-    const order = await Order.findById(orderId).populate('orderedItems.product');
-    
+    const order = await Order.findById(orderId).populate(
+      "orderedItems.product"
+    );
+
     if (!order) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "Order not found" 
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
       });
     }
 
     // Validate if order belongs to user
     if (order.userId.toString() !== userId) {
-      return res.status(403).json({ 
-        success: false, 
-        message: "Unauthorized to cancel this order" 
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized to cancel this order",
       });
     }
 
     // Check if all items can be cancelled
-    const canCancel = order.orderedItems.every(item => 
-      !['Shipped', 'Delivered', 'Cancelled'].includes(item.status)
+    const canCancel = order.orderedItems.every(
+      (item) => !["Shipped", "Delivered", "Cancelled"].includes(item.status)
     );
 
     if (!canCancel) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Cannot cancel order - some items are already shipped, delivered, or cancelled" 
+      return res.status(400).json({
+        success: false,
+        message:
+          "Cannot cancel order - some items are already shipped, delivered, or cancelled",
       });
     }
 
     // Update product quantities
     for (const item of order.orderedItems) {
       const product = await Product.findById(item.product._id);
-      
-      const comboIndex = product.combos.findIndex(combo => 
-        combo.ram === item.RAM && 
-        combo.storage === item.Storage
+
+      const comboIndex = product.combos.findIndex(
+        (combo) => combo.ram === item.RAM && combo.storage === item.Storage
       );
 
       if (comboIndex !== -1) {
@@ -686,49 +679,50 @@ const cancelOrder = async (req, res) => {
     }
 
     // Update order status
-    order.orderedItems.forEach(item => {
-      item.status = 'Cancelled';
+    order.orderedItems.forEach((item) => {
+      item.status = "Cancelled";
     });
     await order.save();
 
     // Only process refund for non-COD orders
-    if (order.paymentMethod !== 'cod') {
+    if (order.paymentMethod !== "cod") {
       let wallet = await Wallet.findOne({ user: userId });
-      
+
       if (!wallet) {
         wallet = new Wallet({
           user: userId,
           balance: 0,
-          transactions: []
+          transactions: [],
         });
       }
 
       // Add refund transaction
       wallet.balance += order.FinalAmount;
       wallet.transactions.push({
-        type: 'credit',
+        type: "credit",
         amount: order.FinalAmount,
-        description: `Refund for cancelled order #${order.orderId} (${order.paymentMethod})`
+        description: `Refund for cancelled order #${order.orderId} (${order.paymentMethod})`,
       });
 
       await wallet.save();
 
-      res.status(200).json({ 
-        success: true, 
-        message: "Order cancelled and refund initiated successfully" 
+      res.status(200).json({
+        success: true,
+        message: "Order cancelled and refund initiated successfully",
       });
     } else {
-      res.status(200).json({ 
-        success: true, 
-        message: "Order cancelled successfully" 
+      res.status(200).json({
+        success: true,
+        message: "Order cancelled successfully",
       });
     }
-
   } catch (error) {
     console.error("Error cancelling order:", error);
-    res.status(500).json({ 
-      success: false, 
-      message: error.message || "An unexpected error occurred while cancelling the order" 
+    res.status(500).json({
+      success: false,
+      message:
+        error.message ||
+        "An unexpected error occurred while cancelling the order",
     });
   }
 };
@@ -739,54 +733,58 @@ const initiateReturn = async (req, res) => {
     const userId = req.user.id;
 
     if (!orderId || !reason) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Order ID and reason are required" 
+      return res.status(400).json({
+        success: false,
+        message: "Order ID and reason are required",
       });
     }
 
     // Find the order
     const order = await Order.findById(orderId);
-    
+
     if (!order) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "Order not found" 
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
       });
     }
 
     // Validate if order belongs to user
     if (order.userId.toString() !== userId) {
-      return res.status(403).json({ 
-        success: false, 
-        message: "Unauthorized to return this order" 
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized to return this order",
       });
     }
 
     // Check if order is delivered and within return window (e.g., 7 days)
-    const deliveredItem = order.orderedItems.find(item => item.status === 'Delivered');
+    const deliveredItem = order.orderedItems.find(
+      (item) => item.status === "Delivered"
+    );
     if (!deliveredItem) {
       return res.status(400).json({
         success: false,
-        message: "Order must be delivered to initiate return"
+        message: "Order must be delivered to initiate return",
       });
     }
 
     const deliveryDate = new Date(order.updatedAt);
     const today = new Date();
-    const daysSinceDelivery = Math.floor((today - deliveryDate) / (1000 * 60 * 60 * 24));
+    const daysSinceDelivery = Math.floor(
+      (today - deliveryDate) / (1000 * 60 * 60 * 24)
+    );
 
     if (daysSinceDelivery > 7) {
       return res.status(400).json({
         success: false,
-        message: "Return window has expired (7 days from delivery)"
+        message: "Return window has expired (7 days from delivery)",
       });
     }
 
     // Update order status to Return Request
-    order.orderedItems.forEach(item => {
-      if (item.status === 'Delivered') {
-        item.status = 'Return Request';
+    order.orderedItems.forEach((item) => {
+      if (item.status === "Delivered") {
+        item.status = "Return Request";
       }
     });
 
@@ -794,16 +792,17 @@ const initiateReturn = async (req, res) => {
     order.returnReason = reason;
     await order.save();
 
-    res.status(200).json({ 
-      success: true, 
-      message: "Return request submitted successfully" 
+    res.status(200).json({
+      success: true,
+      message: "Return request submitted successfully",
     });
-
   } catch (error) {
     console.error("Error processing return request:", error);
-    res.status(500).json({ 
-      success: false, 
-      message: error.message || "An unexpected error occurred while processing return request" 
+    res.status(500).json({
+      success: false,
+      message:
+        error.message ||
+        "An unexpected error occurred while processing return request",
     });
   }
 };
@@ -815,102 +814,111 @@ const downloadInvoice = async (req, res) => {
 
     // First find the order and populate necessary fields
     const order = await Order.findById(orderId)
-      .populate('orderedItems.product')
-      .populate('userId', 'name email')
+      .populate("orderedItems.product")
+      .populate("userId", "name email")
       .lean();
 
     if (!order) {
-      return res.status(404).json({ success: false, message: 'Order not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found" });
     }
 
     // Check authorization
     if (order.userId._id.toString() !== userId) {
-      return res.status(403).json({ success: false, message: 'Unauthorized access' });
+      return res
+        .status(403)
+        .json({ success: false, message: "Unauthorized access" });
     }
 
     // Fetch address details
     const userAddress = await Address.findOne({ userId });
     if (!userAddress) {
-      return res.status(404).json({ success: false, message: 'Address not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: "Address not found" });
     }
 
-    const deliveryAddress = userAddress.address.find(addr => 
-      addr._id.toString() === order.address.toString()
+    const deliveryAddress = userAddress.address.find(
+      (addr) => addr._id.toString() === order.address.toString()
     );
 
     if (!deliveryAddress) {
-      return res.status(404).json({ success: false, message: 'Delivery address not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: "Delivery address not found" });
     }
 
     // Initialize PDF document
-    const doc = new PDFDocument({ 
+    const doc = new PDFDocument({
       margin: 50,
-      size: 'A4',
-      layout: 'portrait'
+      size: "A4",
+      layout: "portrait",
     });
 
     // Setup document
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=invoice-${order.orderId}.pdf`);
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=invoice-${order.orderId}.pdf`
+    );
     doc.pipe(res);
 
     // Add some nice graphics at the top
-    doc.rect(0, 0, doc.page.width, 150).fill('#4a90e2');
-    
+    doc.rect(0, 0, doc.page.width, 150).fill("#4a90e2");
+
     // White circle behind logo
-    doc.circle(doc.page.width / 2, 75, 30)
-      .fill('#ffffff');
-    
+    doc.circle(doc.page.width / 2, 75, 30).fill("#ffffff");
+
     // Logo
-    doc.fontSize(40)
-      .fillColor('#4a90e2')
-      .text('M', doc.page.width / 2 - 15, 55);
+    doc
+      .fontSize(40)
+      .fillColor("#4a90e2")
+      .text("M", doc.page.width / 2 - 15, 55);
 
     // Company name in white
-    doc.fontSize(30)
-      .fillColor('#ffffff')
-      .text('MOBIFY', doc.page.width / 2 - 50, 20);
-    
+    doc
+      .fontSize(30)
+      .fillColor("#ffffff")
+      .text("MOBIFY", doc.page.width / 2 - 50, 20);
+
     // Slogan
-    doc.fontSize(12)
-      .text('Your Trusted Mobile Partner', doc.page.width / 2 - 70, 110);
+    doc
+      .fontSize(12)
+      .text("Your Trusted Mobile Partner", doc.page.width / 2 - 70, 110);
 
     // Invoice title with stylish background
-    doc.rect(50, 170, 495, 40)
-      .fill('#f8f9fa');
-    doc.fontSize(20)
-      .fillColor('#333333')
-      .text('TAX INVOICE', 270, 180);
-    
+    doc.rect(50, 170, 495, 40).fill("#f8f9fa");
+    doc.fontSize(20).fillColor("#333333").text("TAX INVOICE", 270, 180);
+
     // Add invoice details in a box
-    doc.rect(50, 230, 495, 80)
-      .lineWidth(1)
-      .stroke('#dddddd');
-    
-    doc.fontSize(10)
+    doc.rect(50, 230, 495, 80).lineWidth(1).stroke("#dddddd");
+
+    doc
+      .fontSize(10)
       .text(`Invoice No: #${order.orderId}`, 60, 240)
       .text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`, 60, 255)
       .text(`Payment Method: ${order.paymentMethod.toUpperCase()}`, 60, 270)
       .text(`Order Status: ${order.orderedItems[0].status}`, 60, 285);
 
     // Add company info box
-    doc.rect(50, 330, 240, 100)
-      .fill('#f8f9fa');
-    doc.fillColor('#333333')
+    doc.rect(50, 330, 240, 100).fill("#f8f9fa");
+    doc
+      .fillColor("#333333")
       .fontSize(12)
-      .text('From:', 60, 340)
+      .text("From:", 60, 340)
       .fontSize(10)
-      .text('Mobify Technologies Pvt. Ltd.', 60, 360)
-      .text('123 Tech Street, Digital Plaza', 60, 375)
-      .text('Bangalore, Karnataka - 560001', 60, 390)
-      .text('GST: 29ABCDE1234F1Z5', 60, 405);
+      .text("Mobify Technologies Pvt. Ltd.", 60, 360)
+      .text("123 Tech Street, Digital Plaza", 60, 375)
+      .text("Bangalore, Karnataka - 560001", 60, 390)
+      .text("GST: 29ABCDE1234F1Z5", 60, 405);
 
     // Add customer info box
-    doc.rect(305, 330, 240, 100)
-      .fill('#f8f9fa');
-    doc.fillColor('#333333')
+    doc.rect(305, 330, 240, 100).fill("#f8f9fa");
+    doc
+      .fillColor("#333333")
       .fontSize(12)
-      .text('Bill To:', 315, 340)
+      .text("Bill To:", 315, 340)
       .fontSize(10)
       .text(`${order.userId.name}`, 315, 360)
       .text(`${deliveryAddress.houseName}`, 315, 375)
@@ -919,23 +927,23 @@ const downloadInvoice = async (req, res) => {
 
     // Items table header with gradient
     const tableTop = 450;
-    doc.rect(50, tableTop, 495, 30)
-      .fill('#4a90e2');
-    
-    doc.fillColor('#ffffff')
-      .text('Product', 60, tableTop + 10)
-      .text('Specifications', 220, tableTop + 10)
-      .text('Qty', 340, tableTop + 10)
-      .text('Price', 400, tableTop + 10)
-      .text('Total', 470, tableTop + 10);
+    doc.rect(50, tableTop, 495, 30).fill("#4a90e2");
+
+    doc
+      .fillColor("#ffffff")
+      .text("Product", 60, tableTop + 10)
+      .text("Specifications", 220, tableTop + 10)
+      .text("Qty", 340, tableTop + 10)
+      .text("Price", 400, tableTop + 10)
+      .text("Total", 470, tableTop + 10);
 
     // Items table rows with alternating colors
     let yPos = tableTop + 30;
     order.orderedItems.forEach((item, i) => {
-      doc.rect(50, yPos, 495, 25)
-        .fill(i % 2 === 0 ? '#ffffff' : '#f8f9fa');
+      doc.rect(50, yPos, 495, 25).fill(i % 2 === 0 ? "#ffffff" : "#f8f9fa");
 
-      doc.fillColor('#333333')
+      doc
+        .fillColor("#333333")
         .text(item.product.productName, 60, yPos + 7, { width: 150 })
         .text(`${item.RAM}GB RAM, ${item.Storage}GB`, 220, yPos + 7)
         .text(item.quantity.toString(), 340, yPos + 7)
@@ -946,51 +954,57 @@ const downloadInvoice = async (req, res) => {
     });
 
     // Totals section with box
-    doc.rect(305, yPos + 20, 240, 100)
-      .fill('#f8f9fa');
+    doc.rect(305, yPos + 20, 240, 100).fill("#f8f9fa");
 
-    const subtotal = order.orderedItems.reduce((sum, item) => sum + Number(item.totalPrice), 0);
+    const subtotal = order.orderedItems.reduce(
+      (sum, item) => sum + Number(item.totalPrice),
+      0
+    );
     const discount = subtotal - Number(order.FinalAmount);
-    
-    doc.fontSize(10)
-      .text('Subtotal:', 315, yPos + 30)
-      .text(`₹${subtotal.toFixed(2)}`, 485, yPos + 30, { align: 'right' })
-      .text('Discount:', 315, yPos + 50)
-      .text(`₹${discount.toFixed(2)}`, 485, yPos + 50, { align: 'right' })
+
+    doc
+      .fontSize(10)
+      .text("Subtotal:", 315, yPos + 30)
+      .text(`₹${subtotal.toFixed(2)}`, 485, yPos + 30, { align: "right" })
+      .text("Discount:", 315, yPos + 50)
+      .text(`₹${discount.toFixed(2)}`, 485, yPos + 50, { align: "right" })
       .fontSize(12)
-      .fillColor('#4a90e2')
-      .text('Final Amount:', 315, yPos + 80)
-      .text(`₹${Number(order.FinalAmount).toFixed(2)}`, 485, yPos + 80, { align: 'right' });
+      .fillColor("#4a90e2")
+      .text("Final Amount:", 315, yPos + 80)
+      .text(`₹${Number(order.FinalAmount).toFixed(2)}`, 485, yPos + 80, {
+        align: "right",
+      });
 
     // Footer with terms and QR code
     const footerTop = yPos + 150;
-    doc.rect(50, footerTop, 495, 80)
-      .fill('#f8f9fa');
+    doc.rect(50, footerTop, 495, 80).fill("#f8f9fa");
 
-    doc.fontSize(8)
-      .fillColor('#666666')
-      .text('Terms & Conditions:', 60, footerTop + 10)
-      .text('1. All prices include GST', 60, footerTop + 25)
-      .text('2. Returns accepted within 7 days of delivery', 60, footerTop + 35)
-      .text('3. Warranty as per manufacturer terms', 60, footerTop + 45);
+    doc
+      .fontSize(8)
+      .fillColor("#666666")
+      .text("Terms & Conditions:", 60, footerTop + 10)
+      .text("1. All prices include GST", 60, footerTop + 25)
+      .text("2. Returns accepted within 7 days of delivery", 60, footerTop + 35)
+      .text("3. Warranty as per manufacturer terms", 60, footerTop + 45);
 
     // Add a decorative bottom border
-    doc.rect(0, doc.page.height - 20, doc.page.width, 20)
-      .fill('#4a90e2');
+    doc.rect(0, doc.page.height - 20, doc.page.width, 20).fill("#4a90e2");
 
     // Centered text at the bottom
-    doc.fontSize(8)
-      .fillColor('#ffffff')
-      .text('Thank you for shopping with Mobify!', 0, doc.page.height - 15, { align: 'center' });
+    doc
+      .fontSize(8)
+      .fillColor("#ffffff")
+      .text("Thank you for shopping with Mobify!", 0, doc.page.height - 15, {
+        align: "center",
+      });
 
     // End the document
     doc.end();
-
   } catch (error) {
-    console.error('Error generating invoice:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Failed to generate invoice: ' + error.message 
+    console.error("Error generating invoice:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to generate invoice: " + error.message,
     });
   }
 };

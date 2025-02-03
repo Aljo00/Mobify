@@ -859,7 +859,7 @@ footer {
   background-color: #e9ecef;
   color: #4a90e2;
   transform: translateY(-2px);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .page-item.active .page-link:hover {
@@ -870,4 +870,115 @@ footer {
 
 .page-link .fas {
   font-size: 0.8rem;
+}
+
+/* Sort Filter Styles */
+.sort-filter {
+  min-width: 200px;
+}
+
+.sort-filter .form-select {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+  background-color: #fff;
+  color: #4a90e2;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.sort-filter .form-select:hover {
+  border-color: #4a90e2;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.sort-filter .form-select:focus {
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+  outline: none;
+}
+
+/* Enhanced Sort Filter Styles */
+.sort-filter {
+  position: relative;
+  min-width: 250px; /* Increased width to accommodate icons and text */
+}
+
+.filter-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.filter-icon {
+  position: absolute;
+  left: 15px;
+  color: #4a90e2;
+  z-index: 2;
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+
+.custom-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding: 0.7rem 2.5rem 0.7rem 3.2rem; /* Increased left padding */
+  border-radius: 10px;
+  border: 2px solid #e5e7eb;
+  background-color: #fff;
+  color: #4a90e2;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234a90e2'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 20px;
+  font-size: 0.9rem; /* Slightly smaller font size */
+}
+
+/* Style for options */
+.custom-select option {
+  padding: 12px 12px 12px 35px; /* Add padding to align with the main select */
+  font-size: 0.9rem;
+  background-color: white;
+  color: #333;
+  position: relative;
+}
+
+/* Additional styles for better mobile responsiveness */
+@media (max-width: 768px) {
+  .sort-filter {
+    min-width: 200px;
+  }
+
+  .custom-select {
+    padding: 0.6rem 2.2rem 0.6rem 3rem;
+    font-size: 0.85rem;
+  }
+
+  .filter-icon {
+    left: 12px;
+    font-size: 0.85rem;
+  }
+}
+
+/* Additional styles for better mobile responsiveness */
+@media (max-width: 768px) {
+  .sort-filter {
+    min-width: 160px;
+  }
+
+  .custom-select {
+    padding: 0.6rem 2.2rem 0.6rem 2.5rem;
+    font-size: 0.9rem;
+  }
+
+  .filter-icon {
+    left: 10px;
+    font-size: 0.9rem;
+  }
 }

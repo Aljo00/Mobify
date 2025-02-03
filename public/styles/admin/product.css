@@ -524,3 +524,172 @@ button:hover {
   background: var(--secondary-color);
   transform: translateY(-1px);
 }
+
+/* Error Message Styling */
+.error-message {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.error-message .alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #dc3545;
+  background-color: rgba(220, 53, 69, 0.1);
+}
+
+.error-message .alert i {
+  color: #dc3545;
+}
+
+/* Modern Error Message Styling */
+.error-toast {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%);
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+  box-shadow: 0 4px 6px rgba(255, 107, 107, 0.2);
+  transform-origin: right;
+  animation-duration: 0.3s;
+}
+
+.error-toast-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.error-icon {
+  font-size: 1.25rem;
+}
+
+.error-message-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Animations */
+.animated {
+  animation-duration: 0.3s;
+  animation-fill-mode: both;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translate3d(100%, 0, 0);
+    opacity: 0;
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+  to {
+    transform: translate3d(100%, 0, 0);
+    opacity: 0;
+  }
+}
+
+.slideInRight {
+  animation-name: slideInRight;
+}
+
+.slideOutRight {
+  animation-name: slideOutRight;
+}
+
+/* Combo Row Styling */
+.combo-row {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+  border: 1px solid #e2e8f0;
+}
+
+.combo-row:hover {
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+
+.combo-row .form-label {
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+}
+
+.combo-row .form-control {
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  padding: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.combo-row .form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+}
+
+.combo-row .delete-combo-btn {
+  background: #fff;
+  color: #e53e3e;
+  border: 1px solid #e53e3e;
+  transition: all 0.2s ease;
+}
+
+.combo-row .delete-combo-btn:hover {
+  background: #e53e3e;
+  color: white;
+}
+
+/* Animation classes */
+.animated {
+  animation-duration: 0.3s;
+  animation-fill-mode: both;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -20px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.fadeInDown {
+  animation-name: fadeInDown;
+}
+
+/* Sweet Alert Customization */
+.swal2-popup {
+  border-radius: 15px !important;
+  padding: 2rem !important;
+}
+
+.swal2-title {
+  font-size: 1.5rem !important;
+  font-weight: 600 !important;
+}
+
+.swal2-html-container {
+  font-size: 1rem !important;
+}
+
+.swal2-confirm {
+  padding: 0.5rem 1.5rem !important;
+  font-size: 1rem !important;
+  border-radius: 8px !important;
+}

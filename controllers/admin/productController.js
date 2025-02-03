@@ -176,110 +176,141 @@ const getEditProduct = async (req, res) => {
 
 const editProduct = async (req, res) => {
   try {
+    console.log('⭐ Edit Product Request Started');
     const id = req.params.id;
-    const product = await Product.findOne({ _id: id });
     const data = req.body;
-
-    const existingProduct = await Product.findOne({
+    
+    console.log('📦 Request Data:', {
+      id,
       productName: data.productName,
-      _id: { $ne: id },
+      brand: data.brand,
+      category: data.category,
+      filesReceived: req.files?.length || 0
     });
 
-    if (existingProduct) {
-      return res.status(400).json({
-        error:
-          "Product with this name already exists! Please try again with another name",
-      });
+    // Validate product exists
+    const existingProduct = await Product.findById(id);
+    if (!existingProduct) {
+      console.log('❌ Product not found:', id);
+      return res.status(404).json({ error: 'Product not found' });
     }
 
-    const images = [];
+    // Parse and validate combos
+    let combosArray;
+    try {
+      combosArray = typeof data.combos === 'string' ? JSON.parse(data.combos) : data.combos;
+      console.log('🎯 Parsed Combos:', combosArray);
+    } catch (error) {
+      console.error('❌ Combo parsing error:', error);
+      return res.status(400).json({ error: 'Invalid combo data format' });
+    }
 
+    // Handle image uploads
+    let newImages = [];
     if (req.files && req.files.length > 0) {
-      for (let i = 0; i < req.files.length; i++) {
-        const result = await cloudinary.uploader.upload(req.files[i].path, {
-          quailty: "100",
-        });
-
-        images.push(result.secure_url);
+      console.log('📸 Processing', req.files.length, 'new images');
+      for (const file of req.files) {
+        try {
+          const result = await cloudinary.uploader.upload(file.path);
+          newImages.push(result.secure_url);
+        } catch (error) {
+          console.error('❌ Image upload error:', error);
+        }
       }
+      console.log('✅ Uploaded images:', newImages);
     }
 
-    // Ensure combos are parsed as an array of objects
-    let combosArray = [];
-    if (typeof data.combos === "string") {
-      combosArray = JSON.parse(data.combos); // Convert the string to an array of objects
-    } else if (Array.isArray(data.combos)) {
-      combosArray = data.combos; // If it's already an array, no need to parse
-    }
-
-    const updateFields = {
+    // Prepare update data
+    const updateData = {
       productName: data.productName,
       description: data.description,
       brand: data.brand,
       category: data.category,
-      combos: combosArray,
+      combos: combosArray
     };
 
-    if (req.files.length > 0) {
-      updateFields.$push = { productImage: { $each: images } };
+    // Only update images if new ones were uploaded
+    if (newImages.length > 0) {
+      updateData.productImage = [...(existingProduct.productImage || []), ...newImages];
     }
 
-    await Product.findByIdAndUpdate(id, updateFields, { new: true });
-    console.log("Product edited successfully!");
-    res.status(200).json({ message: "Product edited successfully!" });
+    console.log('📝 Update Data:', updateData);
+
+    // Perform update
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+    console.log('✅ Product Updated Successfully:', updatedProduct._id);
+    
+    return res.status(200).json({
+      message: 'Product updated successfully',
+      product: updatedProduct
+    });
+
   } catch (error) {
-    console.log("Error found in Edit Product side: ", error.message);
-    res.status(500).json({ error: "Internal server error." });
+    console.error('❌ Edit Product Error:', error);
+    return res.status(500).json({
+      error: 'Failed to update product: ' + error.message
+    });
   }
 };
 
 const deleteSingleImage = async (req, res) => {
   try {
-    let { imagePublicId, productIdToServer } = req.body;
+    const { imagePublicId, productIdToServer } = req.body;
 
-    console.log("Original imagePublicId:", imagePublicId);
-
-    // Extract public_id from the URL
-    if (imagePublicId.startsWith("http")) {
-      const parts = imagePublicId.split("/");
-      const fileName = parts[parts.length - 1]; // Extract 'fwnq7d0jqo2cjgg8w4np.png'
-      imagePublicId = fileName.split(".")[0]; // Extract 'fwnq7d0jqo2cjgg8w4np'
-    }
-
-    console.log("Extracted public_id:", imagePublicId);
-
-    // Step 1: Delete the image from Cloudinary
-    const result = await cloudinary.uploader.destroy(imagePublicId);
-
-    if (result.result !== "ok") {
-      console.error("Error deleting image from Cloudinary:", result);
-      return res.status(500).send({
+    if (!imagePublicId || !productIdToServer) {
+      return res.status(400).json({
         status: false,
-        message: "Failed to delete image from Cloudinary",
-        error: result,
+        message: "Missing required parameters",
       });
     }
 
-    console.log(`Image ${imagePublicId} deleted from Cloudinary successfully.`);
-
-    // Step 2: Remove image reference from the database
-    const product = await Product.findByIdAndUpdate(productIdToServer, {
-      $pull: { productImage: imagePublicId },
-    });
-
+    // Find the product first to verify it exists
+    const product = await Product.findById(productIdToServer);
     if (!product) {
-      return res
-        .status(404)
-        .send({ status: false, message: "Product not found" });
+      return res.status(404).json({
+        status: false,
+        message: "Product not found",
+      });
     }
 
-    // Step 3: Respond with success
-    res.send({ status: true, message: "Image deleted successfully" });
+    // Check if the image exists in the product's images
+    if (!product.productImage.includes(imagePublicId)) {
+      return res.status(404).json({
+        status: false,
+        message: "Image not found in product",
+      });
+    }
+
+    // Remove the image URL from the product's productImage array
+    const updatedProduct = await Product.findByIdAndUpdate(
+      productIdToServer,
+      {
+        $pull: { productImage: imagePublicId },
+      },
+      { new: true }
+    );
+
+    if (!updatedProduct) {
+      return res.status(500).json({
+        status: false,
+        message: "Failed to update product",
+      });
+    }
+
+    res.json({
+      status: true,
+      message: "Image deleted successfully",
+    });
   } catch (error) {
-    console.error("Error in deleteSingleImage:", error.message);
-    res.status(500).send({
+    console.error("Error in deleteSingleImage:", error);
+    res.status(500).json({
       status: false,
-      message: "Internal Server Error",
+      message: "An error occurred while deleting the image",
       error: error.message,
     });
   }
@@ -317,8 +348,9 @@ const addOffer = async (req, res) => {
 
     // Update salePrice for each combo
     product.combos.forEach((combo) => {
-      combo.salePrice =
-        Math.round(combo.salePrice - combo.salePrice * (offerPercentage / 100));
+      combo.salePrice = Math.round(
+        combo.salePrice - combo.salePrice * (offerPercentage / 100)
+      );
     });
 
     await product.save();
@@ -333,7 +365,7 @@ const removeOffer = async (req, res) => {
   try {
     const { productId } = req.body;
 
-    const product = await Product.findById(productId);  
+    const product = await Product.findById(productId);
 
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
@@ -353,7 +385,7 @@ const removeOffer = async (req, res) => {
 
     await product.save();
 
-    res.status(200).json({ message: "Offer removed successfully"});
+    res.status(200).json({ message: "Offer removed successfully" });
   } catch (error) {
     console.error("Error fetching product combos:", error);
     res.status(500).json({ error: "Internal server error" });

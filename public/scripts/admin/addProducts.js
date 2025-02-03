@@ -6,6 +6,17 @@ function validateAndSubmit(event) {
   event.preventDefault();
 
   if (validateForm()) {
+    // Show SweetAlert2 loading indicator
+    Swal.fire({
+      title: 'Adding Product...',
+      html: 'Please wait while we process your request',
+      allowOutsideClick: false,
+      showConfirmButton: false,
+      willOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
     // Collect combo data from the form
     let combos = [];
     const comboRows = document.querySelectorAll(".combo-row");
@@ -43,37 +54,36 @@ function validateAndSubmit(event) {
       method: "POST",
       body: formData,
     })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data); // Log the response for debugging
-        if (data.message) {
-          Swal.fire({
-            icon: "success",
-            title: "Added Successfully",
-            text: data.message,
-            timer: 1000,
-            showConfirmButton: false,
-          }).then(() => {
-            window.location.href = "/admin/products";
-          });
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: data.error || "An error occurred while adding the product.",
-            timer: 1000,
-            showConfirmButton: false,
-          });
+      .then(async (response) => {
+        try {
+          const data = await response.json();
+          if (!response.ok) {
+            throw new Error(data.error || 'Failed to add product');
+          }
+          return data;
+        } catch (error) {
+          Swal.close(); // Close loading indicator
+          throw error;
         }
       })
+      .then((data) => {
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: data.message || "Product added successfully",
+          showConfirmButton: false,
+          timer: 1500
+        }).then(() => {
+          window.location.href = "/admin/products";
+        });
+      })
       .catch((error) => {
-        console.error(error); // Log the error for debugging
+        console.error('Error:', error);
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "An error occurred while adding the product.",
-          timer: 1000,
-          showConfirmButton: false,
+          text: error.message || "Failed to add product. Please try again.",
+          confirmButtonColor: '#d33',
         });
       });
   }
@@ -143,6 +153,20 @@ function validateForm() {
   clearErrorMessages();
   let isValid = true;
 
+  // Validate Brand
+  const brand = document.querySelector('select[name="brand"]').value;
+  if (!brand) {
+    displayErrorMessage("brand-error", "Please select a brand");
+    isValid = false;
+  }
+
+  // Validate Category
+  const category = document.querySelector('select[name="category"]').value;
+  if (!category) {
+    displayErrorMessage("category-error", "Please select a category");
+    isValid = false;
+  }
+
   const comboSet = new Set();
 
   // Validate Product Name
@@ -167,65 +191,82 @@ function validateForm() {
 
   // Validate Combos
   const combos = document.querySelectorAll(".combo-row");
-  combos.forEach((combo, index) => {
-    const ram = combo.querySelector('input[name="ram"]').value.trim();
-    const storage = combo.querySelector('input[name="storage"]').value.trim();
-    const quantity = combo.querySelector('input[name="quantity"]').value.trim();
-    const regularPrice = combo
-      .querySelector('input[name="regularPrice"]')
-      .value.trim();
-    const salePrice = combo
-      .querySelector('input[name="salePrice"]')
-      .value.trim();
+  combos.forEach((combo) => {
+    const ram = parseFloat(combo.querySelector('input[name="ram"]').value);
+    const storage = parseFloat(combo.querySelector('input[name="storage"]').value);
+    const quantity = parseInt(combo.querySelector('input[name="quantity"]').value);
+    const regularPrice = parseFloat(combo.querySelector('input[name="regularPrice"]').value);
+    const salePrice = parseFloat(combo.querySelector('input[name="salePrice"]').value);
     const color = combo.querySelector('input[name="color"]').value.trim();
 
-    // Check if any field is empty
-    if (ram === "") {
-      displayErrorMessage(`comboRAM-error-${index}`, "This is Empty");
+    // Get error elements specific to this combo row
+    const ramError = combo.querySelector('[id^="comboRAM-error"]');
+    const storageError = combo.querySelector('[id^="comboStorage-error"]');
+    const quantityError = combo.querySelector('[id^="comboQuantity-error"]');
+    const regError = combo.querySelector('[id^="comboReg-error"]');
+    const saleError = combo.querySelector('[id^="comboSale-error"]');
+    const colorError = combo.querySelector('[id^="comboColor-error"]');
+
+    // Validate RAM (should be a positive number)
+    if (isNaN(ram) || ram <= 0) {
+      ramError.innerText = "RAM must be a positive number";
+      ramError.style.display = "block";
       isValid = false;
     }
 
-    if (storage === "") {
-      displayErrorMessage(`comboStorage-error-${index}`, "This is Empty");
+    // Validate Storage (should be a positive number)
+    if (isNaN(storage) || storage <= 0) {
+      storageError.innerText = "Storage must be a positive number";
+      storageError.style.display = "block";
       isValid = false;
     }
 
-    if (quantity === "") {
-      displayErrorMessage(`comboQuantity-error-${index}`, "This is Empty");
+    // Validate Quantity
+    const quantityNum = parseInt(quantity);
+    if (isNaN(quantityNum) || quantityNum <= 0) {
+      quantityError.innerText = "Quantity must be a positive number";
+      quantityError.style.display = "block";
       isValid = false;
     }
 
-    if (regularPrice === "") {
-      displayErrorMessage(`comboReg-error-${index}`, "This is Empty");
+    // Validate Regular Price
+    const regularPriceNum = parseFloat(regularPrice);
+    if (isNaN(regularPriceNum) || regularPriceNum <= 0) {
+      regError.innerText = "Regular price must be a positive number";
+      regError.style.display = "block";
       isValid = false;
     }
 
-    if (salePrice === "") {
-      displayErrorMessage(`comboSale-error-${index}`, "This is Empty");
+    // Validate Sale Price
+    const salePriceNum = parseFloat(salePrice);
+    if (isNaN(salePriceNum) || salePriceNum <= 0) {
+      saleError.innerText = "Sale price must be a positive number";
+      saleError.style.display = "block";
       isValid = false;
     }
 
-    if (color === "") {
-      displayErrorMessage(`comboColor-error-${index}`, "This is Empty");
+    // Validate Price Comparison
+    if (regularPriceNum <= salePriceNum) {
+      regError.innerText = "Regular price must be greater than sale price";
+      regError.style.display = "block";
       isValid = false;
     }
 
-    // Check if regular price is greater than sale price
-    if (parseFloat(regularPrice) <= parseFloat(salePrice)) {
-      displayErrorMessage(
-        `comboReg-error-${index}`,
-        "Regular price must be greater than sale price."
-      );
+    // Validate Color (should not be empty and contain only letters and spaces)
+    if (!color || !/^[a-zA-Z\s,]+$/.test(color)) {
+      colorError.innerText = "Color must contain only letters and spaces";
+      colorError.style.display = "block";
       isValid = false;
     }
 
     // Check for duplicate combos
-    const comboKey = `${ram}-${storage}-${regularPrice}-${salePrice}-${color}`;
+    const comboKey = `${ram}-${storage}-${color}`;
     if (comboSet.has(comboKey)) {
-      displayErrorMessage(`combo-error-${index}`, "Duplicate combo detected.");
+      ramError.innerText = "Duplicate combo detected";
+      ramError.style.display = "block";
       isValid = false;
     } else {
-      comboSet.add(comboKey); // Add comboKey to the set if unique
+      comboSet.add(comboKey);
     }
   });
 
@@ -243,18 +284,27 @@ function validateForm() {
     isValid = false;
   }
 
-  return isValid; // Return the overall validation result
+  if (!isValid) {
+    // If form is invalid, ensure preloader is hidden
+    const preloader = document.getElementById('preloader');
+    if (preloader) {
+      preloader.style.display = 'none';
+    }
+  }
+
+  return isValid;
 }
 
-// Display and Clear Error Messages
 function displayErrorMessage(elementId, message) {
   const errorElement = document.getElementById(elementId);
-  errorElement.innerText = message;
-  errorElement.style.display = "block";
-  errorElement.classList.add("shake");
-  setTimeout(() => {
-    errorElement.classList.remove("shake");
-  }, 500);
+  if (errorElement) {
+    errorElement.innerText = message;
+    errorElement.style.display = "block";
+    errorElement.classList.add("shake");
+    setTimeout(() => {
+      errorElement.classList.remove("shake");
+    }, 500);
+  }
 }
 
 function clearErrorMessages() {
@@ -272,39 +322,39 @@ const productCombosContainer = document.getElementById("product-combos");
 addComboBtn.addEventListener("click", () => {
   // Create a new combo row
   const newRow = document.createElement("div");
-  newRow.classList.add("row", "combo-row");
+  newRow.classList.add("row", "combo-row", "mb-3");
 
   const comboIndex = document.querySelectorAll(".combo-row").length;
 
   newRow.innerHTML = `
         <div class="col-lg-3">
             <label class="form-label">RAM</label>
-            <input name="ram" type="text" class="form-control border" required>
+            <input name="ram" type="number" min="1" class="form-control border" placeholder="Enter RAM in GB" required>
             <div id="comboRAM-error-${comboIndex}" class="error-message"></div>
         </div>
         <div class="col-lg-3">
             <label class="form-label">Storage</label>
-            <input name="storage" type="text" class="form-control border" required>
+            <input name="storage" type="number" min="1" class="form-control border" placeholder="Enter Storage in GB" required>
             <div id="comboStorage-error-${comboIndex}" class="error-message"></div>
         </div>
         <div class="col-lg-3">
             <label class="form-label">Quantity</label>
-            <input name="quantity" type="number" class="form-control border" required>
+            <input name="quantity" type="number" min="1" class="form-control border" required>
             <div id="comboQuantity-error-${comboIndex}" class="error-message"></div>
         </div>
         <div class="col-lg-3">
             <label class="form-label">Regular Price</label>
-            <input name="regularPrice" type="number" class="form-control border" required>
+            <input name="regularPrice" type="number" min="0.01" step="0.01" class="form-control border" required>
             <div id="comboReg-error-${comboIndex}" class="error-message"></div>
         </div>
         <div class="col-lg-3">
             <label class="form-label">Sale Price</label>
-            <input name="salePrice" type="number" class="form-control border" required>
+            <input name="salePrice" type="number" min="0.01" step="0.01" class="form-control border" required>
             <div id="comboSale-error-${comboIndex}" class="error-message"></div>
         </div>
         <div class="col-lg-3">
             <label class="form-label">Color</label>
-            <input name="color" type="text" class="form-control border" placeholder="e.g., Red, Blue, Green" required>
+            <input name="color" type="text" class="form-control border" placeholder="e.g., Red, Blue, Green" pattern="^[a-zA-Z\\s,]+$" required>
             <div id="comboColor-error-${comboIndex}" class="error-message"></div>
         </div>
         <div class="col-lg-3 d-flex align-items-center">

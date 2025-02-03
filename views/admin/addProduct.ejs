@@ -20,6 +20,10 @@
 <link rel="stylesheet" href="/styles/admin/addProduct.css" />
 
 <div class="wrapper">
+  <!-- Add Preloader -->
+  <div id="preloader" style="display: none">
+    <div class="loader"></div>
+  </div>
   <div class="sidebar">
     <h2><i class="fas fa-mobile-alt me-2"></i>Mobify</h2>
     <a href="/admin/dashboard">
@@ -115,7 +119,8 @@
                 </div>
                 <div class="col-lg-6">
                   <label class="form-label">Brand</label>
-                  <select class="form-select border" name="brand">
+                  <select class="form-select border" name="brand" required>
+                    <option value="">Select Brand</option>
                     <% for (let i = 0; i < brand.length; i++) { %>
                     <option value="<%= brand[i].brandName %>">
                       <%= brand[i].brandName %>
@@ -142,20 +147,24 @@
                     <!-- Combo fields for RAM, Storage, Quantity, Price -->
                     <div class="col-lg-3">
                       <label class="form-label">RAM</label>
-                      <input
-                        name="ram"
-                        type="text"
-                        class="form-control border"
+                      <input 
+                        name="ram" 
+                        type="number" 
+                        min="1"
+                        class="form-control border" 
+                        placeholder="Enter RAM in GB"
                         required
                       />
                       <div id="comboRAM-error" class="error-message"></div>
                     </div>
                     <div class="col-lg-3">
                       <label class="form-label">Storage</label>
-                      <input
-                        name="storage"
-                        type="text"
-                        class="form-control border"
+                      <input 
+                        name="storage" 
+                        type="number" 
+                        min="1"
+                        class="form-control border" 
+                        placeholder="Enter Storage in GB"
                         required
                       />
                       <div id="comboStorage-error" class="error-message"></div>
@@ -225,7 +234,9 @@
                         class="form-select border"
                         style="width: 100%"
                         name="category"
+                        required
                       >
+                        <option value="">Select Category</option>
                         <%for(let i = 0; i < cat.length; i++){%>
                         <option value="<%= cat[i].name %>">
                           <%= cat[i].name %>

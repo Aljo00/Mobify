@@ -63,9 +63,17 @@
     <div class="container-fluid">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="mb-0">Brand Management</h4>
-        <div class="date text-muted">
-          <%= new Date().toLocaleDateString('en-US', { weekday: 'long', year:
-          'numeric', month: 'long', day: 'numeric' }) %>
+        <div>
+          <button class="btn btn-primary me-2" onclick="showTopBrands()">
+            <i class="fas fa-chart-line me-2"></i>Top Brands
+          </button>
+          <button
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#addBrandModal"
+          >
+            <i class="fas fa-plus me-2"></i>Add Brand
+          </button>
         </div>
       </div>
 
@@ -198,18 +206,197 @@
           </div>
         </div>
       </div>
+
+      <!-- Deleted Brands Card -->
+      <div class="card mt-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title">Deleted Brands</h5>
+            <button class="btn btn-secondary" onclick="loadDeletedBrands()">
+              <i class="fas fa-trash-restore me-2"></i>View Deleted Brands
+            </button>
+          </div>
+          <div id="deletedBrandsTable" style="display: none;">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead class="table-light">
+                  <tr>
+                    <th>Name</th>
+                    <th>Photo</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="deletedBrandsBody">
+                  <!-- Deleted brands will be loaded here dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Update Brand Modal -->
+  <div class="modal fade" id="updateBrandModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Update Brand</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="updateBrandForm" enctype="multipart/form-data">
+            <input type="hidden" id="updateBrandId" name="brandId">
+            <div class="mb-3">
+              <label for="updateBrandName" class="form-label">Brand Name</label>
+              <input type="text" class="form-control" id="updateBrandName" name="brandName" required>
+            </div>
+            <div class="mb-3">
+              <label for="updateBrandImage" class="form-label">Brand Logo</label>
+              <input type="file" class="form-control" id="updateBrandImage" name="image" accept=".jpg, .jpeg, .png">
+            </div>
+            <div class="current-image mb-3">
+              <label class="form-label">Current Image:</label>
+              <img id="currentBrandImage" src="" alt="Current Brand Image" style="max-width: 100px;">
+            </div>
+            <button type="submit" class="btn btn-primary">Update Brand</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Top Brands Modal -->
+  <div class="modal fade" id="topBrandsModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Top Performing Brands</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Brand</th>
+                  <th>Total Orders</th>
+                  <th>Total Revenue</th>
+                </tr>
+              </thead>
+              <tbody id="topBrandsTableBody">
+                <!-- Data will be populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<!-- Include jQuery before your script -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<script src="/scripts/admin/addCategory.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<%- include('../../views/layout/admin/footer.ejs')%>
+  <!-- Include jQuery before your script -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <script src="/scripts/admin/brandManagement.js"></script>
+
+  <script src="/scripts/admin/addCategory.js"></script>
+
+  <script>
+  function loadDeletedBrands() {
+      const table = document.getElementById('deletedBrandsTable');
+      const tbody = document.getElementById('deletedBrandsBody');
+      
+      fetch('/admin/brands/deleted')
+          .then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  tbody.innerHTML = data.brands.map(brand => `
+                      <tr>
+                          <td>${brand.brandName}</td>
+                          <td>
+                              <img src="/uploads/re-image/${brand.brandImage}" 
+                                   alt="${brand.brandName}" 
+                                   width="50" 
+                                   height="50">
+                          </td>
+                          <td>
+                              <button class="btn btn-success" 
+                                      onclick="restoreBrand('${brand._id}')">
+                                  <i class="fas fa-trash-restore me-2"></i>Restore
+                              </button>
+                          </td>
+                      </tr>
+                  `).join('');
+                  table.style.display = 'block';
+              } else {
+                  Swal.fire({
+                      icon: 'error',
+                      title: 'Error',
+                      text: 'Failed to load deleted brands'
+                  });
+              }
+          })
+          .catch(error => {
+              console.error('Error:', error);
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'Something went wrong!'
+              });
+          });
+  }
+
+  function restoreBrand(brandId) {
+      Swal.fire({
+          title: 'Restore Brand?',
+          text: "This will make the brand active again",
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonColor: '#28a745',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, restore it!'
+      }).then((result) => {
+          if (result.isConfirmed) {
+              fetch(`/admin/brands/restore/${brandId}`, {
+                  method: 'POST'
+              })
+              .then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      Swal.fire({
+                          icon: 'success',
+                          title: 'Restored!',
+                          text: 'Brand has been restored successfully.',
+                          showConfirmButton: false,
+                          timer: 1500
+                      }).then(() => {
+                          location.reload();
+                      });
+                  } else {
+                      Swal.fire({
+                          icon: 'error',
+                          title: 'Error',
+                          text: data.message || 'Failed to restore brand'
+                      });
+                  }
+              })
+              .catch(error => {
+                  console.error('Error:', error);
+                  Swal.fire({
+                      icon: 'error',
+                      title: 'Error',
+                      text: 'Something went wrong!'
+                  });
+              });
+          }
+      });
+  }
+  </script>
+
+  <%- include('../../views/layout/admin/footer.ejs')%>

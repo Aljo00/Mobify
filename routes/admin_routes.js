@@ -126,11 +126,25 @@ admin_route.get(
   brandController.loadBrandPage
 );
 
-admin_route.post(
-  "/addBrands",
-  uploads.single("image"),
-  brandController.addBrands
+// Add these routes BEFORE the /:id route
+admin_route.get(
+  "/brands/deleted",
+  adminAuth.protectAdmin,
+  brandController.getDeletedBrands
 );
+
+admin_route.post(
+  "/brands/restore/:id",
+  adminAuth.protectAdmin,
+  brandController.restoreBrand
+);
+
+admin_route.get("/brands/top", brandController.getTopBrands);
+
+// These routes should come after the specific routes
+admin_route.get('/brands/:id', adminAuth.protectAdmin, brandController.getBrandById);
+admin_route.put('/brands/:id', adminAuth.protectAdmin, uploads.single('image'), brandController.updateBrand);
+admin_route.post('/brands/delete/:id', adminAuth.protectAdmin, brandController.deleteBrand);
 
 //Admin Prduct Management Routes
 admin_route.get(

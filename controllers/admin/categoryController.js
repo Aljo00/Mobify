@@ -198,7 +198,6 @@ const removeOffer = async (req, res) => {
 
 const getTopCategories = async (req, res) => {
   try {
-    console.log('⭐ Starting getTopCategories function');
 
     // First get active categories
     const categories = await Category.find({ 
@@ -242,8 +241,6 @@ const getTopCategories = async (req, res) => {
       }
     ]);
 
-    console.log(`Processed ${orders.length} categories with sales`);
-
     // Map the sales data to categories
     const categoriesWithStats = categories.map(category => {
       const salesData = orders.find(order => order._id === category.name) || {
@@ -272,14 +269,14 @@ const getTopCategories = async (req, res) => {
       percentage: Math.round((category.totalRevenue / maxRevenue) * 100) || 0
     }));
 
-    console.log('✅ Successfully processed top categories');
+    console.log('Successfully processed top categories');
 
     return res.status(200).json({
       categories: formattedCategories
     });
 
   } catch (error) {
-    console.error('❌ Error in getTopCategories:', error);
+    console.error('Error in getTopCategories:', error);
     return res.status(500).json({
       error: 'Failed to fetch top categories',
       details: error.message

@@ -4,5 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mobify</title>
+    <style>
+      /* Add necessary styles for preloader */
+      .preloader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #fff;
+        z-index: 1000;
+      }
+    </style>
   </head>
   <body>
+    <%- include('../../partials/preloader.ejs') %>

@@ -366,10 +366,8 @@ const orderSuccess = async (req, res) => {
     const orderId = req.query.id;
     console.log("Looking for order with ID:", orderId);
 
-    // Find the order and populate address
-    const order = await Order.findOne({ orderId })
-      .populate('address')
-      .exec();
+    // Find the order
+    const order = await Order.findOne({ orderId });
 
     console.log("Raw order from DB:", order); // Debug log
 
@@ -378,15 +376,20 @@ const orderSuccess = async (req, res) => {
       return res.redirect('/orders');
     }
 
+    // Fetch the address
+    const addressDoc = await Address.findOne({ userId: order.userId, 'address._id': order.address });
+    console.log("Address document:", addressDoc); // Debug log
+    const selectedAddress = addressDoc ? addressDoc.address.find(addr => addr._id.toString() === order.address.toString()) : null;
+
     // Extract address data safely
-    const formattedAddress = order.address ? {
-      type: order.address.addressType || 'N/A',
-      name: order.address.houseName || 'N/A',
-      city: order.address.city || 'N/A',
-      state: order.address.state || 'N/A',
-      pincode: order.address.pincode || 'N/A',
-      phone: order.address.phone || 'N/A',
-      alternatePhone: order.address.altPhone || 'N/A'
+    const formattedAddress = selectedAddress ? {
+      addressType: selectedAddress.addressType || 'N/A',
+      houseName: selectedAddress.houseName || 'N/A',
+      city: selectedAddress.city || 'N/A',
+      state: selectedAddress.state || 'N/A',
+      pincode: selectedAddress.pincode || 'N/A',
+      phone: selectedAddress.phone || 'N/A',
+      altPhone: selectedAddress.altPhone || 'N/A'
     } : null;
 
     // Format ordered items safely

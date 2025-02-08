@@ -457,7 +457,7 @@ const verifyRazorpayPayment = async (req, res) => {
 
     if (generatedSignature === razorpay_signature) {
       // Payment successful
-      order.status = "Processing";
+      order.status = "Pending";
       order.paymentDetails = {
         razorpay_payment_id,
         razorpay_order_id,
@@ -467,7 +467,7 @@ const verifyRazorpayPayment = async (req, res) => {
       // Update ordered items status
       order.orderedItems = order.orderedItems.map(item => ({
         ...item,
-        status: "Processing"
+        status: "Pending"
       }));
 
       // Now update product quantities

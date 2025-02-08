@@ -20,10 +20,6 @@ const categorySchema = new Schema(
       type: Number,
       default: 0,
     },
-    offerStartDate: {
-      type: Date, // Start date of the offer
-      default: null,
-    },
     offerEndDate: {
       type: Date, // End date of the offer
       default: null,

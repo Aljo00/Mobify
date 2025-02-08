@@ -119,13 +119,11 @@ const softDeleteCategory = async (req, res) => {
 const addOffer = async (req, res) => {
   try {
     console.log(req.body);
-    const { categoryId, offerPercentage, offerStartDate, offerEndDate } =
-      req.body;
+    const { categoryId, offerPercentage, offerEndDate } = req.body;
 
-    const startDate = new Date(offerStartDate);
     const endDate = new Date(offerEndDate);
-    if (!startDate || !endDate || startDate >= endDate) {
-      return res.status(400).json({ message: "Invalid start or end date" });
+    if (!endDate ) {
+      return res.status(400).json({ message: "Invalid end date" });
     }
 
     const category = await Category.findById(categoryId);
@@ -134,7 +132,6 @@ const addOffer = async (req, res) => {
     }
 
     category.categoryOffer = offerPercentage;
-    category.offerStartDate = startDate;
     category.offerEndDate = endDate;
     await category.save();
 
@@ -198,10 +195,9 @@ const removeOffer = async (req, res) => {
 
 const getTopCategories = async (req, res) => {
   try {
-
     // First get active categories
-    const categories = await Category.find({ 
-      isListed: true 
+    const categories = await Category.find({
+      isListed: true,
     }).lean();
 
     console.log(`Found ${categories.length} active categories`);
@@ -210,42 +206,42 @@ const getTopCategories = async (req, res) => {
     const orders = await Order.aggregate([
       {
         $match: {
-          'orderedItems.status': 'Delivered'
-        }
+          "orderedItems.status": "Delivered",
+        },
       },
       {
-        $unwind: '$orderedItems'
+        $unwind: "$orderedItems",
       },
       {
         $match: {
-          'orderedItems.status': 'Delivered'
-        }
+          "orderedItems.status": "Delivered",
+        },
       },
       {
         $lookup: {
-          from: 'products',
-          localField: 'orderedItems.product',
-          foreignField: '_id',
-          as: 'productInfo'
-        }
+          from: "products",
+          localField: "orderedItems.product",
+          foreignField: "_id",
+          as: "productInfo",
+        },
       },
       {
-        $unwind: '$productInfo'
+        $unwind: "$productInfo",
       },
       {
         $group: {
-          _id: '$productInfo.category',
-          totalSold: { $sum: '$orderedItems.quantity' },
-          totalRevenue: { $sum: '$orderedItems.totalPrice' }
-        }
-      }
+          _id: "$productInfo.category",
+          totalSold: { $sum: "$orderedItems.quantity" },
+          totalRevenue: { $sum: "$orderedItems.totalPrice" },
+        },
+      },
     ]);
 
     // Map the sales data to categories
-    const categoriesWithStats = categories.map(category => {
-      const salesData = orders.find(order => order._id === category.name) || {
+    const categoriesWithStats = categories.map((category) => {
+      const salesData = orders.find((order) => order._id === category.name) || {
         totalSold: 0,
-        totalRevenue: 0
+        totalRevenue: 0,
       };
 
       return {
@@ -253,7 +249,7 @@ const getTopCategories = async (req, res) => {
         totalSold: salesData.totalSold,
         totalRevenue: salesData.totalRevenue,
         currentOffer: category.categoryOffer || 0,
-        description: category.description
+        description: category.description,
       };
     });
 
@@ -263,23 +259,23 @@ const getTopCategories = async (req, res) => {
       .slice(0, 5);
 
     // Calculate percentages
-    const maxRevenue = Math.max(...topCategories.map(c => c.totalRevenue)) || 1;
-    const formattedCategories = topCategories.map(category => ({
+    const maxRevenue =
+      Math.max(...topCategories.map((c) => c.totalRevenue)) || 1;
+    const formattedCategories = topCategories.map((category) => ({
       ...category,
-      percentage: Math.round((category.totalRevenue / maxRevenue) * 100) || 0
+      percentage: Math.round((category.totalRevenue / maxRevenue) * 100) || 0,
     }));
 
-    console.log('Successfully processed top categories');
+    console.log("Successfully processed top categories");
 
     return res.status(200).json({
-      categories: formattedCategories
+      categories: formattedCategories,
     });
-
   } catch (error) {
-    console.error('Error in getTopCategories:', error);
+    console.error("Error in getTopCategories:", error);
     return res.status(500).json({
-      error: 'Failed to fetch top categories',
-      details: error.message
+      error: "Failed to fetch top categories",
+      details: error.message,
     });
   }
 };

@@ -8,7 +8,7 @@ const resetCouponOffer = async () => {
       isListed: true,
     });
 
-    console.log("coupon fetched:", coupons);
+    console.log("Coupon fetched:", coupons);
 
     for (const coupon of coupons) {
       try {

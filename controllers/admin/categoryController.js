@@ -137,12 +137,24 @@ const addOffer = async (req, res) => {
 
     const products = await Product.find({ category: category.name });
     products.forEach(async (product) => {
-      product.combos.forEach((combo) => {
-        combo.salePrice = Math.round(
-          combo.salePrice - combo.salePrice * (offerPercentage / 100)
-        );
-      });
-      await product.save();
+      if(product.offer){
+        if(product.offer < offerPercentage){
+          product.combos.forEach((combo) => {
+            combo.salePrice = Math.round(
+              combo.salePrice - combo.salePrice * (offerPercentage / 100)
+            );
+          });
+        }
+
+      }else{
+        product.combos.forEach((combo) => {
+          combo.salePrice = Math.round(
+            combo.salePrice - combo.salePrice * (offerPercentage / 100)
+          );
+        });
+        await product.save();
+      }
+      
     });
 
     res

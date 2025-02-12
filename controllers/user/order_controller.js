@@ -404,10 +404,17 @@ const orderSuccess = async (req, res) => {
       totalPrice: item.totalPrice || 0
     })) : [];
 
+    // Get status from the first ordered item (assuming all items have same status)
+    const orderStatus = order.orderedItems && order.orderedItems.length > 0 
+      ? order.orderedItems[0].status 
+      : 'Payment Pending'; // default status
+
+    console.log("Order status:", orderStatus);
+
     // Create view model with all required data
     const orderData = {
       orderId: order.orderId,
-      status: order.status,
+      status: orderStatus,
       totalPrice: order.totalPrice,
       createdAt: order.createdAt,
       formattedAddress,

@@ -292,6 +292,8 @@ user_router.post('/verify-cod-to-online', userAuth.protect, paymentController.ve
 
 user_router.get('/download-invoice/:orderId', userAuth.protect, accountController.downloadInvoice);
 
+user_router.get("/aboutus", userAuth.notProtect, user_controller.load_aboutPage);
+
 user_router.get("/logout", user_controller.logout);
 
 module.exports = user_router;

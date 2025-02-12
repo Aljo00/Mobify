@@ -1,0 +1,183 @@
+<%- include('../../views/layout/header.ejs') %>
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+<!-- AOS Animation -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<!-- Custom CSS -->
+<link rel="stylesheet" href="/styles/user/about.css" />
+
+<!-- About Us Section -->
+<div class="about-section">
+    <!-- Hero Section with Video Background -->
+    <div class="hero-section">
+        <video autoplay muted loop id="heroVideo">
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-person-scrolling-through-their-phone-43518-large.mp4" type="video/mp4">
+        </video>
+        <div class="hero-content" data-aos="fade-up">
+            <h1>Welcome to Mobify</h1>
+            <p class="subtitle">Where Innovation Meets Shopping</p>
+            <div class="hero-buttons">
+                <a href="#story" class="btn btn-primary btn-lg">Our Story</a>
+                <a href="#features" class="btn btn-outline-light btn-lg">Explore Features</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Story Section with Parallax -->
+    <div id="story" class="story-section parallax-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6" data-aos="fade-right">
+                    <div class="story-content">
+                        <h2>Our Journey</h2>
+                        <p>We're revolutionizing the mobile shopping experience with cutting-edge technology and user-centric design. Our platform brings together the best of e-commerce innovation and customer satisfaction.</p>
+                        <div class="story-highlights">
+                            <div class="highlight">
+                                <i class="fas fa-rocket"></i>
+                                <span>Launched in 2023</span>
+                            </div>
+                            <div class="highlight">
+                                <i class="fas fa-globe-americas"></i>
+                                <span>Global Reach</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6" data-aos="fade-left">
+                    <div class="floating-image">
+                        <img src="https://images.unsplash.com/photo-1601972599720-36938d4ecd31?w=500&auto=format" alt="Mobile Innovation" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Features Grid -->
+    <div id="features" class="features-grid">
+        <div class="container">
+            <h2 class="text-center mb-5" data-aos="fade-up">Experience the Future</h2>
+            <div class="row">
+                <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="100">
+                    <div class="feature-box">
+                        <div class="feature-icon">
+                            <i class="fas fa-mobile-screen-button"></i>
+                        </div>
+                        <h3>Smart Shopping</h3>
+                        <p>AI-powered recommendations tailored just for you</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="feature-box active">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-halved"></i>
+                        </div>
+                        <h3>Secure Platform</h3>
+                        <p>Advanced security for worry-free shopping</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="300">
+                    <div class="feature-box">
+                        <div class="feature-icon">
+                            <i class="fas fa-truck-fast"></i>
+                        </div>
+                        <h3>Express Delivery</h3>
+                        <p>Lightning-fast delivery to your doorstep</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Timeline -->
+    <div class="timeline-section">
+        <div class="container">
+            <h2 class="text-center mb-5" data-aos="fade-up">Our Evolution</h2>
+            <div class="timeline">
+                <div class="timeline-item" data-aos="fade-right">
+                    <div class="timeline-content">
+                        <h3>Platform Launch</h3>
+                        <p>Revolutionizing mobile shopping with our innovative platform</p>
+                    </div>
+                </div>
+                <div class="timeline-item" data-aos="fade-left">
+                    <div class="timeline-content">
+                        <h3>Global Expansion</h3>
+                        <p>Expanding our services across multiple countries</p>
+                    </div>
+                </div>
+                <div class="timeline-item" data-aos="fade-right">
+                    <div class="timeline-content">
+                        <h3>AI Integration</h3>
+                        <p>Implementing smart features for better user experience</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Cards Section -->
+    <div class="experience-section">
+        <div class="container">
+            <h2 class="text-center mb-5" data-aos="fade-up">Why Choose Mobify</h2>
+            <div class="row">
+                <div class="col-md-4" data-aos="flip-left" data-aos-delay="100">
+                    <div class="exp-card">
+                        <div class="exp-card-inner">
+                            <div class="exp-card-front">
+                                <i class="fas fa-headset"></i>
+                                <h3>24/7 Support</h3>
+                            </div>
+                            <div class="exp-card-back">
+                                <p>Round-the-clock customer service with real human support</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4" data-aos="flip-left" data-aos-delay="200">
+                    <div class="exp-card">
+                        <div class="exp-card-inner">
+                            <div class="exp-card-front">
+                                <i class="fas fa-gift"></i>
+                                <h3>Rewards</h3>
+                            </div>
+                            <div class="exp-card-back">
+                                <p>Earn points with every purchase and get exclusive deals</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4" data-aos="flip-left" data-aos-delay="300">
+                    <div class="exp-card">
+                        <div class="exp-card-inner">
+                            <div class="exp-card-front">
+                                <i class="fas fa-rotate-left"></i>
+                                <h3>Easy Returns</h3>
+                            </div>
+                            <div class="exp-card-back">
+                                <p>Hassle-free returns with our customer-first policy</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- AOS Animation -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<!-- Include jQuery before your script -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    AOS.init({
+        duration: 1000,
+        once: true
+    });
+</script>
+<%- include('../../views/layout/footer.ejs') %>

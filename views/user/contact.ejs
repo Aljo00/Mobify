@@ -1,0 +1,263 @@
+<%- include('../../views/layout/header.ejs') %>
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+
+<!-- Font Awesome -->
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+/>
+<!-- AOS Animation -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<!-- Custom CSS -->
+<link rel="stylesheet" href="/styles/user/contact.css" />
+
+<!-- Contact Us Section -->
+<div class="contact-section">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="hero-content" data-aos="fade-up">
+            <div class="hero-icon">
+                <i class="fas fa-comments"></i>
+            </div>
+            <h1>Let's Start a Conversation</h1>
+            <p class="subtitle">We're Here to Help You</p>
+        </div>
+        <div class="wave-shape">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+                <path fill="#ffffff" fill-opacity="1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+            </svg>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Contact Info Cards -->
+        <div class="contact-info">
+            <div class="row g-4">
+                <div class="col-md-3" data-aos="fade-up" data-aos-delay="100">
+                    <div class="info-card">
+                        <div class="icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <h3>Visit Us</h3>
+                        <p>123 Shopping Street<br>Silicon Valley, CA 94025</p>
+                    </div>
+                </div>
+                <div class="col-md-3" data-aos="fade-up" data-aos-delay="200">
+                    <div class="info-card">
+                        <div class="icon">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                        <h3>Call Us</h3>
+                        <p>+1 (555) 123-4567<br>Mon-Fri, 9:00-18:00</p>
+                    </div>
+                </div>
+                <div class="col-md-3" data-aos="fade-up" data-aos-delay="300">
+                    <div class="info-card">
+                        <div class="icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <h3>Email Us</h3>
+                        <p>support@mobify.com<br>info@mobify.com</p>
+                    </div>
+                </div>
+                <div class="col-md-3" data-aos="fade-up" data-aos-delay="400">
+                    <div class="info-card">
+                        <div class="icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <h3>Working Hours</h3>
+                        <p>Monday - Friday<br>9:00 AM - 6:00 PM</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Main Section -->
+        <div class="contact-main">
+            <div class="row g-4">
+                <!-- Contact Form -->
+                <div class="col-lg-7" data-aos="fade-right">
+                    <div class="contact-form">
+                        <div class="form-header">
+                            <div class="form-icon">
+                                <i class="fas fa-paper-plane"></i>
+                            </div>
+                            <h2>Send us a Message</h2>
+                            <p>We'll get back to you as soon as possible</p>
+                        </div>
+                        <form id="contactForm">
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="name" placeholder="Your Name" required>
+                                        <label for="name"><i class="fas fa-user"></i> Your Name</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="email" class="form-control" id="email" placeholder="Your Email" required>
+                                        <label for="email"><i class="fas fa-envelope"></i> Your Email</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="subject" placeholder="Subject" required>
+                                        <label for="subject"><i class="fas fa-heading"></i> Subject</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <textarea class="form-control" id="message" style="height: 150px" placeholder="Your Message" required></textarea>
+                                        <label for="message"><i class="fas fa-comment-alt"></i> Your Message</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-paper-plane me-2"></i>Send Message
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Contact Features -->
+                <div class="col-lg-5" data-aos="fade-left">
+                    <div class="contact-features">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-headset"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h3>24/7 Support</h3>
+                                <p>Our dedicated team is here to assist you around the clock</p>
+                            </div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h3>Quick Response</h3>
+                                <p>Get answers to your questions within hours</p>
+                            </div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h3>Secure Communication</h3>
+                                <p>Your information is safe and encrypted with us</p>
+                            </div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h3>Expert Team</h3>
+                                <p>Professional support from our experienced team</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Social Media Section -->
+        <div class="social-section" data-aos="fade-up">
+            <h2>Connect With Us</h2>
+            <p>Follow us on social media for updates and offers</p>
+            <div class="social-icons">
+                <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- AOS Animation -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<!-- Custom JS -->
+
+ <!-- Add SweetAlert2 CSS and JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-material-ui/material-ui.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Custom JS -->
+<script>
+    // Initialize AOS
+    AOS.init({
+        duration: 1000,
+        once: true
+    });
+
+    // Form Submission with Beautiful Notification
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const subject = document.getElementById('subject').value;
+        const message = document.getElementById('message').value;
+
+        if (name && email && subject && message) {
+            // Show loading state
+            Swal.fire({
+                title: 'Sending Message',
+                html: 'Please wait while we process your message...',
+                timer: 2000,
+                timerProgressBar: true,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            }).then(() => {
+                // Show success message
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Message Sent Successfully!',
+                    text: 'Thank you for contacting us. We will get back to you soon.',
+                    showConfirmButton: true,
+                    confirmButtonText: 'Great!',
+                    confirmButtonColor: '#6366f1',
+                    background: '#fff',
+                    iconColor: '#6366f1',
+                    customClass: {
+                        title: 'text-gray-800',
+                        content: 'text-gray-600'
+                    }
+                });
+                this.reset();
+            });
+        } else {
+            // Show error message if form is incomplete
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Please fill in all the required fields.',
+                confirmButtonColor: '#6366f1',
+                background: '#fff',
+                iconColor: '#ef4444'
+            });
+        }
+    });
+</script>
+<script>
+    // Initialize AOS
+    AOS.init({
+        duration: 1000,
+        once: true
+    });
+</script>
+
+<%- include('../../views/layout/footer.ejs') %>

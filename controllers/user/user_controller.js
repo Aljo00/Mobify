@@ -376,6 +376,62 @@ const load_aboutPage = async (req, res) => {
   }
 };
 
+const load_contactPage = async (req, res) => {
+  try {
+    const user = req.user;
+    
+    // Fetch active brands
+    const brand = await Brand.find({ isBlocked: false});
+    // Get cart item count from session or calculate it
+    let cartItemCount = 0;
+    let userData = null;
+
+    let wishlistItems = [];
+    if (user) {
+      const userId = user.id;
+
+      if (userId) {
+        const userWishlist = await Wishlist.findOne({ userId }).lean();
+        if (userWishlist) {
+          wishlistItems = userWishlist.items.map((item) =>
+            item.ProductId.toString()
+          );
+        }
+      }
+
+      const userCart = await cart.findOne({
+        userId: new mongoose.Types.ObjectId(userId),
+      });
+
+      cartItemCount = userCart ? userCart.items.length : 0;
+
+      // Fetch user details from the database
+      userData = await User.findById(userId);
+
+      // Generate initials if no profile picture exists
+      if (!userData.profileImage) {
+        const name = userData.name || "";
+        userData.initials = name
+          .replace(/\s+/g, "") // Remove all spaces in the name
+          .slice(0, 2) // Take the first two characters
+          .toUpperCase(); // Convert to uppercase
+      }
+    } else {
+      console.log("User not logged in or session not set.");
+    }
+
+    res.render('user/contact', { 
+      user,
+      brand,
+      cartItemCount,
+      userData,
+      wishlistItems
+    });
+  } catch (error) {
+    res.redirect('/page404');
+  }
+};
+
 module.exports = {
   load_homePage,
   load_page404,
@@ -389,5 +445,6 @@ module.exports = {
   resendOtp,
   verifyLogin,
   logout,
-  load_aboutPage
+  load_aboutPage,
+  load_contactPage
 };

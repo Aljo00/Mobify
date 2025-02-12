@@ -294,6 +294,8 @@ user_router.get('/download-invoice/:orderId', userAuth.protect, accountControlle
 
 user_router.get("/aboutus", userAuth.notProtect, user_controller.load_aboutPage);
 
+user_router.get("/contactus", userAuth.notProtect, user_controller.load_contactPage);
+
 user_router.get("/logout", user_controller.logout);
 
 module.exports = user_router;

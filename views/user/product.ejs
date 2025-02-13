@@ -151,13 +151,6 @@
           >
             <button class="btn btn-success">Add to Cart</button>
           </a>
-
-          <a
-            id="buyNowBtn"
-            href="/buy-now/<%= product._id %>?ram=<%= product.combos[0].ram %>&storage=<%= product.combos[0].storage %>&color=<%= product.combos[0].color %>"
-          >
-            <button class="btn btn-primary">Buy Now</button>
-          </a>
           <% } else { %>
           <button class="btn btn-danger" disabled>Out of Stock</button>
           <% } %>

@@ -617,11 +617,6 @@
           <h2>
             <% if (order.status === "Payment Pending") { %>
               Order Created - Payment Pending
-              <div class="mt-4">
-                <a href="/payment/<%= order.orderId %>" class="action-button payment-pending">
-                  <i class="fas fa-credit-card me-2"></i>Complete Payment
-                </a>
-              </div>
             <% } else { %>
               Order Placed Successfully!
             <% } %>

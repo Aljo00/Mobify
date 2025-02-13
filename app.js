@@ -34,7 +34,7 @@ const resetCouponOffer = require("./helpers/couponResetting");
 const cron = require("node-cron");
 
 // Run every minute for testing
-cron.schedule("* * * * *", async () => {
+cron.schedule("0 0 * * *", async () => {
   const now = new Date();
   console.log("Cron job started at", now);
 
